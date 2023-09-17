@@ -1,0 +1,10 @@
+{
+  "create_trainwrecked.create_trainwrecked.train_assembly.no_engines": "Engine Not Found",
+  "create_trainwrecked.create_trainwrecked.train_assembly.too_many_bogeys": "Too Many Bogeys",
+  "text.create_trainwrecked.jei.train_engine.acceleration": "Acceleration: %s blocks/sec\u00B2",
+  "text.create_trainwrecked.jei.train_engine.heat_durability": "Heat Durability: %s sec",
+  "text.create_trainwrecked.jei.train_engine.max_bogey": "Max. Bogey: %s",
+  "text.create_trainwrecked.jei.train_engine.max_fuel_usage": "Max. Fuel Usage: %s mB/sec",
+  "text.create_trainwrecked.jei.train_engine.max_speed": "Max. Speed: %s blocks/sec",
+  "text.create_trainwrecked.jei.train_engine.title": "Train Engine"
+}

@@ -1,0 +1,12 @@
+{
+  "type": "create_trainwrecked:train_engine",
+  "blockType": "createindustry:diesel_engine",
+  "maxSpeed": 50.0,
+  "acceleration": 10.0,
+  "fuelType": "#forge:diesel",
+  "fuelPerSpeed": 1.0,
+  "heatCapacity": 144000,
+  "heatPerFuel": 10,
+  "airCoolingRate": 20,
+  "burnOutDuration": 6000
+}

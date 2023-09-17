@@ -1,0 +1,12 @@
+{
+  "type": "create_trainwrecked:train_engine",
+  "blockType": "create:steam_engine",
+  "maxSpeed": 30.0,
+  "acceleration": 1.0,
+  "fuelType": "#minecraft:water",
+  "fuelPerSpeed": 1.0,
+  "heatCapacity": 33600,
+  "heatPerFuel": 10,
+  "airCoolingRate": 20,
+  "burnOutDuration": 6000
+}

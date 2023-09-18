@@ -1,9 +1,9 @@
 {
   "type": "create_trainwrecked:train_engine",
   "blockType": "create:steam_engine",
-  "maxSpeed": 30.0,
-  "acceleration": 0.5,
-  "fuelType": "#minecraft:water",
+  "maxSpeed": 50.0,
+  "acceleration": 0.8333333,
+  "fuelType": "minecraft:water",
   "fuelShare": true,
   "fuelMinimum": 108.0,
   "fuelPerSpeed": 0.0,

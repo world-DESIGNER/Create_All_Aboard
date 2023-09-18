@@ -382,10 +382,10 @@ public class TrainHelper
 
 		if (engineMap.size() > 0 && !Mth.equal(speed, 0.0D))
 		{
-			float maxSpeed = train.maxSpeed();
-			double currentSpeedRatio = Math.abs(speed) / maxSpeed;
+			double maxSpeed = train.maxSpeed();
+			double targetSpeed = train.targetSpeed;
 			double reductionRatio = maxSpeed / maxSpeedBeforeReduction(train);
-			double targetSpeedRatio = Math.abs(train.targetSpeed) / maxSpeed;
+			double targetSpeedRatio = Math.abs(targetSpeed) / maxSpeed;
 			double absNextSpeed = 0.0D;
 
 			for (Entry<TrainEngineRecipe, List<Engine>> entry : engineMap.entrySet())
@@ -393,10 +393,8 @@ public class TrainHelper
 				TrainEngineRecipe recipe = entry.getKey();
 				List<Engine> engines = entry.getValue();
 				int duplicatedRecipeCount = engines.size() - 1;
-				double engineMaxSpeed = recipe.getMaxSpeed();
-				double engineCurrentTarget = currentSpeedRatio * engineMaxSpeed;
-				double engineAllocatedTarget = targetSpeedRatio * engineMaxSpeed;
-				double toBurn = recipe.getFuelUsage(duplicatedRecipeCount, engineCurrentTarget) / 20.0D;
+				double allocatedSpeed = targetSpeedRatio * (double) recipe.getMaxSpeed();
+				double toBurn = recipe.getFuelUsage(duplicatedRecipeCount, allocatedSpeed) / 20.0D;
 
 				if (recipe.isFuelShare())
 				{
@@ -405,7 +403,7 @@ public class TrainHelper
 
 					for (Engine engine : engines)
 					{
-						engine.onFuelBurned(eachBurned, engineAllocatedTarget);
+						engine.onFuelBurned(eachBurned, allocatedSpeed);
 					}
 
 				}
@@ -414,7 +412,7 @@ public class TrainHelper
 					for (Engine engine : engines)
 					{
 						double burned = engine.getFuelBurner().burn(train, recipe.getFuelType(), toBurn);
-						engine.onFuelBurned(burned, engineAllocatedTarget);
+						engine.onFuelBurned(burned, allocatedSpeed);
 					}
 
 				}
@@ -426,9 +424,7 @@ public class TrainHelper
 
 			}
 
-			absNextSpeed = Math.min(absNextSpeed, maxSpeed);
-
-			if (speed < 0)
+			if (targetSpeed < 0)
 			{
 				absNextSpeed = -absNextSpeed;
 			}

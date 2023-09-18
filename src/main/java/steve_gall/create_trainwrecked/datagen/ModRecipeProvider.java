@@ -10,6 +10,7 @@ import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import steve_gall.create_trainwrecked.common.CreateTrainwrecked;
 import steve_gall.create_trainwrecked.common.recipe.ConditionFinishedRecipe;
@@ -29,9 +30,9 @@ public class ModRecipeProvider extends RecipeProvider
 	{
 		TrainEngineRecipe.Builder steam = new TrainEngineRecipe.Builder();
 		steam.blockType(ItemTagEntry.TYPE.of(AllBlocks.STEAM_ENGINE.get()));
-		steam.maxSpeed(30.0F);
+		steam.maxSpeed(50.0F);
 		steam.acceleration(steam.maxSpeed() / 60.0F);
-		steam.fuelType(FluidTagEntry.TYPE.of(FluidTags.WATER));
+		steam.fuelType(FluidTagEntry.TYPE.of(Fluids.WATER));
 		steam.fuelShare(true);
 		steam.fuelMinimum(6480.0F / 60.0F);
 		steam.fuelPerRecipePow(2.0F);
@@ -42,7 +43,7 @@ public class ModRecipeProvider extends RecipeProvider
 
 		TrainEngineRecipe.Builder diesel = new TrainEngineRecipe.Builder();
 		diesel.blockType(ItemTagEntry.TYPE.of(CIBlocks.DIESEL_ENGINE.get()));
-		diesel.maxSpeed(50.0F);
+		diesel.maxSpeed(30.0F);
 		diesel.acceleration(diesel.maxSpeed() / 5.0F);
 		diesel.fuelType(FluidTagEntry.TYPE.of(FluidTags.create(new ResourceLocation("forge", "diesel"))));
 		diesel.fuelPerSpeed(1.0F);

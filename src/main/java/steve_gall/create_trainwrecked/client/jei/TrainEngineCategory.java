@@ -85,19 +85,19 @@ public class TrainEngineCategory implements IRecipeCategory<TrainEngineRecipe>
 		font.draw(stack, new TranslatableComponent(TEXT_MAX_BOGEY, recipe.getMaxBogeyCount()), textX, textY, 0x000000);
 		textY += font.lineHeight;
 
-		font.draw(stack, new TranslatableComponent(TEXT_MAX_SPEED, maxSpeed), textX, textY, 0x000000);
+		font.draw(stack, new TranslatableComponent(TEXT_MAX_SPEED, String.format("%.2f", recipe.getMaxSpeed())), textX, textY, 0x000000);
 		textY += font.lineHeight;
 
-		font.draw(stack, new TranslatableComponent(TEXT_ACCELERATION, recipe.getAcceleration()), textX, textY, 0x000000);
+		font.draw(stack, new TranslatableComponent(TEXT_ACCELERATION, String.format("%.2f", recipe.getAcceleration())), textX, textY, 0x000000);
 		textY += font.lineHeight;
 
-		font.draw(stack, new TranslatableComponent(TEXT_MAX_FUEL_USAGE, maxFuelUsage), textX, textY, 0x000000);
+		font.draw(stack, new TranslatableComponent(TEXT_MAX_FUEL_USAGE, String.format("%.1f", maxFuelUsage)), textX, textY, 0x000000);
 		textY += font.lineHeight;
 
 		if (recipe.getHeatPerFuel() > 0)
 		{
 			double heatDuration = recipe.getHeatDuration(maxFuelUsage);
-			font.draw(stack, new TranslatableComponent(TEXT_HEAT_DURABILITY, heatDuration), textX, textY, 0x000000);
+			font.draw(stack, new TranslatableComponent(TEXT_HEAT_DURABILITY, String.format("%.2f", heatDuration)), textX, textY, 0x000000);
 			textY += font.lineHeight;
 		}
 

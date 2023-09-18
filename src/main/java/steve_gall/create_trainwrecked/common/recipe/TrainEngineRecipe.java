@@ -60,11 +60,11 @@ public class TrainEngineRecipe implements SerializableRecipe<Container>
 
 	public double getFuelUsage(int sameRecipeCount, double speed)
 	{
-		float minimm = this.getFuelMinimum();
+		float minimum = this.getFuelMinimum();
 		float perSpeed = this.getFuelPerSpeed();
 		float perRecipe = this.getFuelPerRecipe();
 		float perRecipePow = this.getFuelPerRecipePow();
-		return minimm + (speed * perSpeed) + (perRecipe * sameRecipeCount) + Math.pow(perRecipePow, sameRecipeCount);
+		return minimum + (speed * perSpeed) + (perRecipe * sameRecipeCount) + (perRecipePow != 0.0F ? Math.pow(perRecipePow, sameRecipeCount) : 0.0F);
 	}
 
 	public static int getMaxBogeyCount(double totalSpeed)

@@ -56,7 +56,7 @@ public class Engine
 		}
 		else if (burned > 0)
 		{
-			this.setSpeed(allocatedSpeed);
+			this.setSpeed(allocatedSpeed / 20.0D);
 		}
 		else
 		{

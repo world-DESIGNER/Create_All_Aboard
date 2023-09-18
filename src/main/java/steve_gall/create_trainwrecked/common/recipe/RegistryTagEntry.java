@@ -2,6 +2,7 @@ package steve_gall.create_trainwrecked.common.recipe;
 
 import com.google.gson.JsonElement;
 
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.tags.TagKey;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -60,6 +61,13 @@ public abstract class RegistryTagEntry<VALUE extends IForgeRegistryEntry<VALUE>,
 	{
 		RegistryTagEntryType<VALUE, INGREDIENT, RegistryTagEntry<VALUE, INGREDIENT>> type = (RegistryTagEntryType<VALUE, INGREDIENT, RegistryTagEntry<VALUE, INGREDIENT>>) this.getType();
 		type.toNetwork(buffer, this);
+	}
+
+	@SuppressWarnings("unchecked")
+	public CompoundTag toNBT()
+	{
+		RegistryTagEntryType<VALUE, INGREDIENT, RegistryTagEntry<VALUE, INGREDIENT>> type = (RegistryTagEntryType<VALUE, INGREDIENT, RegistryTagEntry<VALUE, INGREDIENT>>) this.getType();
+		return type.toNBT(this);
 	}
 
 }

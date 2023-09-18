@@ -3,6 +3,7 @@ package steve_gall.create_trainwrecked.common.recipe;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -49,6 +50,16 @@ public interface RegistryTagEntryType<VALUE extends IForgeRegistryEntry<VALUE>, 
 	public default void toNetwork(FriendlyByteBuf buffer, ENTRY entry)
 	{
 		entry.getTagEntry().toNetwork(buffer);
+	}
+
+	public default ENTRY fromNBT(CompoundTag tag)
+	{
+		return this.of(WrappedTagEntry.fromNBT(tag));
+	}
+
+	public default CompoundTag toNBT(ENTRY entry)
+	{
+		return entry.getTagEntry().toNBT();
 	}
 
 	public default ENTRY of(VALUE value)

@@ -4,6 +4,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -47,6 +49,14 @@ public record WrappedTagEntry(ResourceLocation id, boolean isTag, boolean isRequ
 		return new WrappedTagEntry(id, isTag, isRequired);
 	}
 
+	public static WrappedTagEntry fromNBT(CompoundTag tag)
+	{
+		ResourceLocation id = ResourceLocation.CODEC.decode(NbtOps.INSTANCE, tag.get("id")).result().get().getFirst();
+		boolean isTag = tag.getBoolean("isTag");
+		boolean isRequired = tag.getBoolean("isRequired");
+		return new WrappedTagEntry(id, isTag, isRequired);
+	}
+
 	public JsonElement toJson()
 	{
 
@@ -78,6 +88,15 @@ public record WrappedTagEntry(ResourceLocation id, boolean isTag, boolean isRequ
 		buffer.writeResourceLocation(this.id());
 		buffer.writeBoolean(this.isTag());
 		buffer.writeBoolean(this.isRequired());
+	}
+
+	public CompoundTag toNBT()
+	{
+		CompoundTag tag = new CompoundTag();
+		tag.put("id", ResourceLocation.CODEC.encodeStart(NbtOps.INSTANCE, this.id()).result().get());
+		tag.putBoolean("isTag", this.isTag());
+		tag.putBoolean("isRequired", this.isRequired());
+		return tag;
 	}
 
 }

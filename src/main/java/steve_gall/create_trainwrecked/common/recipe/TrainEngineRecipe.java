@@ -24,9 +24,11 @@ public class TrainEngineRecipe implements SerializableRecipe<Container>
 	private final float maxSpeed;
 	private final float acceleration;
 	private final FluidTagEntry fuelType;
+	private final boolean fuelShare;
+	private final float fuelMinimum;
 	private final float fuelPerSpeed;
-	private final float fuelPerBogey;
-	private final float fuelPerBogeyPow2;
+	private final float fuelPerRecipe;
+	private final float fuelPerRecipePow;
 	private final int heatCapacity;
 	private final int heatPerFuel;
 	private final int airCoolingRate;
@@ -42,9 +44,11 @@ public class TrainEngineRecipe implements SerializableRecipe<Container>
 		this.maxSpeed = builder.maxSpeed();
 		this.acceleration = builder.acceleration();
 		this.fuelType = builder.fuelType();
+		this.fuelShare = builder.fuelShare();
+		this.fuelMinimum = builder.fuelMinimum();
 		this.fuelPerSpeed = builder.fuelPerSpeed();
-		this.fuelPerBogey = builder.fuelPerBogey();
-		this.fuelPerBogeyPow2 = builder.fuelPerBogeyPow2();
+		this.fuelPerRecipe = builder.fuelPerRecipe();
+		this.fuelPerRecipePow = builder.fuelPerRecipePow();
 		this.heatCapacity = builder.heatCapacity();
 		this.heatPerFuel = builder.heatPerFuel();
 		this.airCoolingRate = builder.airCoolingRate();
@@ -52,6 +56,15 @@ public class TrainEngineRecipe implements SerializableRecipe<Container>
 
 		this.block = this.blockType.toIngredient();
 		this.fuel = this.fuelType.toIngredient();
+	}
+
+	public double getFuelUsage(int sameRecipeCount, double speed)
+	{
+		float minimm = this.getFuelMinimum();
+		float perSpeed = this.getFuelPerSpeed();
+		float perRecipe = this.getFuelPerRecipe();
+		float perRecipePow = this.getFuelPerRecipePow();
+		return minimm + (speed * perSpeed) + (perRecipe * sameRecipeCount) + Math.pow(perRecipePow, sameRecipeCount);
 	}
 
 	public static int getMaxBogeyCount(double totalSpeed)
@@ -62,6 +75,11 @@ public class TrainEngineRecipe implements SerializableRecipe<Container>
 	public int getMaxBogeyCount()
 	{
 		return getMaxBogeyCount(this.getMaxSpeed());
+	}
+
+	public double getHeatDuration(double maxFuelUsage)
+	{
+		return this.getHeatCapacity() / ((this.getHeatPerFuel() * maxFuelUsage) - this.getAirCoolingRate());
 	}
 
 	@Override
@@ -107,9 +125,11 @@ public class TrainEngineRecipe implements SerializableRecipe<Container>
 		pJson.addProperty("maxSpeed", this.getMaxSpeed());
 		pJson.addProperty("acceleration", this.getAcceleration());
 		pJson.add("fuelType", this.getFuelType().toJson());
+		pJson.addProperty("fuelShare", this.isFuelShare());
+		pJson.addProperty("fuelMinimum", this.getFuelMinimum());
 		pJson.addProperty("fuelPerSpeed", this.getFuelPerSpeed());
-		pJson.addProperty("fuelPerBogey", this.getFuelPerBogey());
-		pJson.addProperty("fuelPerBogeyPow2", this.getFuelPerBogeyPow2());
+		pJson.addProperty("fuelPerRecipe", this.getFuelPerRecipe());
+		pJson.addProperty("fuelPerRecipePow", this.getFuelPerRecipePow());
 		pJson.addProperty("heatCapacity", this.getHeatCapacity());
 		pJson.addProperty("heatPerFuel", this.getHeatPerFuel());
 		pJson.addProperty("airCoolingRate", this.getAirCoolingRate());
@@ -123,9 +143,11 @@ public class TrainEngineRecipe implements SerializableRecipe<Container>
 		pBuffer.writeFloat(this.getMaxSpeed());
 		pBuffer.writeFloat(this.getAcceleration());
 		this.getFuelType().toNetwork(pBuffer);
+		pBuffer.writeBoolean(this.isFuelShare());
+		pBuffer.writeFloat(this.getFuelMinimum());
 		pBuffer.writeFloat(this.getFuelPerSpeed());
-		pBuffer.writeFloat(this.getFuelPerBogey());
-		pBuffer.writeFloat(this.getFuelPerBogeyPow2());
+		pBuffer.writeFloat(this.getFuelPerRecipe());
+		pBuffer.writeFloat(this.getFuelPerRecipePow());
 		pBuffer.writeInt(this.getHeatCapacity());
 		pBuffer.writeInt(this.getHeatPerFuel());
 		pBuffer.writeInt(this.getAirCoolingRate());
@@ -168,19 +190,29 @@ public class TrainEngineRecipe implements SerializableRecipe<Container>
 		return this.fuel;
 	}
 
+	public boolean isFuelShare()
+	{
+		return this.fuelShare;
+	}
+
+	public float getFuelMinimum()
+	{
+		return this.fuelMinimum;
+	}
+
 	public float getFuelPerSpeed()
 	{
 		return this.fuelPerSpeed;
 	}
 
-	public float getFuelPerBogey()
+	public float getFuelPerRecipe()
 	{
-		return this.fuelPerBogey;
+		return this.fuelPerRecipe;
 	}
 
-	public float getFuelPerBogeyPow2()
+	public float getFuelPerRecipePow()
 	{
-		return this.fuelPerBogeyPow2;
+		return this.fuelPerRecipePow;
 	}
 
 	public int getHeatCapacity()
@@ -209,9 +241,11 @@ public class TrainEngineRecipe implements SerializableRecipe<Container>
 		private float maxSpeed = 0.0F;
 		private float acceleration = 0.0F;
 		private FluidTagEntry fuelType = FluidTagEntry.TYPE.empty();
+		private boolean fuelShare = false;
+		private float fuelMinimum = 0.0F;
 		private float fuelPerSpeed = 0.0F;
-		private float fuelPerBogey = 0.0F;
-		private float fuelPerBogeyPow2 = 0.0F;
+		private float fuelPerRecipe = 0.0F;
+		private float fuelPerRecipePow = 0.0F;
 		private int heatCapacity = 0;
 		private int heatPerFuel = 0;
 		private int airCoolingRate = 0;
@@ -228,9 +262,11 @@ public class TrainEngineRecipe implements SerializableRecipe<Container>
 			this.maxSpeed(GsonHelper.getAsFloat(pJson, "maxSpeed"));
 			this.acceleration(GsonHelper.getAsFloat(pJson, "acceleration"));
 			this.fuelType(FluidTagEntry.TYPE.getAsTagEntry(pJson, "fuelType"));
+			this.fuelShare(GsonHelper.getAsBoolean(pJson, "fuelShare"));
+			this.fuelMinimum(GsonHelper.getAsFloat(pJson, "fuelMinimum"));
 			this.fuelPerSpeed(GsonHelper.getAsFloat(pJson, "fuelPerSpeed"));
-			this.fuelPerBogey(GsonHelper.getAsFloat(pJson, "fuelPerBogey"));
-			this.fuelPerBogeyPow2(GsonHelper.getAsFloat(pJson, "fuelPerBogeyPow2"));
+			this.fuelPerRecipe(GsonHelper.getAsFloat(pJson, "fuelPerRecipe"));
+			this.fuelPerRecipePow(GsonHelper.getAsFloat(pJson, "fuelPerRecipePow"));
 			this.heatCapacity(GsonHelper.getAsInt(pJson, "heatCapacity"));
 			this.heatPerFuel(GsonHelper.getAsInt(pJson, "heatPerFuel"));
 			this.airCoolingRate(GsonHelper.getAsInt(pJson, "airCoolingRate"));
@@ -243,9 +279,11 @@ public class TrainEngineRecipe implements SerializableRecipe<Container>
 			this.maxSpeed(pBuffer.readFloat());
 			this.acceleration(pBuffer.readFloat());
 			this.fuelType(FluidTagEntry.TYPE.fromNetwork(pBuffer));
+			this.fuelShare(pBuffer.readBoolean());
+			this.fuelMinimum(pBuffer.readFloat());
 			this.fuelPerSpeed(pBuffer.readFloat());
-			this.fuelPerBogey(pBuffer.readFloat());
-			this.fuelPerBogeyPow2(pBuffer.readFloat());
+			this.fuelPerRecipe(pBuffer.readFloat());
+			this.fuelPerRecipePow(pBuffer.readFloat());
 			this.heatCapacity(pBuffer.readInt());
 			this.heatPerFuel(pBuffer.readInt());
 			this.airCoolingRate(pBuffer.readInt());
@@ -275,7 +313,7 @@ public class TrainEngineRecipe implements SerializableRecipe<Container>
 
 		public Builder maxSpeed(float maxSpeed)
 		{
-			this.maxSpeed = maxSpeed;
+			this.maxSpeed = Math.max(maxSpeed, 0.0F);
 			return this;
 		}
 
@@ -286,7 +324,7 @@ public class TrainEngineRecipe implements SerializableRecipe<Container>
 
 		public Builder acceleration(float acceleration)
 		{
-			this.acceleration = acceleration;
+			this.acceleration = Math.max(acceleration, 0.0F);
 			return this;
 		}
 
@@ -301,6 +339,28 @@ public class TrainEngineRecipe implements SerializableRecipe<Container>
 			return this;
 		}
 
+		public boolean fuelShare()
+		{
+			return this.fuelShare;
+		}
+
+		public Builder fuelShare(boolean fuelShare)
+		{
+			this.fuelShare = fuelShare;
+			return this;
+		}
+
+		public float fuelMinimum()
+		{
+			return this.fuelMinimum;
+		}
+
+		public Builder fuelMinimum(float fuelMinimum)
+		{
+			this.fuelMinimum = Math.max(fuelMinimum, 0.0F);
+			return this;
+		}
+
 		public float fuelPerSpeed()
 		{
 			return this.fuelPerSpeed;
@@ -308,29 +368,29 @@ public class TrainEngineRecipe implements SerializableRecipe<Container>
 
 		public Builder fuelPerSpeed(float fuelPerSpeed)
 		{
-			this.fuelPerSpeed = fuelPerSpeed;
+			this.fuelPerSpeed = Math.max(fuelPerSpeed, 0.0F);
 			return this;
 		}
 
-		public float fuelPerBogey()
+		public float fuelPerRecipe()
 		{
-			return this.fuelPerBogey;
+			return this.fuelPerRecipe;
 		}
 
-		public Builder fuelPerBogey(float fuelPerBogey)
+		public Builder fuelPerRecipe(float fuelPerRecipe)
 		{
-			this.fuelPerBogey = fuelPerBogey;
+			this.fuelPerRecipe = Math.max(fuelPerRecipe, 0.0F);
 			return this;
 		}
 
-		public float fuelPerBogeyPow2()
+		public float fuelPerRecipePow()
 		{
-			return this.fuelPerBogeyPow2;
+			return this.fuelPerRecipePow;
 		}
 
-		public Builder fuelPerBogeyPow2(float fuelPerBogeyPow2)
+		public Builder fuelPerRecipePow(float fuelPerRecipePow)
 		{
-			this.fuelPerBogeyPow2 = fuelPerBogeyPow2;
+			this.fuelPerRecipePow = Math.max(fuelPerRecipePow, 0.0F);
 			return this;
 		}
 
@@ -341,7 +401,7 @@ public class TrainEngineRecipe implements SerializableRecipe<Container>
 
 		public Builder heatCapacity(int heatCapacity)
 		{
-			this.heatCapacity = heatCapacity;
+			this.heatCapacity = Math.max(heatCapacity, 0);
 			return this;
 		}
 
@@ -352,7 +412,7 @@ public class TrainEngineRecipe implements SerializableRecipe<Container>
 
 		public Builder heatPerFuel(int heatPerFuel)
 		{
-			this.heatPerFuel = heatPerFuel;
+			this.heatPerFuel = Math.max(heatPerFuel, 0);
 			return this;
 		}
 
@@ -374,7 +434,7 @@ public class TrainEngineRecipe implements SerializableRecipe<Container>
 
 		public Builder burnOutDuration(int burnOutDuration)
 		{
-			this.burnOutDuration = burnOutDuration;
+			this.burnOutDuration = Math.max(burnOutDuration, 0);
 			return this;
 		}
 

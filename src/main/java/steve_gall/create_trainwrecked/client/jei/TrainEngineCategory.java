@@ -77,20 +77,30 @@ public class TrainEngineCategory implements IRecipeCategory<TrainEngineRecipe>
 	{
 		Minecraft minecraft = Minecraft.getInstance();
 		Font font = minecraft.font;
-		float maxFuelUsage = recipe.getFuelPerSpeed() * recipe.getMaxSpeed();
+		float maxSpeed = recipe.getMaxSpeed();
+		double maxFuelUsage = recipe.getFuelUsage(0, maxSpeed);
 
 		int textX = 26;
 		int textY = 4;
 		font.draw(stack, new TranslatableComponent(TEXT_MAX_BOGEY, recipe.getMaxBogeyCount()), textX, textY, 0x000000);
 		textY += font.lineHeight;
-		font.draw(stack, new TranslatableComponent(TEXT_MAX_SPEED, recipe.getMaxSpeed()), textX, textY, 0x000000);
+
+		font.draw(stack, new TranslatableComponent(TEXT_MAX_SPEED, maxSpeed), textX, textY, 0x000000);
 		textY += font.lineHeight;
+
 		font.draw(stack, new TranslatableComponent(TEXT_ACCELERATION, recipe.getAcceleration()), textX, textY, 0x000000);
 		textY += font.lineHeight;
+
 		font.draw(stack, new TranslatableComponent(TEXT_MAX_FUEL_USAGE, maxFuelUsage), textX, textY, 0x000000);
 		textY += font.lineHeight;
-		font.draw(stack, new TranslatableComponent(TEXT_HEAT_DURABILITY, recipe.getHeatCapacity() / ((recipe.getHeatPerFuel() * maxFuelUsage) - recipe.getAirCoolingRate())), textX, textY, 0x000000);
-		textY += font.lineHeight;
+
+		if (recipe.getHeatPerFuel() > 0)
+		{
+			double heatDuration = recipe.getHeatDuration(maxFuelUsage);
+			font.draw(stack, new TranslatableComponent(TEXT_HEAT_DURABILITY, heatDuration), textX, textY, 0x000000);
+			textY += font.lineHeight;
+		}
+
 	}
 
 	@Override

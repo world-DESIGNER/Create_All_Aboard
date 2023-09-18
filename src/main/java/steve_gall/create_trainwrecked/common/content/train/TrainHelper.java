@@ -299,11 +299,8 @@ public class TrainHelper
 			if (contraption.containsBlockBreakers())
 				self.award(AllAdvancements.CONTRAPTION_ACTORS);
 
-			if (contraption instanceof CarriageContraptionExtension cce && carriage instanceof CarriageExtension ce)
-			{
-				ce.getEngines().addAll(cce.getAssembledEnginePos().stream().map(Engine::new).toList());
-			}
-
+			List<EnginPos> assembledEnginePos = ((CarriageContraptionExtension) contraption).getAssembledEnginePos();
+			((CarriageExtension) carriage).getEngines().addAll(assembledEnginePos.stream().map(Engine::new).toList());
 		}
 
 		GlobalStation station = self.getStation();
@@ -335,57 +332,116 @@ public class TrainHelper
 			engine.tick(train, level);
 		}
 
-//		CreateTrainwrecked.LOGGER.info("targetSpeed:" + String.format("%.3f", train.targetSpeed) + " b/s, speed: " + String.format("%.3f", train.speed) + " b/s, delta: " + getSpeedDelta(train) + " b/t");
+		System.out.println("targetSpeed:" + String.format("%.3f", train.targetSpeed * 20) + " b/s, speed: " + String.format("%.3f", train.speed * 20) + " b/s");
 	}
 
-	public static void controlBySpeedReference(Train train, double targetSpeed)
+	public static double getPredictSpeed(Train train, double speed, double targetSpeed, float accelerationMod)
 	{
-		double speed = train.speed;
-
 		if (Mth.equal(speed, targetSpeed))
 		{
-			return;
+			return speed;
 		}
 
-		double acceleration = getBogeySpeedReduction(train);
+		double delta = getSpeedDelta(train, speed, targetSpeed) * accelerationMod;
 
 		if (speed < targetSpeed)
 		{
-			speed = Math.min(speed + acceleration, targetSpeed);
+			speed = Math.min(speed + delta, targetSpeed);
 		}
 		else if (speed > targetSpeed)
 		{
-			speed = Math.max(speed - acceleration, targetSpeed);
+			speed = Math.max(speed - delta, targetSpeed);
 		}
 
-		train.speed = speed;
+		return speed;
 	}
 
 	public static void applyFuelSpeed(Train train)
 	{
-		Map<Engine, Float> speedMap = streamEngines(train).collect(Collectors.toMap(e -> e, e -> e.getRecipe().getMaxSpeed()));
+		TrainExtension trainE = ((TrainExtension) train);
+		float acelerationMod = 0.0F;
 		double speed = train.speed;
 
-		if (speedMap.size() > 0 && !Mth.equal(speed, 0.0D))
 		{
-			double speedRatio = Math.abs(speed) / train.maxSpeed();
-			double reductionRatio = train.maxSpeed() / maxSpeedBeforeReduction(train);
+			float approachAccelerationMod = trainE.getApproachAccelerationMod();
+
+			if (approachAccelerationMod != 0.0F)
+			{
+				acelerationMod = approachAccelerationMod;
+				trainE.setApproachAccelerationMod(0.0F);
+				speed = getPredictSpeed(train, speed, train.targetSpeed, approachAccelerationMod);
+			}
+			else
+			{
+				acelerationMod = 1.0F;
+			}
+
+		}
+
+		Map<TrainEngineRecipe, List<Engine>> engineMap = streamEngines(train).collect(Collectors.groupingBy(e -> e.getRecipe()));
+
+		if (engineMap.size() > 0 && !Mth.equal(speed, 0.0D))
+		{
+			float maxSpeed = train.maxSpeed();
+			double currentSpeedRatio = Math.abs(speed) / maxSpeed;
+			double reductionRatio = maxSpeed / maxSpeedBeforeReduction(train);
+			double targetSpeedRatio = Math.abs(train.targetSpeed) / maxSpeed;
 			double absNextSpeed = 0.0D;
 
-			for (Entry<Engine, Float> entry : speedMap.entrySet())
+			for (Entry<TrainEngineRecipe, List<Engine>> entry : engineMap.entrySet())
 			{
-				Engine engine = entry.getKey();
-				engine.burnFuel(train, speedRatio * entry.getValue());
-				absNextSpeed += engine.getSpeed() * reductionRatio;
+				TrainEngineRecipe recipe = entry.getKey();
+				List<Engine> engines = entry.getValue();
+				int duplicatedRecipeCount = engines.size() - 1;
+				double engineMaxSpeed = recipe.getMaxSpeed();
+				double engineCurrentTarget = currentSpeedRatio * engineMaxSpeed;
+				double engineAllocatedTarget = targetSpeedRatio * engineMaxSpeed;
+				double toBurn = recipe.getFuelUsage(duplicatedRecipeCount, engineCurrentTarget) / 20.0D;
+
+				if (recipe.isFuelShare())
+				{
+					double sharedBurned = trainE.getFuelBurner().burn(train, recipe.getFuelType(), toBurn);
+					double eachBurned = sharedBurned / engines.size();
+
+					for (Engine engine : engines)
+					{
+						engine.onFuelBurned(eachBurned, engineAllocatedTarget);
+					}
+
+				}
+				else
+				{
+					for (Engine engine : engines)
+					{
+						double burned = engine.getFuelBurner().burn(train, recipe.getFuelType(), toBurn);
+						engine.onFuelBurned(burned, engineAllocatedTarget);
+					}
+
+				}
+
+				for (Engine engine : engines)
+				{
+					absNextSpeed += engine.getSpeed() * reductionRatio;
+				}
+
 			}
+
+			absNextSpeed = Math.min(absNextSpeed, maxSpeed);
 
 			if (speed < 0)
 			{
 				absNextSpeed = -absNextSpeed;
 			}
 
-			// System.out.println("BPT: " + absNextSpeed + ", BPS:" + (absNextSpeed * 20));
-			controlBySpeedReference(train, absNextSpeed);
+			train.speed = getPredictSpeed(train, train.speed, absNextSpeed, acelerationMod);
+		}
+
+		// when fuel not enough during test
+		// train.speed = getPredictSpeed(train, train.speed, train.targetSpeed, acelerationMod);;
+
+		if (train.manualTick & !Mth.equal(train.speed, 0.0D))
+		{
+			train.leaveStation();
 		}
 
 	}
@@ -404,7 +460,21 @@ public class TrainHelper
 
 	public static float getBogeySpeedReduction(Train train)
 	{
-		return (getBogeyCount(train) - 1) * CreateTrainwreckedConfig.COMMON.bogeyStress.get() / 20;
+		int bogeyCount = getBogeyCount(train);
+		return getBogeyStress(bogeyCount) / 20;
+	}
+
+	public static float getBogeyStress(int bogeyCount)
+	{
+		if (bogeyCount <= 1)
+		{
+			return 0.0F;
+		}
+		else
+		{
+			return (bogeyCount - 1) * CreateTrainwreckedConfig.COMMON.bogeyStress.get();
+		}
+
 	}
 
 	public static float maxSpeedBeforeReduction(Train train)
@@ -440,15 +510,15 @@ public class TrainHelper
 
 	}
 
-	public static float getSpeedDelta(Train train)
+	public static float getSpeedDelta(Train train, double speed, double targetSpeed)
 	{
-		if (train.speed < train.targetSpeed)
+		if (speed < targetSpeed)
 		{
-			return train.speed >= 0 ? TrainHelper.acceleration(train) : TrainHelper.deacceleration(train);
+			return speed >= 0 ? TrainHelper.acceleration(train) : TrainHelper.deacceleration(train);
 		}
 		else
 		{
-			return train.speed <= 0 ? TrainHelper.acceleration(train) : TrainHelper.deacceleration(train);
+			return speed <= 0 ? TrainHelper.acceleration(train) : TrainHelper.deacceleration(train);
 		}
 
 	}

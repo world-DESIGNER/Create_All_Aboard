@@ -25,12 +25,9 @@ public abstract class CarriageMixin implements CarriageExtension
 	@Inject(method = "read", at = @At(value = "TAIL"), cancellable = true)
 	private static void read(CompoundTag tag, TrackGraph graph, DimensionPalette dimensions, CallbackInfoReturnable<Carriage> cir)
 	{
-		if (cir.getReturnValue() instanceof CarriageExtension extension)
-		{
-			List<Engine> engines = extension.getEngines();
-			NBTHelper.iterateCompoundList(tag.getList("engines", Tag.TAG_COMPOUND), c -> engines.add(new Engine(c)));
-		}
-
+		List<Engine> engines = ((CarriageExtension) cir.getReturnValue()).getEngines();
+		engines.clear();
+		NBTHelper.iterateCompoundList(tag.getList("engines", Tag.TAG_COMPOUND), c -> engines.add(new Engine(c)));
 	}
 
 	@Inject(method = "write", at = @At(value = "TAIL"), cancellable = true)

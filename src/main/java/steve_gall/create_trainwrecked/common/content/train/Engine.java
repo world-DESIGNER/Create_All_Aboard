@@ -2,7 +2,6 @@ package steve_gall.create_trainwrecked.common.content.train;
 
 import java.util.List;
 
-import com.simibubi.create.content.trains.entity.Carriage;
 import com.simibubi.create.content.trains.entity.Train;
 
 import net.minecraft.core.BlockPos;
@@ -13,11 +12,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 import steve_gall.create_trainwrecked.common.CreateTrainwrecked;
-import steve_gall.create_trainwrecked.common.fluid.FluidHelper;
 import steve_gall.create_trainwrecked.common.init.ModRecipeTypes;
 import steve_gall.create_trainwrecked.common.recipe.TrainEngineRecipe;
 
@@ -26,6 +21,7 @@ public class Engine
 	public static final ResourceLocation RECIPE_NOT_FOUND_ID = CreateTrainwrecked.asResource("recipe_not_found");
 	public static final TrainEngineRecipe NOT_FOUND_RECIPE = new TrainEngineRecipe.Builder().build(RECIPE_NOT_FOUND_ID);
 
+	private final FuelBurner fuelBurner;
 	private BlockPos localPos;
 	private BlockState blockState;
 	private ItemStack item;
@@ -33,72 +29,41 @@ public class Engine
 	private TrainEngineRecipe recipe;
 	private double heat;
 	private double speed;
-	private double remainedFuel;
 
 	public Engine(CompoundTag tag)
 	{
+		this.fuelBurner = new FuelBurner();
 		this.readNBT(tag);
 		this.recipe = null;
 	}
 
 	public Engine(EnginPos enginPos)
 	{
+		this.fuelBurner = new FuelBurner();
 		this.localPos = enginPos.localPos();
 		this.blockState = enginPos.blockState();
 		this.item = enginPos.item();
 		this.recipe = enginPos.recipe();
 	}
 
-	public void burnFuel(Train train, double targetSpeed)
+	public void onFuelBurned(double burned, double allocatedSpeed)
 	{
 		TrainEngineRecipe recipe = this.getRecipe();
-		double toBurn = (targetSpeed * recipe.getFuelPerSpeed()) / 20;
-		int extracting = Mth.ceil(Math.max(toBurn - this.remainedFuel, 0.0D));
-		int extracted = 0;
 
-		if (extracting > 0)
+		if (recipe.getFuelPerSpeed() > 0)
 		{
-			for (Carriage carriage : train.carriages)
-			{
-				IFluidHandler fluidStroage = carriage.storage.getFluids();
-
-				for (FluidStack fluidStack : recipe.getFuel().getMatchingFluidStacks())
-				{
-					if (extracted >= extracting)
-					{
-						break;
-					}
-
-					FluidStack burning = FluidHelper.deriveAmount(fluidStack, extracting - extracted);
-					FluidStack burned = fluidStroage.drain(burning, FluidAction.EXECUTE);
-
-					if (!burned.isEmpty())
-					{
-						extracted += burned.getAmount();
-					}
-
-				}
-
-			}
-
+			this.setSpeed(burned / recipe.getFuelPerSpeed());
 		}
-
-		double burning = 0.0D;
-
-		if (extracted + this.remainedFuel > toBurn)
+		else if (burned > 0)
 		{
-			burning = toBurn;
-			this.remainedFuel += extracted - toBurn;
+			this.setSpeed(allocatedSpeed);
 		}
 		else
 		{
-			this.remainedFuel = 0.0D;
+			this.setSpeed(0.0D);
 		}
 
-		this.setSpeed(burning / recipe.getFuelPerSpeed());
-		this.setHeat(this.getHeat() + (burning * recipe.getHeatPerFuel()));
-
-//		System.out.println("toBurn:" + toBurn + ", extracting: " + extracting + ", extracted: " + extracted + ", burning: " + burning + ", remainedFuel: " + remainedFuel);
+		this.setHeat(this.getHeat() + (burned * recipe.getHeatPerFuel()));
 	}
 
 	public void tick(Train train, Level level)
@@ -110,27 +75,30 @@ public class Engine
 		}
 
 		this.setHeat(this.getHeat() - this.getRecipe().getAirCoolingRate() / 20);
-//		System.out.println("heat: " + this.getHeat() + ", " + this.getHeat() / this.getRecipe().getHeatCapacity());
+		// System.out.println("heat: " + this.getHeat() + ", " + this.getHeat() / this.getRecipe().getHeatCapacity());
 	}
 
 	public CompoundTag writeNBT()
 	{
 		CompoundTag tag = new CompoundTag();
+		tag.put("fuelBurner", this.fuelBurner.write());
 		tag.put("localPos", NbtUtils.writeBlockPos(this.localPos));
 		tag.put("blockState", NbtUtils.writeBlockState(this.blockState));
 		tag.put("item", this.item.serializeNBT());
-
-		tag.putDouble("remainedFuel", this.remainedFuel);
 		return tag;
 	}
 
 	public void readNBT(CompoundTag tag)
 	{
+		this.fuelBurner.read(tag.getCompound("fuelBurner"));
 		this.localPos = NbtUtils.readBlockPos(tag.getCompound("localPos"));
 		this.blockState = NbtUtils.readBlockState(tag.getCompound("blockState"));
 		this.item = ItemStack.of(tag.getCompound("item"));
+	}
 
-		this.remainedFuel = tag.getDouble("remainedFuel");
+	public FuelBurner getFuelBurner()
+	{
+		return this.fuelBurner;
 	}
 
 	public BlockPos getBlockPos()

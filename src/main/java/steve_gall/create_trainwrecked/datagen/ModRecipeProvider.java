@@ -32,8 +32,9 @@ public class ModRecipeProvider extends RecipeProvider
 		steam.maxSpeed(30.0F);
 		steam.acceleration(steam.maxSpeed() / 60.0F);
 		steam.fuelType(FluidTagEntry.TYPE.of(FluidTags.WATER));
-		steam.fuelPerSpeed(1.0F);
-		steam.heatPerFuel(10);
+		steam.fuelShare(true);
+		steam.fuelMinimum(6480.0F / 60.0F);
+		steam.fuelPerRecipePow(2.0F);
 		steam.airCoolingRate(20);
 		steam.heatCapacity((int) (((steam.maxSpeed() * steam.fuelPerSpeed() * steam.heatPerFuel()) - steam.airCoolingRate()) * 2 * 60));
 		steam.burnOutDuration(5 * 60 * 20);

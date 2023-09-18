@@ -18,7 +18,7 @@ public class FinishedRecipeWrapper implements FinishedRecipe
 	@Override
 	public void serializeRecipeData(JsonObject pJson)
 	{
-		this.wrapped.serializeRecipeData(pJson);;
+		this.wrapped.serializeRecipeData(pJson);
 	}
 
 	@Override

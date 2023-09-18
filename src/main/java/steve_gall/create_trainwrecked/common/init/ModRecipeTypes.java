@@ -15,7 +15,7 @@ public class ModRecipeTypes
 	private static <RECIPE extends Recipe<?>> RecipeRegistryObject<RecipeType<RECIPE>> register(String name)
 	{
 		ResourceLocation id = new ResourceLocation(RECIPE_TYPES.getModId(), name);
-		return RECIPE_TYPES.register(name, () -> new SimpleRecpeType<RECIPE>(id));
+		return RECIPE_TYPES.register(name, () -> new SimpleRecpeType<>(id));
 	}
 
 	private static record SimpleRecpeType<RECIPE extends Recipe<?>> (ResourceLocation id) implements RecipeType<RECIPE>

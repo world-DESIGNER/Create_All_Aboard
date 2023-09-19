@@ -1,3 +1,4 @@
-2559f6332339ec69406e1c685b5d60fd4038f1d6 assets/create_trainwrecked/lang/en_us.json
-b0991d5eea6c2862e127f3d90973c936f95a5880 data/create_trainwrecked/recipes/train/engines/diesel.json
-66d95f5b8a7b3da08b967e02161dcb40a825c207 data/create_trainwrecked/recipes/train/engines/steam.json
+890513ddf34b6cd4b4317223ba2de5c8510844f0 assets/create_trainwrecked/lang/en_us.json
+d12e1c0d17287f85ea09ad27ec356f657439b036 assets/create_trainwrecked/models/item/jerrycan.json
+cacd8b151419a4d2721829a96b992302be26cadb data/create_trainwrecked/recipes/train/engines/diesel.json
+13d1b6e0373cd4640bbaf8a18474b87a9dd41fa7 data/create_trainwrecked/recipes/train/engines/steam.json

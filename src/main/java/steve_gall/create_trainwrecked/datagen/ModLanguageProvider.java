@@ -11,6 +11,8 @@ import net.minecraftforge.common.data.LanguageProvider;
 import steve_gall.create_trainwrecked.client.jei.TrainEngineCategory;
 import steve_gall.create_trainwrecked.common.CreateTrainwrecked;
 import steve_gall.create_trainwrecked.common.content.train.TrainHelper;
+import steve_gall.create_trainwrecked.common.init.ModItems;
+import steve_gall.create_trainwrecked.common.item.JerrycanItem;
 
 public class ModLanguageProvider extends LanguageProvider
 {
@@ -22,6 +24,18 @@ public class ModLanguageProvider extends LanguageProvider
 	@Override
 	protected void addTranslations()
 	{
+		this.add(ModItems.JERRYCAN.get(), "Jerrycan");
+		this.add(ModItems.JERRYCAN.get().getDescriptionId() + ".tooltip.empty", "Empty");
+		this.add(ModItems.JERRYCAN.get().getDescriptionId() + ".tooltip.amount", "%1$s: %2$s mB");
+		this.add(ModItems.JERRYCAN.get().getDescriptionId() + ".tooltip.capacity", "Capacity: %s mB");
+
+		this.add(JerrycanItem.TOOLTIP_FILLED, "%1$s %2$s mB filled");
+		this.add(JerrycanItem.TOOLTIP_DRAINED, "%1$s %2$s mB drained");
+		this.add(JerrycanItem.TOOLTIP_ITEM_EMPTY, "Jerrycan is empty");
+		this.add(JerrycanItem.TOOLTIP_ITEM_FULL, "Can't drain fluid, jerrycan can't accept fluid");
+		this.add(JerrycanItem.TOOLTIP_STORAGE_EMPTY, "Fluid storage is empty");
+		this.add(JerrycanItem.TOOLTIP_STORAGE_FULL, "Can't fill fluid, fluid storage can't accept fluid");
+
 		this.add(TrainEngineCategory.TEXT_TITLE, "Train Engine");
 		this.add(TrainEngineCategory.TEXT_MAX_BOGEY, "Max. Bogey: %s");
 		this.add(TrainEngineCategory.TEXT_MAX_SPEED, "Max. Speed: %s blocks/sec");

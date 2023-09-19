@@ -16,6 +16,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import steve_gall.create_trainwrecked.client.CreateTrainwreckedClient;
 import steve_gall.create_trainwrecked.common.config.CreateTrainwreckedConfig;
+import steve_gall.create_trainwrecked.common.init.ModItems;
 import steve_gall.create_trainwrecked.common.init.ModRecipeSerializers;
 import steve_gall.create_trainwrecked.common.init.ModRecipeTypes;
 
@@ -32,6 +33,7 @@ public class CreateTrainwrecked
 		DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> CreateTrainwreckedClient::init);
 
 		IEventBus fml_bus = FMLJavaModLoadingContext.get().getModEventBus();
+		ModItems.ITEMS.register(fml_bus);
 		ModRecipeTypes.RECIPE_TYPES.register(fml_bus);
 		ModRecipeSerializers.RECIPE_SERIALIZERS.register(fml_bus);
 

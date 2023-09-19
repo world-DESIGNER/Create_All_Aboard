@@ -1,10 +1,20 @@
 {
   "create_trainwrecked.create_trainwrecked.train_assembly.no_engines": "Engine Not Found",
   "create_trainwrecked.create_trainwrecked.train_assembly.too_many_bogeys": "Too Many Bogeys",
+  "item.create_trainwrecked.jerrycan": "Jerrycan",
+  "item.create_trainwrecked.jerrycan.tooltip.amount": "%1$s: %2$s mB",
+  "item.create_trainwrecked.jerrycan.tooltip.capacity": "Capacity: %s mB",
+  "item.create_trainwrecked.jerrycan.tooltip.empty": "Empty",
   "text.create_trainwrecked.jei.train_engine.acceleration": "Acceleration: %s blocks/sec\u00B2",
   "text.create_trainwrecked.jei.train_engine.heat_durability": "Heat Durability: %s sec",
   "text.create_trainwrecked.jei.train_engine.max_bogey": "Max. Bogey: %s",
   "text.create_trainwrecked.jei.train_engine.max_fuel_usage": "Max. Fuel Usage: %s mB/sec",
   "text.create_trainwrecked.jei.train_engine.max_speed": "Max. Speed: %s blocks/sec",
-  "text.create_trainwrecked.jei.train_engine.title": "Train Engine"
+  "text.create_trainwrecked.jei.train_engine.title": "Train Engine",
+  "tooltip.create_trainwrecked.drained": "%1$s %2$s mB drained",
+  "tooltip.create_trainwrecked.filled": "%1$s %2$s mB filled",
+  "tooltip.create_trainwrecked.item_empty": "Jerrycan is empty",
+  "tooltip.create_trainwrecked.item_full": "Can't drain fluid, jerrycan can't accept fluid",
+  "tooltip.create_trainwrecked.storage_empty": "Fluid storage is empty",
+  "tooltip.create_trainwrecked.storage_full": "Can't fill fluid, fluid storage can't accept fluid"
 }

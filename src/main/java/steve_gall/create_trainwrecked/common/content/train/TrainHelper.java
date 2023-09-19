@@ -50,7 +50,7 @@ import steve_gall.create_trainwrecked.common.recipe.TrainEngineRecipe;
 public class TrainHelper
 {
 	public static String NO_ENGINES = CreateTrainwrecked.translationKey("train_assembly.no_engines");
-	public static String TOO_MANY_BOGEYS = CreateTrainwrecked.translationKey("train_assembly.too_many_bogeys");
+	public static String TOO_MANY_CARRIAGES = CreateTrainwrecked.translationKey("train_assembly.too_many_carriages");
 
 	public static void assemble(StationBlockEntity self, UUID playerUUID)
 	{
@@ -195,7 +195,7 @@ public class TrainHelper
 		List<Integer> spacing = new ArrayList<>();
 		boolean atLeastOneForwardControls = false;
 		boolean atLeastOneEngines = false;
-		double totalEngineBogeyStreesHeap = 0.0D;
+		double totalEngineCarriageStreesHeap = 0.0D;
 
 		for (int bogeyIndex = 0; bogeyIndex < bogeyCount; bogeyIndex++)
 		{
@@ -214,7 +214,7 @@ public class TrainHelper
 				for (EnginPos enginePos : ((CarriageContraptionExtension) contraption).getAssembledEnginePos())
 				{
 					atLeastOneEngines = true;
-					totalEngineBogeyStreesHeap += enginePos.recipe().getBogeyStressHeap();
+					totalEngineCarriageStreesHeap += enginePos.recipe().getCarriageStressHeap();
 				}
 				contraption.setSoundQueueOffset(offset);
 				if (!success)
@@ -271,9 +271,9 @@ public class TrainHelper
 			accessor.invokeException(new AssemblyException(new TranslatableComponent(NO_ENGINES)), -1);
 			return;
 		}
-		else if (!Double.isFinite(totalEngineBogeyStreesHeap) && TrainEngineRecipe.getMaxBogeyCount(totalEngineBogeyStreesHeap) < bogeyCount)
+		else if (!Double.isFinite(totalEngineCarriageStreesHeap) && TrainEngineRecipe.getMaxCarriageCount(totalEngineCarriageStreesHeap) < carriages.size())
 		{
-			accessor.invokeException(new AssemblyException(new TranslatableComponent(TOO_MANY_BOGEYS)), -1);
+			accessor.invokeException(new AssemblyException(new TranslatableComponent(TOO_MANY_CARRIAGES)), -1);
 			return;
 		}
 
@@ -442,33 +442,20 @@ public class TrainHelper
 
 	}
 
-	public static int getBogeyCount(Train train)
+	public static float getCarriageSpeedReduction(Train train)
 	{
-		int count = 0;
-
-		for (Carriage carriage : train.carriages)
-		{
-			count += carriage.isOnTwoBogeys() ? 2 : 1;
-		}
-
-		return count;
+		return getCarriageStress(train.carriages.size()) / 20;
 	}
 
-	public static float getBogeySpeedReduction(Train train)
+	public static float getCarriageStress(int carriageCount)
 	{
-		int bogeyCount = getBogeyCount(train);
-		return getBogeyStress(bogeyCount) / 20;
-	}
-
-	public static float getBogeyStress(int bogeyCount)
-	{
-		if (bogeyCount <= 1)
+		if (carriageCount <= 1)
 		{
 			return 0.0F;
 		}
 		else
 		{
-			return (bogeyCount - 1) * CreateTrainwreckedConfig.COMMON.bogeyStress.get();
+			return (carriageCount - 1) * CreateTrainwreckedConfig.COMMON.carriageStress.get();
 		}
 
 	}
@@ -482,7 +469,7 @@ public class TrainHelper
 	public static float maxSpeed(Train train)
 	{
 		float original = maxSpeedBeforeReduction(train);
-		return Math.max(original - getBogeySpeedReduction(train), 0.0F);
+		return Math.max(original - getCarriageSpeedReduction(train), 0.0F);
 	}
 
 	public static float maxTurnSpeed(Train train)

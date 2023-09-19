@@ -27,7 +27,7 @@ public class TrainEngineCategory implements IRecipeCategory<TrainEngineRecipe>
 {
 	public static final ResourceLocation TEXTURE_BACKGROUND = ModJEI.texture(ModJEIRecipeTypes.TRAIN_ENGINE);
 	public static final String TEXT_TITLE = ModJEI.translationKey(ModJEIRecipeTypes.TRAIN_ENGINE, "title");
-	public static final String TEXT_MAX_BOGEY = ModJEI.translationKey(ModJEIRecipeTypes.TRAIN_ENGINE, "max_bogey");
+	public static final String TEXT_MAX_CARRIAGES = ModJEI.translationKey(ModJEIRecipeTypes.TRAIN_ENGINE, "max_carriage");
 	public static final String TEXT_MAX_SPEED = ModJEI.translationKey(ModJEIRecipeTypes.TRAIN_ENGINE, "max_speed");
 	public static final String TEXT_ACCELERATION = ModJEI.translationKey(ModJEIRecipeTypes.TRAIN_ENGINE, "acceleration");
 	public static final String TEXT_MAX_FUEL_USAGE = ModJEI.translationKey(ModJEIRecipeTypes.TRAIN_ENGINE, "max_fuel_usage");
@@ -82,7 +82,7 @@ public class TrainEngineCategory implements IRecipeCategory<TrainEngineRecipe>
 
 		int textX = 26;
 		int textY = 4;
-		font.draw(stack, new TranslatableComponent(TEXT_MAX_BOGEY, recipe.getMaxBogeyCount()), textX, textY, 0x000000);
+		font.draw(stack, new TranslatableComponent(TEXT_MAX_CARRIAGES, recipe.getMaxCarriageCount()), textX, textY, 0x000000);
 		textY += font.lineHeight;
 
 		font.draw(stack, new TranslatableComponent(TEXT_MAX_SPEED, String.format("%.2f", recipe.getMaxSpeed())), textX, textY, 0x000000);

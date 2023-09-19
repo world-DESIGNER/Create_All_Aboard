@@ -37,14 +37,14 @@ public class ModLanguageProvider extends LanguageProvider
 		this.add(JerrycanItem.TOOLTIP_STORAGE_FULL, "Can't fill fluid, fluid storage can't accept fluid");
 
 		this.add(TrainEngineCategory.TEXT_TITLE, "Train Engine");
-		this.add(TrainEngineCategory.TEXT_MAX_BOGEY, "Max. Bogey: %s");
+		this.add(TrainEngineCategory.TEXT_MAX_CARRIAGES, "Max. Carriags: %s");
 		this.add(TrainEngineCategory.TEXT_MAX_SPEED, "Max. Speed: %s blocks/sec");
 		this.add(TrainEngineCategory.TEXT_ACCELERATION, "Acceleration: %s blocks/sec²");
 		this.add(TrainEngineCategory.TEXT_MAX_FUEL_USAGE, "Max. Fuel Usage: %s mB/sec");
 		this.add(TrainEngineCategory.TEXT_HEAT_DURABILITY, "Heat Durability: %s sec");
 
 		this.add(TrainHelper.NO_ENGINES, "Engine Not Found");
-		this.add(TrainHelper.TOO_MANY_BOGEYS, "Too Many Bogeys");
+		this.add(TrainHelper.TOO_MANY_CARRIAGES, "Too Many Carriages");
 
 		PonderLocalization.generateSceneLang();
 		JsonObject object = new JsonObject();

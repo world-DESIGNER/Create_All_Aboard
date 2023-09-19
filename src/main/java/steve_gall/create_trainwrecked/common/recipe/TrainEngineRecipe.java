@@ -69,17 +69,22 @@ public class TrainEngineRecipe implements SerializableRecipe<Container>
 		return minimum + (speed * perSpeed) + (perRecipe * sameRecipeCount) + (perRecipePow > 0.0F ? Math.pow(perRecipePow, sameRecipeCount) : 0.0F);
 	}
 
-	public static int getMaxCarriageCount(double carriageStressHeap)
+	public static double getMaxCarriageCount(double carriageSpeedStressHeap)
 	{
-		return (int) (carriageStressHeap / CreateTrainwreckedConfig.COMMON.carriageStress.get()) + 1;
+		return carriageSpeedStressHeap / CreateTrainwreckedConfig.COMMON.carriageSpeedStress.get() + 1;
 	}
 
-	public int getMaxCarriageCount()
+	public static int getMaxContraptionsBlockCount(double carriageBlocksHeap)
 	{
-		return getMaxCarriageCount(this.getCarriageStressHeap());
+		return (int) (carriageBlocksHeap / CreateTrainwreckedConfig.COMMON.carriageBlocksLimit.get());
 	}
 
-	public double getCarriageStressHeap()
+	public double getMaxCarriageCount()
+	{
+		return getMaxCarriageCount(this.getCarriageSpeedStressHeap());
+	}
+
+	public double getCarriageSpeedStressHeap()
 	{
 		float carriageStressMultiplier = this.getCarriageStressMultiplier();
 
@@ -90,6 +95,21 @@ public class TrainEngineRecipe implements SerializableRecipe<Container>
 		else
 		{
 			return this.getMaxSpeed() / carriageStressMultiplier;
+		}
+
+	}
+
+	public double getMaxBlockCountPerCarriage()
+	{
+		float carriageStressMultiplier = this.getCarriageStressMultiplier();
+
+		if (carriageStressMultiplier <= 0)
+		{
+			return Double.POSITIVE_INFINITY;
+		}
+		else
+		{
+			return CreateTrainwreckedConfig.COMMON.carriageBlocksLimit.get() / carriageStressMultiplier;
 		}
 
 	}

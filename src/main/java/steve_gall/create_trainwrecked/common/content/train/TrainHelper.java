@@ -51,6 +51,7 @@ public class TrainHelper
 {
 	public static String NO_ENGINES = CreateTrainwrecked.translationKey("train_assembly.no_engines");
 	public static String TOO_MANY_CARRIAGES = CreateTrainwrecked.translationKey("train_assembly.too_many_carriages");
+	public static String TOO_MANY_BLOCKS = CreateTrainwrecked.translationKey("train_assembly.too_many_blocks");
 
 	public static void assemble(StationBlockEntity self, UUID playerUUID)
 	{
@@ -195,7 +196,9 @@ public class TrainHelper
 		List<Integer> spacing = new ArrayList<>();
 		boolean atLeastOneForwardControls = false;
 		boolean atLeastOneEngines = false;
-		double totalEngineCarriageStreesHeap = 0.0D;
+		double totalEngineCarriageStressHeap = 0.0D;
+		double maxBlocksPerCarriage = 0.0D;
+		long totalBlocks = 0L;
 
 		for (int bogeyIndex = 0; bogeyIndex < bogeyCount; bogeyIndex++)
 		{
@@ -214,7 +217,8 @@ public class TrainHelper
 				for (EnginPos enginePos : ((CarriageContraptionExtension) contraption).getAssembledEnginePos())
 				{
 					atLeastOneEngines = true;
-					totalEngineCarriageStreesHeap += enginePos.recipe().getCarriageStressHeap();
+					totalEngineCarriageStressHeap += enginePos.recipe().getCarriageSpeedStressHeap();
+					maxBlocksPerCarriage += enginePos.recipe().getMaxBlockCountPerCarriage();
 				}
 				contraption.setSoundQueueOffset(offset);
 				if (!success)
@@ -257,6 +261,7 @@ public class TrainHelper
 				return;
 			}
 
+			totalBlocks += contraption.getBlocks().size();
 			contraptions.add(contraption);
 			carriages.add(new Carriage(firstBogey, secondBogey, bogeySpacing));
 		}
@@ -266,14 +271,26 @@ public class TrainHelper
 			accessor.invokeException(new AssemblyException(Lang.translateDirect("train_assembly.no_controls")), -1);
 			return;
 		}
-		else if (!atLeastOneEngines)
+
+		if (!atLeastOneEngines)
 		{
 			accessor.invokeException(new AssemblyException(new TranslatableComponent(NO_ENGINES)), -1);
 			return;
 		}
-		else if (!Double.isFinite(totalEngineCarriageStreesHeap) && TrainEngineRecipe.getMaxCarriageCount(totalEngineCarriageStreesHeap) < carriages.size())
+
+		int maxCarriageCount = (int) TrainEngineRecipe.getMaxCarriageCount(totalEngineCarriageStressHeap);
+
+		if (!Double.isInfinite(totalEngineCarriageStressHeap) && maxCarriageCount < carriages.size())
 		{
-			accessor.invokeException(new AssemblyException(new TranslatableComponent(TOO_MANY_CARRIAGES)), -1);
+			accessor.invokeException(new AssemblyException(new TranslatableComponent(TOO_MANY_CARRIAGES, maxCarriageCount, carriages.size())), -1);
+			return;
+		}
+
+		int maxBlocks = (int) (maxBlocksPerCarriage * carriages.size());
+
+		if (!Double.isInfinite(maxBlocksPerCarriage) && maxBlocks < totalBlocks)
+		{
+			accessor.invokeException(new AssemblyException(new TranslatableComponent(TOO_MANY_BLOCKS, maxBlocks, totalBlocks)), -1);
 			return;
 		}
 
@@ -384,7 +401,7 @@ public class TrainHelper
 		{
 			double maxSpeed = train.maxSpeed();
 			double targetSpeed = train.targetSpeed;
-			double reductionRatio = maxSpeed / maxSpeedBeforeReduction(train);
+			double reductionRatio = getCarriageSpeedReductionRatio(train);
 			double targetSpeedRatio = Math.abs(targetSpeed) / maxSpeed;
 			double absNextSpeed = 0.0D;
 
@@ -442,9 +459,16 @@ public class TrainHelper
 
 	}
 
-	public static float getCarriageSpeedReduction(Train train)
+	public static double getCarriageSpeedReductionRatio(Train train)
 	{
-		return getCarriageStress(train.carriages.size()) / 20;
+		double heap = 0.0D;
+
+		for (Engine engine : streamEngines(train).toList())
+		{
+			heap += engine.getRecipe().getCarriageSpeedStressHeap();
+		}
+
+		return 1.0D - (getCarriageStress(train.carriages.size()) / heap);
 	}
 
 	public static float getCarriageStress(int carriageCount)
@@ -455,7 +479,7 @@ public class TrainHelper
 		}
 		else
 		{
-			return (carriageCount - 1) * CreateTrainwreckedConfig.COMMON.carriageStress.get();
+			return (carriageCount - 1) * CreateTrainwreckedConfig.COMMON.carriageSpeedStress.get();
 		}
 
 	}
@@ -469,7 +493,7 @@ public class TrainHelper
 	public static float maxSpeed(Train train)
 	{
 		float original = maxSpeedBeforeReduction(train);
-		return Math.max(original - getCarriageSpeedReduction(train), 0.0F);
+		return (float) Math.max(original * getCarriageSpeedReductionRatio(train), 0.0F);
 	}
 
 	public static float maxTurnSpeed(Train train)

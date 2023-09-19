@@ -8,7 +8,8 @@ public class CommonConfig
 {
 	private ForgeConfigSpec configSpec;
 
-	public final ConfigValue<Float> carriageStress;
+	public final ConfigValue<Float> carriageSpeedStress;
+	public final ConfigValue<Integer> carriageBlocksLimit;
 
 	public final ConfigValue<Integer> oilGunCapacity;
 	public final ConfigValue<Integer> oilGunTransfer;
@@ -17,7 +18,11 @@ public class CommonConfig
 	{
 		ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
 
-		this.carriageStress = builder.define("carriage_stress", 4.0F);
+		builder.push("carriage");
+		this.carriageSpeedStress = builder.define("speed_stress", 4.0F);
+		this.carriageBlocksLimit = builder.define("blocks_limit", 50);
+		builder.pop();
+
 		builder.push("oil_gun");
 		this.oilGunCapacity = builder.define("capacity", FluidAttributes.BUCKET_VOLUME * 4);
 		this.oilGunTransfer = builder.define("transfer", FluidAttributes.BUCKET_VOLUME);

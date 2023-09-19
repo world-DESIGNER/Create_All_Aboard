@@ -38,13 +38,15 @@ public class ModLanguageProvider extends LanguageProvider
 
 		this.add(TrainEngineCategory.TEXT_TITLE, "Train Engine");
 		this.add(TrainEngineCategory.TEXT_MAX_CARRIAGES, "Max. Carriags: %s");
+		this.add(TrainEngineCategory.TEXT_MAX_BLOCKS_PER_CARRIAGE, "Max. Blocks %s blocks/carriage");
 		this.add(TrainEngineCategory.TEXT_MAX_SPEED, "Max. Speed: %s blocks/sec");
 		this.add(TrainEngineCategory.TEXT_ACCELERATION, "Acceleration: %s blocks/sec²");
 		this.add(TrainEngineCategory.TEXT_MAX_FUEL_USAGE, "Max. Fuel Usage: %s mB/sec");
 		this.add(TrainEngineCategory.TEXT_HEAT_DURABILITY, "Heat Durability: %s sec");
 
 		this.add(TrainHelper.NO_ENGINES, "Engine Not Found");
-		this.add(TrainHelper.TOO_MANY_CARRIAGES, "Too Many Carriages");
+		this.add(TrainHelper.TOO_MANY_CARRIAGES, "Too Many Carriages, With the current engines, up to %s can be configured, Current carriages: %s");
+		this.add(TrainHelper.TOO_MANY_BLOCKS, "Too Many Contraption Blocks, With the current engines, up to %s can be placed, Current blocks: %s");
 
 		PonderLocalization.generateSceneLang();
 		JsonObject object = new JsonObject();

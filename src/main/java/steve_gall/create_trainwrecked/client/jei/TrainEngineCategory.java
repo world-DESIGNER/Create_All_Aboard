@@ -27,7 +27,8 @@ public class TrainEngineCategory implements IRecipeCategory<TrainEngineRecipe>
 {
 	public static final ResourceLocation TEXTURE_BACKGROUND = ModJEI.texture(ModJEIRecipeTypes.TRAIN_ENGINE);
 	public static final String TEXT_TITLE = ModJEI.translationKey(ModJEIRecipeTypes.TRAIN_ENGINE, "title");
-	public static final String TEXT_MAX_CARRIAGES = ModJEI.translationKey(ModJEIRecipeTypes.TRAIN_ENGINE, "max_carriage");
+	public static final String TEXT_MAX_CARRIAGES = ModJEI.translationKey(ModJEIRecipeTypes.TRAIN_ENGINE, "max_carriages");
+	public static final String TEXT_MAX_BLOCKS_PER_CARRIAGE = ModJEI.translationKey(ModJEIRecipeTypes.TRAIN_ENGINE, "max_blocks_per_carriage");
 	public static final String TEXT_MAX_SPEED = ModJEI.translationKey(ModJEIRecipeTypes.TRAIN_ENGINE, "max_speed");
 	public static final String TEXT_ACCELERATION = ModJEI.translationKey(ModJEIRecipeTypes.TRAIN_ENGINE, "acceleration");
 	public static final String TEXT_MAX_FUEL_USAGE = ModJEI.translationKey(ModJEIRecipeTypes.TRAIN_ENGINE, "max_fuel_usage");
@@ -38,7 +39,7 @@ public class TrainEngineCategory implements IRecipeCategory<TrainEngineRecipe>
 
 	public TrainEngineCategory(IJeiHelpers jeiHelpers)
 	{
-		this.background = jeiHelpers.getGuiHelper().createDrawable(TEXTURE_BACKGROUND, 0, 0, 178, 48);
+		this.background = jeiHelpers.getGuiHelper().createDrawable(TEXTURE_BACKGROUND, 0, 0, 178, 96);
 		this.title = new TranslatableComponent(TEXT_TITLE);
 	}
 
@@ -80,9 +81,12 @@ public class TrainEngineCategory implements IRecipeCategory<TrainEngineRecipe>
 		float maxSpeed = recipe.getMaxSpeed();
 		double maxFuelUsage = recipe.getFuelUsage(0, maxSpeed);
 
-		int textX = 26;
-		int textY = 4;
-		font.draw(stack, new TranslatableComponent(TEXT_MAX_CARRIAGES, recipe.getMaxCarriageCount()), textX, textY, 0x000000);
+		int textX = 4;
+		int textY = 26;
+		font.draw(stack, new TranslatableComponent(TEXT_MAX_CARRIAGES, String.format("%.2f", recipe.getMaxCarriageCount())), textX, textY, 0x000000);
+		textY += font.lineHeight;
+
+		font.draw(stack, new TranslatableComponent(TEXT_MAX_BLOCKS_PER_CARRIAGE, String.format("%.2f", recipe.getMaxBlockCountPerCarriage())), textX, textY, 0x000000);
 		textY += font.lineHeight;
 
 		font.draw(stack, new TranslatableComponent(TEXT_MAX_SPEED, String.format("%.2f", recipe.getMaxSpeed())), textX, textY, 0x000000);
@@ -109,7 +113,7 @@ public class TrainEngineCategory implements IRecipeCategory<TrainEngineRecipe>
 		layout.addSlot(RecipeIngredientRole.INPUT, 4, 4).addIngredients(recipe.getBlock());
 
 		List<FluidStack> fluids = FluidHelper.deriveAmount(recipe.getFuelType().toIngredient().getMatchingFluidStacks(), FluidAttributes.BUCKET_VOLUME).toList();
-		layout.addSlot(RecipeIngredientRole.INPUT, 4, 28).addIngredients(ForgeTypes.FLUID_STACK, fluids);
+		layout.addSlot(RecipeIngredientRole.INPUT, 28, 4).addIngredients(ForgeTypes.FLUID_STACK, fluids);
 	}
 
 }

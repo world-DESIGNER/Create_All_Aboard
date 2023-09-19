@@ -195,7 +195,7 @@ public class TrainHelper
 		List<Integer> spacing = new ArrayList<>();
 		boolean atLeastOneForwardControls = false;
 		boolean atLeastOneEngines = false;
-		double totalEngineSpeed = 0.0D;
+		double totalEngineBogeyStreesHeap = 0.0D;
 
 		for (int bogeyIndex = 0; bogeyIndex < bogeyCount; bogeyIndex++)
 		{
@@ -214,7 +214,7 @@ public class TrainHelper
 				for (EnginPos enginePos : ((CarriageContraptionExtension) contraption).getAssembledEnginePos())
 				{
 					atLeastOneEngines = true;
-					totalEngineSpeed += enginePos.recipe().getMaxSpeed();
+					totalEngineBogeyStreesHeap += enginePos.recipe().getBogeyStressHeap();
 				}
 				contraption.setSoundQueueOffset(offset);
 				if (!success)
@@ -271,7 +271,7 @@ public class TrainHelper
 			accessor.invokeException(new AssemblyException(new TranslatableComponent(NO_ENGINES)), -1);
 			return;
 		}
-		else if (TrainEngineRecipe.getMaxBogeyCount(totalEngineSpeed) < bogeyCount)
+		else if (!Double.isFinite(totalEngineBogeyStreesHeap) && TrainEngineRecipe.getMaxBogeyCount(totalEngineBogeyStreesHeap) < bogeyCount)
 		{
 			accessor.invokeException(new AssemblyException(new TranslatableComponent(TOO_MANY_BOGEYS)), -1);
 			return;
@@ -332,7 +332,7 @@ public class TrainHelper
 			engine.tick(train, level);
 		}
 
-		System.out.println("targetSpeed:" + String.format("%.3f", train.targetSpeed * 20) + " b/s, speed: " + String.format("%.3f", train.speed * 20) + " b/s");
+		System.out.println("targetSpeed: " + String.format("%.3f", train.targetSpeed * 20) + " b/s, speed: " + String.format("%.3f", train.speed * 20) + " b/s");
 	}
 
 	public static double getPredictSpeed(Train train, double speed, double targetSpeed, float accelerationMod)
@@ -393,7 +393,7 @@ public class TrainHelper
 				TrainEngineRecipe recipe = entry.getKey();
 				List<Engine> engines = entry.getValue();
 				int duplicatedRecipeCount = engines.size() - 1;
-				double allocatedSpeed = targetSpeedRatio * (double) recipe.getMaxSpeed();
+				double allocatedSpeed = targetSpeedRatio * recipe.getMaxSpeed();
 				double toBurn = recipe.getFuelUsage(duplicatedRecipeCount, allocatedSpeed) / 20.0D;
 
 				if (recipe.isFuelShare())
@@ -483,6 +483,11 @@ public class TrainHelper
 	{
 		float original = maxSpeedBeforeReduction(train);
 		return Math.max(original - getBogeySpeedReduction(train), 0.0F);
+	}
+
+	public static float maxTurnSpeed(Train train)
+	{
+		return maxSpeed(train) * 0.5F;
 	}
 
 	public static float acceleration(Train train)

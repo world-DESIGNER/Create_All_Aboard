@@ -3,6 +3,7 @@
   "blockType": "create:steam_engine",
   "maxSpeed": 50.0,
   "acceleration": 0.8333333,
+  "bogeyStressMultiplier": 0.75,
   "fuelType": "minecraft:water",
   "fuelShare": true,
   "fuelMinimum": 108.0,

@@ -32,6 +32,7 @@ public class ModRecipeProvider extends RecipeProvider
 		steam.blockType(ItemTagEntry.TYPE.of(AllBlocks.STEAM_ENGINE.get()));
 		steam.maxSpeed(50.0F);
 		steam.acceleration(steam.maxSpeed() / 60.0F);
+		steam.bogeyStressMultiplier(0.75F);
 		steam.fuelType(FluidTagEntry.TYPE.of(Fluids.WATER));
 		steam.fuelShare(true);
 		steam.fuelMinimum(6480.0F / 60.0F);

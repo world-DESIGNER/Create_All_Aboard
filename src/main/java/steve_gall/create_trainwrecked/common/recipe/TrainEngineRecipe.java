@@ -23,6 +23,7 @@ public class TrainEngineRecipe implements SerializableRecipe<Container>
 	private final ItemTagEntry blockType;
 	private final float maxSpeed;
 	private final float acceleration;
+	private final float bogeyStressMultiplier;
 	private final FluidTagEntry fuelType;
 	private final boolean fuelShare;
 	private final float fuelMinimum;
@@ -43,6 +44,7 @@ public class TrainEngineRecipe implements SerializableRecipe<Container>
 		this.blockType = builder.blockType();
 		this.maxSpeed = builder.maxSpeed();
 		this.acceleration = builder.acceleration();
+		this.bogeyStressMultiplier = builder.bogeyStressMultiplier();
 		this.fuelType = builder.fuelType();
 		this.fuelShare = builder.fuelShare();
 		this.fuelMinimum = builder.fuelMinimum();
@@ -64,17 +66,32 @@ public class TrainEngineRecipe implements SerializableRecipe<Container>
 		float perSpeed = this.getFuelPerSpeed();
 		float perRecipe = this.getFuelPerRecipe();
 		float perRecipePow = this.getFuelPerRecipePow();
-		return minimum + (speed * perSpeed) + (perRecipe * sameRecipeCount) + (perRecipePow != 0.0F ? Math.pow(perRecipePow, sameRecipeCount) : 0.0F);
+		return minimum + (speed * perSpeed) + (perRecipe * sameRecipeCount) + (perRecipePow > 0.0F ? Math.pow(perRecipePow, sameRecipeCount) : 0.0F);
 	}
 
-	public static int getMaxBogeyCount(double totalSpeed)
+	public static int getMaxBogeyCount(double bogeyStressHeap)
 	{
-		return (int) (totalSpeed / CreateTrainwreckedConfig.COMMON.bogeyStress.get()) + 1;
+		return (int) (bogeyStressHeap / CreateTrainwreckedConfig.COMMON.bogeyStress.get()) + 1;
 	}
 
 	public int getMaxBogeyCount()
 	{
-		return getMaxBogeyCount(this.getMaxSpeed());
+		return getMaxBogeyCount(this.getBogeyStressHeap());
+	}
+
+	public double getBogeyStressHeap()
+	{
+		float bogeyStressMultiplier = this.getBogeyStressMultiplier();
+
+		if (bogeyStressMultiplier <= 0)
+		{
+			return Double.POSITIVE_INFINITY;
+		}
+		else
+		{
+			return this.getMaxSpeed() / bogeyStressMultiplier;
+		}
+
 	}
 
 	public double getHeatDuration(double maxFuelUsage)
@@ -124,6 +141,7 @@ public class TrainEngineRecipe implements SerializableRecipe<Container>
 		pJson.add("blockType", this.getBlockType().toJson());
 		pJson.addProperty("maxSpeed", this.getMaxSpeed());
 		pJson.addProperty("acceleration", this.getAcceleration());
+		pJson.addProperty("bogeyStressMultiplier", this.getBogeyStressMultiplier());
 		pJson.add("fuelType", this.getFuelType().toJson());
 		pJson.addProperty("fuelShare", this.isFuelShare());
 		pJson.addProperty("fuelMinimum", this.getFuelMinimum());
@@ -142,6 +160,7 @@ public class TrainEngineRecipe implements SerializableRecipe<Container>
 		this.getBlockType().toNetwork(pBuffer);
 		pBuffer.writeFloat(this.getMaxSpeed());
 		pBuffer.writeFloat(this.getAcceleration());
+		pBuffer.writeFloat(this.getBogeyStressMultiplier());
 		this.getFuelType().toNetwork(pBuffer);
 		pBuffer.writeBoolean(this.isFuelShare());
 		pBuffer.writeFloat(this.getFuelMinimum());
@@ -178,6 +197,11 @@ public class TrainEngineRecipe implements SerializableRecipe<Container>
 	public float getAcceleration()
 	{
 		return this.acceleration;
+	}
+
+	public float getBogeyStressMultiplier()
+	{
+		return this.bogeyStressMultiplier;
 	}
 
 	public FluidTagEntry getFuelType()
@@ -240,6 +264,7 @@ public class TrainEngineRecipe implements SerializableRecipe<Container>
 		private ItemTagEntry blockType = ItemTagEntry.TYPE.empty();
 		private float maxSpeed = 0.0F;
 		private float acceleration = 0.0F;
+		private float bogeyStressMultiplier = 1.0F;
 		private FluidTagEntry fuelType = FluidTagEntry.TYPE.empty();
 		private boolean fuelShare = false;
 		private float fuelMinimum = 0.0F;
@@ -261,6 +286,7 @@ public class TrainEngineRecipe implements SerializableRecipe<Container>
 			this.blockType(ItemTagEntry.TYPE.getAsTagEntry(pJson, "blockType"));
 			this.maxSpeed(GsonHelper.getAsFloat(pJson, "maxSpeed"));
 			this.acceleration(GsonHelper.getAsFloat(pJson, "acceleration"));
+			this.bogeyStressMultiplier(GsonHelper.getAsFloat(pJson, "bogeyStressMultiplier"));
 			this.fuelType(FluidTagEntry.TYPE.getAsTagEntry(pJson, "fuelType"));
 			this.fuelShare(GsonHelper.getAsBoolean(pJson, "fuelShare"));
 			this.fuelMinimum(GsonHelper.getAsFloat(pJson, "fuelMinimum"));
@@ -278,6 +304,7 @@ public class TrainEngineRecipe implements SerializableRecipe<Container>
 			this.blockType(ItemTagEntry.TYPE.fromNetwork(pBuffer));
 			this.maxSpeed(pBuffer.readFloat());
 			this.acceleration(pBuffer.readFloat());
+			this.bogeyStressMultiplier(pBuffer.readFloat());
 			this.fuelType(FluidTagEntry.TYPE.fromNetwork(pBuffer));
 			this.fuelShare(pBuffer.readBoolean());
 			this.fuelMinimum(pBuffer.readFloat());
@@ -325,6 +352,17 @@ public class TrainEngineRecipe implements SerializableRecipe<Container>
 		public Builder acceleration(float acceleration)
 		{
 			this.acceleration = Math.max(acceleration, 0.0F);
+			return this;
+		}
+
+		public float bogeyStressMultiplier()
+		{
+			return this.bogeyStressMultiplier;
+		}
+
+		public Builder bogeyStressMultiplier(float bogeyStressMultiplier)
+		{
+			this.bogeyStressMultiplier = Math.max(bogeyStressMultiplier, 0.0F);
 			return this;
 		}
 

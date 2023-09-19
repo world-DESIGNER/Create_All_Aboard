@@ -62,6 +62,13 @@ public abstract class TrainMixin implements TrainExtension
 		cir.setReturnValue(maxSpeed);
 	}
 
+	@Inject(method = "maxTurnSpeed", at = @At(value = "HEAD"), cancellable = true)
+	private void maxTurnSpeed(CallbackInfoReturnable<Float> cir)
+	{
+		float maxTurnSpeed = TrainHelper.maxTurnSpeed((Train) (Object) this);
+		cir.setReturnValue(maxTurnSpeed);
+	}
+
 	@Inject(method = "acceleration", at = @At(value = "HEAD"), cancellable = true)
 	private void acceleration(CallbackInfoReturnable<Float> cir)
 	{

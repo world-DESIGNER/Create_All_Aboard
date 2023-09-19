@@ -3,6 +3,7 @@
   "blockType": "createindustry:diesel_engine",
   "maxSpeed": 30.0,
   "acceleration": 6.0,
+  "bogeyStressMultiplier": 1.0,
   "fuelType": "#forge:diesel",
   "fuelShare": false,
   "fuelMinimum": 0.0,

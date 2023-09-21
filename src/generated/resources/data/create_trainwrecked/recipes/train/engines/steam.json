@@ -1,5 +1,5 @@
 {
-  "type": "create_trainwrecked:train_engine",
+  "type": "create_trainwrecked:train_engine_type",
   "blockType": "create:steam_engine",
   "maxSpeed": 50.0,
   "acceleration": 0.8333333,
@@ -13,5 +13,11 @@
   "heatCapacity": 0,
   "heatPerFuel": 0,
   "airCoolingRate": 20,
-  "burnOutDuration": 6000
+  "overheatDuration": 6000,
+  "conditions": [
+    {
+      "item": "create:steam_engine",
+      "type": "forge:item_exists"
+    }
+  ]
 }

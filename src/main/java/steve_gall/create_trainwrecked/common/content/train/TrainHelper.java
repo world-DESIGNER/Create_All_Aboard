@@ -44,8 +44,8 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.PacketDistributor;
 import steve_gall.create_trainwrecked.common.CreateTrainwrecked;
 import steve_gall.create_trainwrecked.common.config.CreateTrainwreckedConfig;
+import steve_gall.create_trainwrecked.common.crafting.TrainEngineTypeRecipe;
 import steve_gall.create_trainwrecked.common.mixin.StationBlockEntityAccessor;
-import steve_gall.create_trainwrecked.common.recipe.TrainEngineRecipe;
 
 public class TrainHelper
 {
@@ -278,7 +278,7 @@ public class TrainHelper
 			return;
 		}
 
-		int maxCarriageCount = (int) TrainEngineRecipe.getMaxCarriageCount(totalEngineCarriageStressHeap);
+		int maxCarriageCount = (int) TrainEngineTypeRecipe.getMaxCarriageCount(totalEngineCarriageStressHeap);
 
 		if (!Double.isInfinite(totalEngineCarriageStressHeap) && maxCarriageCount < carriages.size())
 		{
@@ -342,8 +342,16 @@ public class TrainHelper
 		return train.carriages.stream().flatMap(c -> ((CarriageExtension) c).getEngines().stream());
 	}
 
+	public static Stream<Engine> streamAliveEngines(Train train)
+	{
+		return streamEngines(train).filter(engine -> !engine.isOverheated());
+	}
+
 	public static void tickTrain(Train train, Level level)
 	{
+		TrainExtension extension = (TrainExtension) train;
+		extension.getCoolingSystem().tick(train, level);
+
 		for (Engine engine : streamEngines(train).toList())
 		{
 			engine.tick(train, level);
@@ -395,9 +403,9 @@ public class TrainHelper
 
 		}
 
-		Map<TrainEngineRecipe, List<Engine>> engineMap = streamEngines(train).collect(Collectors.groupingBy(e -> e.getRecipe()));
+		Map<TrainEngineTypeRecipe, List<Engine>> engineMap = streamAliveEngines(train).collect(Collectors.groupingBy(e -> e.getRecipe()));
 
-		if (engineMap.size() > 0 && !Mth.equal(speed, 0.0D))
+		if (!Mth.equal(speed, 0.0D))
 		{
 			double maxSpeed = train.maxSpeed();
 			double targetSpeed = train.targetSpeed;
@@ -405,9 +413,9 @@ public class TrainHelper
 			double targetSpeedRatio = Math.abs(targetSpeed) / maxSpeed;
 			double absNextSpeed = 0.0D;
 
-			for (Entry<TrainEngineRecipe, List<Engine>> entry : engineMap.entrySet())
+			for (Entry<TrainEngineTypeRecipe, List<Engine>> entry : engineMap.entrySet())
 			{
-				TrainEngineRecipe recipe = entry.getKey();
+				TrainEngineTypeRecipe recipe = entry.getKey();
 				List<Engine> engines = entry.getValue();
 				int duplicatedRecipeCount = engines.size() - 1;
 				double allocatedSpeed = targetSpeedRatio * recipe.getMaxSpeed();
@@ -457,18 +465,23 @@ public class TrainHelper
 			train.leaveStation();
 		}
 
+		for (Engine engine : streamEngines(train).toList())
+		{
+			engine.onAfterTick(train);
+		}
+
 	}
 
 	public static double getCarriageSpeedReductionRatio(Train train)
 	{
 		double heap = 0.0D;
 
-		for (Engine engine : streamEngines(train).toList())
+		for (Engine engine : streamAliveEngines(train).toList())
 		{
 			heap += engine.getRecipe().getCarriageSpeedStressHeap();
 		}
 
-		return 1.0D - (getCarriageStress(train.carriages.size()) / heap);
+		return Mth.clamp(1.0D - (getCarriageStress(train.carriages.size()) / heap), 0.0D, 1.0D);
 	}
 
 	public static float getCarriageStress(int carriageCount)
@@ -486,7 +499,7 @@ public class TrainHelper
 
 	public static float maxSpeedBeforeReduction(Train train)
 	{
-		Double collect = streamEngines(train).collect(Collectors.summingDouble(v -> v.getRecipe().getMaxSpeed()));
+		Double collect = streamAliveEngines(train).collect(Collectors.summingDouble(v -> v.getRecipe().getMaxSpeed()));
 		return (collect != null ? collect.floatValue() : AllConfigs.server().trains.trainTopSpeed.getF()) / 20;
 	}
 
@@ -503,7 +516,7 @@ public class TrainHelper
 
 	public static float acceleration(Train train)
 	{
-		Double collect = streamEngines(train).collect(Collectors.summingDouble(v -> v.getRecipe().getAcceleration()));
+		Double collect = streamAliveEngines(train).collect(Collectors.summingDouble(v -> v.getRecipe().getAcceleration()));
 		return (collect != null ? collect.floatValue() : AllConfigs.server().trains.trainAcceleration.getF()) / 400;
 	}
 

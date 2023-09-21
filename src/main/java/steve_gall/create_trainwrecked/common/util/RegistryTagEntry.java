@@ -1,4 +1,4 @@
-package steve_gall.create_trainwrecked.common.recipe;
+package steve_gall.create_trainwrecked.common.util;
 
 import com.google.gson.JsonElement;
 

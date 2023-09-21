@@ -1,6 +1,8 @@
 package steve_gall.create_trainwrecked.client.jei;
 
-import com.simibubi.create.AllBlocks;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
@@ -11,19 +13,27 @@ import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeManager;
 import steve_gall.create_trainwrecked.common.CreateTrainwrecked;
-import steve_gall.create_trainwrecked.common.init.ModRecipeTypes;
 
 @JeiPlugin
 public class ModJEI implements IModPlugin
 {
+	private final List<ModJEICategory<?>> categories = new ArrayList<>();
+
 	@Override
 	public void registerCategories(IRecipeCategoryRegistration registration)
 	{
 		IJeiHelpers jeiHelpers = registration.getJeiHelpers();
-		registration.addRecipeCategories(new TrainEngineCategory(jeiHelpers));
+		this.categories.clear();
+		this.categories.add(new TrainEngineTypeCategory(jeiHelpers));
+		this.categories.add(new TrainEngineCoolantCategory(jeiHelpers));
+
+		for (ModJEICategory<?> category : this.categories)
+		{
+			registration.addRecipeCategories(category);
+		}
+
 	}
 
 	@SuppressWarnings("removal")
@@ -32,14 +42,23 @@ public class ModJEI implements IModPlugin
 	{
 		Minecraft minecraft = Minecraft.getInstance();
 		RecipeManager recipeManager = minecraft.player.level.getRecipeManager();
-		registration.addRecipes(recipeManager.getAllRecipesFor(ModRecipeTypes.TRAIN_ENGINE.get()), ModJEIRecipeTypes.TRAIN_ENGINE);
+
+		for (ModJEICategory<?> category : this.categories)
+		{
+			Collection<?> recipes = category.getRecipes(recipeManager);
+			registration.addRecipes(recipes, category.getUid());
+		}
+
 	}
 
-	@SuppressWarnings("removal")
 	@Override
 	public void registerRecipeCatalysts(IRecipeCatalystRegistration registration)
 	{
-		registration.addRecipeCatalyst(new ItemStack(AllBlocks.TRAIN_CONTROLS.get()), ModJEIRecipeTypes.TRAIN_ENGINE);
+		for (ModJEICategory<?> category : this.categories)
+		{
+			category.addRecipeCatalyst(registration);
+		}
+
 	}
 
 	@Override

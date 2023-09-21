@@ -13,8 +13,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import steve_gall.create_trainwrecked.common.crafting.TrainEngineTypeRecipe;
 import steve_gall.create_trainwrecked.common.init.ModRecipeTypes;
-import steve_gall.create_trainwrecked.common.recipe.TrainEngineRecipe;
 
 public class CarriageContraptionHelper
 {
@@ -23,8 +23,8 @@ public class CarriageContraptionHelper
 		CarriageContraptionExtension extension = (CarriageContraptionExtension) carriageContraption;
 		BlockState blockState = level.getBlockState(pos);
 		ItemStack item = new ItemStack(blockState.getBlock());
-		List<TrainEngineRecipe> recipes = level.getRecipeManager().getAllRecipesFor(ModRecipeTypes.TRAIN_ENGINE.get());
-		TrainEngineRecipe recipe = recipes.stream().filter(r -> r.getBlock().test(item)).findFirst().orElse(null);
+		List<TrainEngineTypeRecipe> recipes = level.getRecipeManager().getAllRecipesFor(ModRecipeTypes.TRAIN_ENGINE_TYPE.get());
+		TrainEngineTypeRecipe recipe = recipes.stream().filter(r -> r.getBlock().test(item)).findFirst().orElse(null);
 
 		if (recipe != null)
 		{

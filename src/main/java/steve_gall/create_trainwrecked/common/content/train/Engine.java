@@ -13,22 +13,25 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import steve_gall.create_trainwrecked.common.CreateTrainwrecked;
+import steve_gall.create_trainwrecked.common.crafting.TrainEngineTypeRecipe;
 import steve_gall.create_trainwrecked.common.init.ModRecipeTypes;
-import steve_gall.create_trainwrecked.common.recipe.TrainEngineRecipe;
+import steve_gall.create_trainwrecked.common.util.NumberHelper;
 
 public class Engine
 {
 	public static final ResourceLocation RECIPE_NOT_FOUND_ID = CreateTrainwrecked.asResource("recipe_not_found");
-	public static final TrainEngineRecipe NOT_FOUND_RECIPE = new TrainEngineRecipe.Builder().build(RECIPE_NOT_FOUND_ID);
+	public static final TrainEngineTypeRecipe NOT_FOUND_RECIPE = new TrainEngineTypeRecipe.Builder<>().build(RECIPE_NOT_FOUND_ID);
 
 	private final FuelBurner fuelBurner;
 	private BlockPos localPos;
 	private BlockState blockState;
 	private ItemStack item;
 
-	private TrainEngineRecipe recipe;
+	private TrainEngineTypeRecipe recipe;
 	private double heat;
 	private double speed;
+	private boolean overheated;
+	private int overheatTimer;
 
 	public Engine(CompoundTag tag)
 	{
@@ -48,7 +51,7 @@ public class Engine
 
 	public void onFuelBurned(double burned, double allocatedSpeed)
 	{
-		TrainEngineRecipe recipe = this.getRecipe();
+		TrainEngineTypeRecipe recipe = this.getRecipe();
 
 		if (recipe.getFuelPerSpeed() > 0)
 		{
@@ -70,12 +73,39 @@ public class Engine
 	{
 		if (this.recipe == null)
 		{
-			List<TrainEngineRecipe> recipes = level.getRecipeManager().getAllRecipesFor(ModRecipeTypes.TRAIN_ENGINE.get());
+			List<TrainEngineTypeRecipe> recipes = level.getRecipeManager().getAllRecipesFor(ModRecipeTypes.TRAIN_ENGINE_TYPE.get());
 			this.recipe = recipes.stream().filter(r -> r.getBlock().test(this.item)).findFirst().orElse(null);
 		}
 
-		this.setHeat(this.getHeat() - this.getRecipe().getAirCoolingRate() / 20);
 		// System.out.println("heat: " + this.getHeat() + ", " + this.getHeat() / this.getRecipe().getHeatCapacity());
+	}
+
+	public void onAfterTick(Train train)
+	{
+		TrainEngineTypeRecipe recipe = this.getRecipe();
+		int heatCapacity = recipe.getHeatCapacity();
+
+		if (heatCapacity <= 0)
+		{
+			return;
+		}
+
+		this.setHeat(this.getHeat() - recipe.getAirCoolingRate() / 20);
+
+		double heat = this.getHeat();
+		double cooled = ((TrainExtension) train).getCoolingSystem().useCoolant(train, heat);
+		this.setHeat(heat - cooled);
+
+		if (this.getHeat() > heatCapacity)
+		{
+			this.setOverheat(recipe.getOverheatDuration());
+		}
+		else if (this.isOverheated())
+		{
+			this.setOverheat(this.getOverheatTimer() - 1);
+		}
+
+		System.out.println("heat: " + NumberHelper.format(this.getHeat() / (heatCapacity / 100.0D), 2) + "%, " + this.getHeat() + " J, " + this.getOverheatTimer());
 	}
 
 	public CompoundTag writeNBT()
@@ -116,7 +146,7 @@ public class Engine
 		return this.item.copy();
 	}
 
-	public TrainEngineRecipe getRecipe()
+	public TrainEngineTypeRecipe getRecipe()
 	{
 		return this.recipe != null ? this.recipe : NOT_FOUND_RECIPE;
 	}
@@ -139,6 +169,37 @@ public class Engine
 	public void setHeat(double heat)
 	{
 		this.heat = Math.max(heat, 0.0D);
+	}
+
+	public void setOverheat(int duration)
+	{
+		if (duration > 0)
+		{
+			this.overheated = true;
+			this.overheatTimer = duration;
+			this.setSpeed(0.0D);
+		}
+		else
+		{
+			this.resetOverheat();
+		}
+
+	}
+
+	public void resetOverheat()
+	{
+		this.overheated = false;
+		this.overheatTimer = 0;
+	}
+
+	public boolean isOverheated()
+	{
+		return this.overheated;
+	}
+
+	public int getOverheatTimer()
+	{
+		return this.overheatTimer;
 	}
 
 }

@@ -1,4 +1,4 @@
-package steve_gall.create_trainwrecked.common.recipe;
+package steve_gall.create_trainwrecked.common.util;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -59,7 +59,6 @@ public record WrappedTagEntry(ResourceLocation id, boolean isTag, boolean isRequ
 
 	public JsonElement toJson()
 	{
-
 		if (this.isRequired())
 		{
 			if (this.isTag())
@@ -90,7 +89,7 @@ public record WrappedTagEntry(ResourceLocation id, boolean isTag, boolean isRequ
 		buffer.writeBoolean(this.isRequired());
 	}
 
-	public CompoundTag toNBT()
+	public CompoundTag toNbt()
 	{
 		CompoundTag tag = new CompoundTag();
 		tag.put("id", ResourceLocation.CODEC.encodeStart(NbtOps.INSTANCE, this.id()).result().get());

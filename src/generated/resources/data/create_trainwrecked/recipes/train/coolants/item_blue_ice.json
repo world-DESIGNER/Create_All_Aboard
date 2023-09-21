@@ -1,0 +1,7 @@
+{
+  "type": "create_trainwrecked:train_engine_coolant",
+  "item": {
+    "item": "minecraft:blue_ice"
+  },
+  "cooling": 100000
+}

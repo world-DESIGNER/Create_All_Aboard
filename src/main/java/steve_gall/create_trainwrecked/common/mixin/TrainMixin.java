@@ -17,6 +17,7 @@ import com.simibubi.create.content.trains.graph.TrackGraph;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
+import steve_gall.create_trainwrecked.common.content.train.CoolingSystem;
 import steve_gall.create_trainwrecked.common.content.train.FuelBurner;
 import steve_gall.create_trainwrecked.common.content.train.TrainExtension;
 import steve_gall.create_trainwrecked.common.content.train.TrainHelper;
@@ -26,6 +27,8 @@ public abstract class TrainMixin implements TrainExtension
 {
 	@Unique
 	private FuelBurner fuelBurner = new FuelBurner();
+	@Unique
+	private CoolingSystem coolingSystem = new CoolingSystem();
 
 	@Unique
 	private float approachAccelerationMod = 0.0F;
@@ -79,7 +82,9 @@ public abstract class TrainMixin implements TrainExtension
 	@Inject(method = "read", at = @At(value = "TAIL"), cancellable = true)
 	private static void read(CompoundTag tag, Map<UUID, TrackGraph> trackNetworks, DimensionPalette dimensions, CallbackInfoReturnable<Train> cir)
 	{
-		((TrainExtension) cir.getReturnValue()).getFuelBurner().read(tag.getCompound("fuelBurner"));
+		TrainExtension extension = (TrainExtension) cir.getReturnValue();
+		extension.getFuelBurner().read(tag.getCompound("fuelBurner"));
+		extension.getCoolingSystem().read(tag.getCompound("coolingSystem"));
 	}
 
 	@Inject(method = "write", at = @At(value = "TAIL"), cancellable = true)
@@ -87,6 +92,7 @@ public abstract class TrainMixin implements TrainExtension
 	{
 		CompoundTag tag = cir.getReturnValue();
 		tag.put("fuelBurner", this.getFuelBurner().write());
+		tag.put("coolingSystem", this.getCoolingSystem().write());
 	}
 
 	@Override
@@ -94,6 +100,13 @@ public abstract class TrainMixin implements TrainExtension
 	public FuelBurner getFuelBurner()
 	{
 		return this.fuelBurner;
+	}
+
+	@Override
+	@Unique
+	public CoolingSystem getCoolingSystem()
+	{
+		return this.coolingSystem;
 	}
 
 	@Override

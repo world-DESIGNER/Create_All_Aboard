@@ -4,6 +4,8 @@ public interface TrainExtension
 {
 	FuelBurner getFuelBurner();
 
+	CoolingSystem getCoolingSystem();
+
 	void setApproachAccelerationMod(float accelerationMod);
 
 	float getApproachAccelerationMod();

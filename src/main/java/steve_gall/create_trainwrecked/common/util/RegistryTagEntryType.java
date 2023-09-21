@@ -1,4 +1,4 @@
-package steve_gall.create_trainwrecked.common.recipe;
+package steve_gall.create_trainwrecked.common.util;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -59,7 +59,7 @@ public interface RegistryTagEntryType<VALUE extends IForgeRegistryEntry<VALUE>, 
 
 	public default CompoundTag toNBT(ENTRY entry)
 	{
-		return entry.getTagEntry().toNBT();
+		return entry.getTagEntry().toNbt();
 	}
 
 	public default ENTRY of(VALUE value)

@@ -15,7 +15,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 import steve_gall.create_trainwrecked.common.fluid.FluidHelper;
-import steve_gall.create_trainwrecked.common.recipe.FluidTagEntry;
+import steve_gall.create_trainwrecked.common.util.FluidTagEntry;
 
 public class FuelBurner
 {

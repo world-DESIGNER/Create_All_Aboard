@@ -491,6 +491,10 @@ public class TrainHelper
 
 			train.speed = getPredictSpeed(train, train.speed, absNextSpeed, acelerationMod);
 		}
+		else
+		{
+			train.speed = 0.0D;
+		}
 
 		// when fuel not enough during test
 		// train.speed = getPredictSpeed(train, train.speed, train.targetSpeed, acelerationMod);

@@ -2,7 +2,7 @@ package steve_gall.create_trainwrecked.common.config;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
-import net.minecraftforge.fluids.FluidAttributes;
+import net.minecraftforge.fluids.FluidType;
 
 public class CommonConfig
 {
@@ -24,8 +24,8 @@ public class CommonConfig
 		builder.pop();
 
 		builder.push("oil_gun");
-		this.oilGunCapacity = builder.define("capacity", FluidAttributes.BUCKET_VOLUME * 4);
-		this.oilGunTransfer = builder.define("transfer", FluidAttributes.BUCKET_VOLUME);
+		this.oilGunCapacity = builder.define("capacity", FluidType.BUCKET_VOLUME * 4);
+		this.oilGunTransfer = builder.define("transfer", FluidType.BUCKET_VOLUME);
 		builder.pop();
 
 		this.configSpec = builder.build();

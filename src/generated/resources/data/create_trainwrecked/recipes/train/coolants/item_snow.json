@@ -1,7 +1,7 @@
 {
   "type": "create_trainwrecked:train_engine_coolant",
+  "cooling": 500,
   "item": {
     "item": "minecraft:snow"
-  },
-  "cooling": 500
+  }
 }

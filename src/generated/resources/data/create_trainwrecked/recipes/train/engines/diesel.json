@@ -1,23 +1,23 @@
 {
   "type": "create_trainwrecked:train_engine_type",
-  "blockType": "createindustry:diesel_engine",
-  "maxSpeed": 30.0,
   "acceleration": 6.0,
-  "carriageStressMultiplier": 1.0,
-  "fuelType": "#forge:diesel",
-  "fuelShare": false,
-  "fuelMinimum": 0.0,
-  "fuelPerSpeed": 1.0,
-  "fuelPerRecipe": 0.0,
-  "fuelPerRecipePow": 0.0,
-  "heatCapacity": 84000,
-  "heatPerFuel": 10,
   "airCoolingRate": 20,
-  "overheatDuration": 6000,
+  "blockType": "createindustry:diesel_engine",
+  "carriageStressMultiplier": 1.0,
   "conditions": [
     {
-      "item": "createindustry:diesel_engine",
-      "type": "forge:item_exists"
+      "type": "forge:item_exists",
+      "item": "createindustry:diesel_engine"
     }
-  ]
+  ],
+  "fuelMinimum": 0.0,
+  "fuelPerRecipe": 0.0,
+  "fuelPerRecipePow": 0.0,
+  "fuelPerSpeed": 1.0,
+  "fuelShare": false,
+  "fuelType": "#forge:diesel",
+  "heatCapacity": 84000,
+  "heatPerFuel": 10,
+  "maxSpeed": 30.0,
+  "overheatDuration": 6000
 }

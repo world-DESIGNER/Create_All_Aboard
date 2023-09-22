@@ -12,22 +12,22 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IJeiHelpers;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
+import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeType;
 import steve_gall.create_trainwrecked.common.crafting.TrainEngineCoolantRecipe;
 import steve_gall.create_trainwrecked.common.init.ModRecipeTypes;
 import steve_gall.create_trainwrecked.common.util.NumberHelper;
 
 public class TrainEngineCoolantCategory extends ModJEIRecipeCategory<TrainEngineCoolantRecipe>
 {
-	public static final ResourceLocation RECIPE_TYPE = ModJEIRecipeTypes.TRAIN_ENGINE_COOLANT;
-	public static final ResourceLocation TEXTURE_BACKGROUND = ModJEI.texture(RECIPE_TYPE);
+	public static final RecipeType<TrainEngineCoolantRecipe> RECIPE_TYPE = ModJEIRecipeTypes.TRAIN_ENGINE_COOLANT;
+	public static final ResourceLocation TEXTURE_BACKGROUND = ModJEI.texture(RECIPE_TYPE.getUid());
 	public static final String TEXT_TITLE = ModJEI.translationKey(RECIPE_TYPE, "title");
 	public static final String TEXT_COOLING = ModJEI.translationKey(RECIPE_TYPE, "cooling");
 
@@ -35,7 +35,7 @@ public class TrainEngineCoolantCategory extends ModJEIRecipeCategory<TrainEngine
 
 	public TrainEngineCoolantCategory(IJeiHelpers helpers)
 	{
-		super(helpers, RECIPE_TYPE, TrainEngineCoolantRecipe.class, helpers.getGuiHelper().createDrawable(TEXTURE_BACKGROUND, 0, 0, 178, 20), TEXT_TITLE);
+		super(helpers, RECIPE_TYPE, helpers.getGuiHelper().createDrawable(TEXTURE_BACKGROUND, 0, 0, 178, 20), TEXT_TITLE);
 
 		this.icon = this.getHelpers().getGuiHelper().createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(Items.ICE));
 	}
@@ -47,7 +47,7 @@ public class TrainEngineCoolantCategory extends ModJEIRecipeCategory<TrainEngine
 	}
 
 	@Override
-	public RecipeType<TrainEngineCoolantRecipe> getCraftingRecipeType()
+	public net.minecraft.world.item.crafting.RecipeType<? extends TrainEngineCoolantRecipe> getCraftingRecipeType()
 	{
 		return ModRecipeTypes.TRAIN_ENGINE_COOLANT.get();
 	}
@@ -59,7 +59,7 @@ public class TrainEngineCoolantCategory extends ModJEIRecipeCategory<TrainEngine
 		Font font = minecraft.font;
 
 		int textColor = 0x404040;
-		font.draw(stack, new TranslatableComponent(TEXT_COOLING, NumberHelper.format(recipe.getCooling())), 22, 6, textColor);
+		font.draw(stack, Component.translatable(TEXT_COOLING, NumberHelper.format(recipe.getCooling())), 22, 6, textColor);
 	}
 
 	@Override

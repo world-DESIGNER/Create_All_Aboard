@@ -8,7 +8,7 @@
   "item.create_trainwrecked.jerrycan.tooltip.empty": "Empty",
   "text.create_trainwrecked.jei.train_engine_coolant.cooling": "Cooling: %s J",
   "text.create_trainwrecked.jei.train_engine_coolant.title": "Train Engine Coolant",
-  "text.create_trainwrecked.jei.train_engine_type.acceleration": "Acceleration: %s blocks/sec\u00B2",
+  "text.create_trainwrecked.jei.train_engine_type.acceleration": "Acceleration: %s blocks/sec²",
   "text.create_trainwrecked.jei.train_engine_type.air_cooling_rate": "Air Cooling Rate: %s J/sec",
   "text.create_trainwrecked.jei.train_engine_type.heat_capacity": "Heat Capacity: %s J",
   "text.create_trainwrecked.jei.train_engine_type.heat_durability": "Heat Durability: %s sec",

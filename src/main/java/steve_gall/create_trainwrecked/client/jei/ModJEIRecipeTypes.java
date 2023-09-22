@@ -1,10 +1,12 @@
 package steve_gall.create_trainwrecked.client.jei;
 
-import net.minecraft.resources.ResourceLocation;
+import mezz.jei.api.recipe.RecipeType;
+import steve_gall.create_trainwrecked.common.crafting.TrainEngineCoolantRecipe;
+import steve_gall.create_trainwrecked.common.crafting.TrainEngineTypeRecipe;
 import steve_gall.create_trainwrecked.common.init.ModRecipeTypes;
 
 public class ModJEIRecipeTypes
 {
-	public static final ResourceLocation TRAIN_ENGINE_TYPE = ModRecipeTypes.TRAIN_ENGINE_TYPE.getId();
-	public static final ResourceLocation TRAIN_ENGINE_COOLANT = ModRecipeTypes.TRAIN_ENGINE_COOLANT.getId();
+	public static final RecipeType<TrainEngineTypeRecipe> TRAIN_ENGINE_TYPE = new RecipeType<>(ModRecipeTypes.TRAIN_ENGINE_TYPE.getId(), TrainEngineTypeRecipe.class);
+	public static final RecipeType<TrainEngineCoolantRecipe> TRAIN_ENGINE_COOLANT = new RecipeType<>(ModRecipeTypes.TRAIN_ENGINE_COOLANT.getId(), TrainEngineCoolantRecipe.class);
 }

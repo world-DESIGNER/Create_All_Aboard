@@ -1,5 +1,6 @@
 package steve_gall.create_trainwrecked.common.util;
 
+import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -22,7 +23,7 @@ public class ItemTagEntryType implements RegistryTagEntryType<Item, Ingredient, 
 	}
 
 	@Override
-	public ItemTagEntry of(WrappedTagEntry tagEntry)
+	public ItemTagEntry of(TagEntry tagEntry)
 	{
 		return new ItemTagEntry(tagEntry);
 	}

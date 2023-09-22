@@ -1,7 +1,6 @@
 package steve_gall.create_trainwrecked.client.jei;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import mezz.jei.api.IModPlugin;
@@ -36,7 +35,6 @@ public class ModJEI implements IModPlugin
 
 	}
 
-	@SuppressWarnings("removal")
 	@Override
 	public void registerRecipes(IRecipeRegistration registration)
 	{
@@ -45,10 +43,16 @@ public class ModJEI implements IModPlugin
 
 		for (ModJEICategory<?> category : this.categories)
 		{
-			Collection<?> recipes = category.getRecipes(recipeManager);
-			registration.addRecipes(recipes, category.getUid());
+			this.registerRecipe(registration, category, recipeManager);
 		}
 
+	}
+
+	public <RECIPE> void registerRecipe(IRecipeRegistration registration, ModJEICategory<RECIPE> category, RecipeManager recipeManager)
+	{
+		RecipeType<RECIPE> recipeType = category.getRecipeType();
+		List<RECIPE> recipes = category.getRecipes(recipeManager);
+		registration.addRecipes(recipeType, recipes);
 	}
 
 	@Override
@@ -67,7 +71,7 @@ public class ModJEI implements IModPlugin
 		return CreateTrainwrecked.asResource("jei_plugin");
 	}
 
-	public static ResourceLocation texture(RecipeType<?> recipe, String path)
+	public static ResourceLocation texture(RecipeType<?> recipe, CharSequence path)
 	{
 		ResourceLocation id = recipe.getUid();
 		return texture(id.getNamespace(), new StringBuilder().append(id.getPath().replace('.', '/')).append(".").append(path));
@@ -89,9 +93,10 @@ public class ModJEI implements IModPlugin
 		return new ResourceLocation(namespace, builder.toString());
 	}
 
-	public static String translationKey(ResourceLocation type, CharSequence path)
+	public static String translationKey(RecipeType<?> type, CharSequence path)
 	{
-		return translationKey(type.getNamespace(), new StringBuilder().append(type.getPath()).append(".").append(path));
+		ResourceLocation uid = type.getUid();
+		return translationKey(uid.getNamespace(), new StringBuilder().append(uid.getPath()).append(".").append(path));
 	}
 
 	public static String translationKey(ResourceLocation id)

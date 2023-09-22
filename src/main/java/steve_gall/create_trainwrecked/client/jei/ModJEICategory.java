@@ -1,39 +1,35 @@
 package steve_gall.create_trainwrecked.client.jei;
 
-import java.util.Collection;
+import java.util.List;
 
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.helpers.IJeiHelpers;
 import mezz.jei.api.ingredients.IIngredientType;
+import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.runtime.IIngredientManager;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeManager;
 
 public abstract class ModJEICategory<RECIPE> implements IRecipeCategory<RECIPE>
 {
 	private final IJeiHelpers helpers;
-	private final ResourceLocation id;
-	private final Class<? extends RECIPE> recipeClass;
+	private final RecipeType<RECIPE> type;
 	private final IDrawable background;
 	private final Component title;
 
-	public ModJEICategory(IJeiHelpers helpers, ResourceLocation id, Class<? extends RECIPE> recipeClass, IDrawable background, String titleKey)
+	public ModJEICategory(IJeiHelpers helpers, RecipeType<RECIPE> type, IDrawable background, String titleKey)
 	{
 		this.helpers = helpers;
-		this.id = id;
-		this.recipeClass = recipeClass;
+		this.type = type;
 		this.background = background;
-		this.title = new TranslatableComponent(titleKey);
+		this.title = Component.translatable(titleKey);
 	}
 
-	public abstract Collection<RECIPE> getRecipes(RecipeManager recipeManager);
+	public abstract List<RECIPE> getRecipes(RecipeManager recipeManager);
 
-	@SuppressWarnings("removal")
 	public final void addRecipeCatalyst(IRecipeCatalystRegistration registration)
 	{
 		this.addRecipeCatalyst(new RecipeCatalystConsumer()
@@ -47,13 +43,13 @@ public abstract class ModJEICategory<RECIPE> implements IRecipeCategory<RECIPE>
 			@Override
 			public void consume(ItemStack ingredient)
 			{
-				registration.addRecipeCatalyst(ingredient, getUid());
+				registration.addRecipeCatalyst(ingredient, getRecipeType());
 			}
 
 			@Override
 			public <T> void consume(IIngredientType<T> type, T ingredient)
 			{
-				registration.addRecipeCatalyst(type, ingredient, getUid());
+				registration.addRecipeCatalyst(type, ingredient, getRecipeType());
 			}
 
 		});
@@ -70,15 +66,15 @@ public abstract class ModJEICategory<RECIPE> implements IRecipeCategory<RECIPE>
 	}
 
 	@Override
-	public IDrawable getIcon()
+	public RecipeType<RECIPE> getRecipeType()
 	{
-		return null;
+		return this.type;
 	}
 
 	@Override
-	public ResourceLocation getUid()
+	public IDrawable getIcon()
 	{
-		return this.id;
+		return null;
 	}
 
 	@Override
@@ -91,12 +87,6 @@ public abstract class ModJEICategory<RECIPE> implements IRecipeCategory<RECIPE>
 	public Component getTitle()
 	{
 		return this.title;
-	}
-
-	@Override
-	public Class<? extends RECIPE> getRecipeClass()
-	{
-		return this.recipeClass;
 	}
 
 	public interface RecipeCatalystConsumer

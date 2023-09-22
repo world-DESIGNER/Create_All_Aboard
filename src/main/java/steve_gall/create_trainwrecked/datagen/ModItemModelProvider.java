@@ -6,6 +6,7 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraftforge.registries.ForgeRegistries;
 import steve_gall.create_trainwrecked.common.CreateTrainwrecked;
 import steve_gall.create_trainwrecked.common.init.ModItems;
 
@@ -39,7 +40,7 @@ public class ModItemModelProvider extends ItemModelProvider
 
 	public String name(ItemLike item)
 	{
-		return item.asItem().getRegistryName().getPath();
+		return ForgeRegistries.ITEMS.getKey(item.asItem()).getPath();
 	}
 
 }

@@ -1,9 +1,9 @@
 {
   "type": "create_trainwrecked:train_engine_coolant",
+  "cooling": 1,
   "fluid": {
+    "amount": 1,
     "fluid": "minecraft:water",
-    "nbt": {},
-    "amount": 1
-  },
-  "cooling": 1
+    "nbt": {}
+  }
 }

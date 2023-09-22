@@ -2,6 +2,7 @@ package steve_gall.create_trainwrecked.common.util;
 
 import com.simibubi.create.foundation.fluid.FluidIngredient;
 
+import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
@@ -17,7 +18,7 @@ public class FluidTagEntryType implements RegistryTagEntryType<Fluid, FluidIngre
 	}
 
 	@Override
-	public FluidTagEntry of(WrappedTagEntry tagEntry)
+	public FluidTagEntry of(TagEntry tagEntry)
 	{
 		return new FluidTagEntry(tagEntry);
 	}

@@ -37,7 +37,7 @@ import com.simibubi.create.infrastructure.config.AllConfigs;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -275,7 +275,7 @@ public class TrainHelper
 
 		if (!atLeastOneEngines)
 		{
-			accessor.invokeException(new AssemblyException(new TranslatableComponent(NO_ENGINES)), -1);
+			accessor.invokeException(new AssemblyException(Component.translatable(NO_ENGINES)), -1);
 			return;
 		}
 
@@ -283,7 +283,7 @@ public class TrainHelper
 
 		if (!Double.isInfinite(totalEngineCarriageStressHeap) && maxCarriageCount < carriages.size())
 		{
-			accessor.invokeException(new AssemblyException(new TranslatableComponent(TOO_MANY_CARRIAGES, maxCarriageCount, carriages.size())), -1);
+			accessor.invokeException(new AssemblyException(Component.translatable(TOO_MANY_CARRIAGES, maxCarriageCount, carriages.size())), -1);
 			return;
 		}
 
@@ -291,7 +291,7 @@ public class TrainHelper
 
 		if (!Double.isInfinite(maxBlocksPerCarriage) && maxBlocks < totalBlocks)
 		{
-			accessor.invokeException(new AssemblyException(new TranslatableComponent(TOO_MANY_BLOCKS, maxBlocks, totalBlocks)), -1);
+			accessor.invokeException(new AssemblyException(Component.translatable(TOO_MANY_BLOCKS, maxBlocks, totalBlocks)), -1);
 			return;
 		}
 

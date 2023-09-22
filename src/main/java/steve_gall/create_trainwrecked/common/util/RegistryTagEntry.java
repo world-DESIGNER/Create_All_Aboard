@@ -2,17 +2,17 @@ package steve_gall.create_trainwrecked.common.util;
 
 import com.google.gson.JsonElement;
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagKey;
 import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 
-public abstract class RegistryTagEntry<VALUE extends IForgeRegistryEntry<VALUE>, INGREDIENT>
+public abstract class RegistryTagEntry<VALUE, INGREDIENT>
 {
-	private final WrappedTagEntry tagEntry;
+	private final TagEntry tagEntry;
 
-	public RegistryTagEntry(WrappedTagEntry tagEntry)
+	public RegistryTagEntry(TagEntry tagEntry)
 	{
 		this.tagEntry = tagEntry;
 	}
@@ -27,16 +27,16 @@ public abstract class RegistryTagEntry<VALUE extends IForgeRegistryEntry<VALUE>,
 	{
 		RegistryTagEntryType<VALUE, INGREDIENT, ?> type = this.getType();
 		IForgeRegistry<VALUE> registry = type.getRegistry();
-		WrappedTagEntry tagEntry = this.getTagEntry();
+		TagEntry tagEntry = this.getTagEntry();
 
 		if (tagEntry.isTag())
 		{
-			TagKey<VALUE> tagKey = registry.tags().createTagKey(tagEntry.id());
+			TagKey<VALUE> tagKey = registry.tags().createTagKey(tagEntry.getId());
 			return type.toIngredient(tagKey);
 		}
 		else
 		{
-			VALUE value = registry.getValue(tagEntry.id());
+			VALUE value = registry.getValue(tagEntry.getId());
 			return type.toIngredient(value);
 		}
 
@@ -44,7 +44,7 @@ public abstract class RegistryTagEntry<VALUE extends IForgeRegistryEntry<VALUE>,
 
 	public abstract RegistryTagEntryType<VALUE, INGREDIENT, ? extends RegistryTagEntry<VALUE, INGREDIENT>> getType();
 
-	public WrappedTagEntry getTagEntry()
+	public TagEntry getTagEntry()
 	{
 		return this.tagEntry;
 	}
@@ -64,10 +64,10 @@ public abstract class RegistryTagEntry<VALUE extends IForgeRegistryEntry<VALUE>,
 	}
 
 	@SuppressWarnings("unchecked")
-	public CompoundTag toNBT()
+	public Tag toNbt()
 	{
 		RegistryTagEntryType<VALUE, INGREDIENT, RegistryTagEntry<VALUE, INGREDIENT>> type = (RegistryTagEntryType<VALUE, INGREDIENT, RegistryTagEntry<VALUE, INGREDIENT>>) this.getType();
-		return type.toNBT(this);
+		return type.toNbt(this);
 	}
 
 }

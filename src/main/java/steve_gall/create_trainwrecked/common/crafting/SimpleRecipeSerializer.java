@@ -9,9 +9,8 @@ import com.google.gson.JsonObject;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraftforge.registries.ForgeRegistryEntry;
 
-public class SimpleRecipeSerializer<RECIPE extends SerializableRecipe<?>, BUILDER extends SimpleRecipeBuilder<? extends BUILDER, RECIPE>> extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<RECIPE>
+public class SimpleRecipeSerializer<RECIPE extends SerializableRecipe<?>, BUILDER extends SimpleRecipeBuilder<? extends BUILDER, RECIPE>> implements RecipeSerializer<RECIPE>
 {
 	private final Supplier<? extends BUILDER> builderSupplier;
 

@@ -3,18 +3,18 @@ package steve_gall.create_trainwrecked.common.util;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagKey;
 import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 
-public interface RegistryTagEntryType<VALUE extends IForgeRegistryEntry<VALUE>, INGREDIENT, ENTRY extends RegistryTagEntry<? extends VALUE, ? extends INGREDIENT>>
+public interface RegistryTagEntryType<VALUE, INGREDIENT, ENTRY extends RegistryTagEntry<? extends VALUE, ? extends INGREDIENT>>
 {
 	VALUE getEmptyValue();
 
-	ENTRY of(WrappedTagEntry tagEntry);
+	ENTRY of(TagEntry tagEntry);
 
 	IForgeRegistry<VALUE> getRegistry();
 
@@ -29,12 +29,12 @@ public interface RegistryTagEntryType<VALUE extends IForgeRegistryEntry<VALUE>, 
 
 	public default ENTRY fromJson(JsonElement json)
 	{
-		return this.of(WrappedTagEntry.fromJson(json));
+		return this.of(TagEntryHelper.fromJson(json));
 	}
 
 	public default JsonElement toJson(ENTRY entry)
 	{
-		return entry.getTagEntry().toJson();
+		return TagEntryHelper.toJson(entry.getTagEntry());
 	}
 
 	public default ENTRY getAsTagEntry(JsonObject json, String memberName)
@@ -44,22 +44,22 @@ public interface RegistryTagEntryType<VALUE extends IForgeRegistryEntry<VALUE>, 
 
 	public default ENTRY fromNetwork(FriendlyByteBuf buffer)
 	{
-		return this.of(WrappedTagEntry.fromNetwork(buffer));
+		return this.of(TagEntryHelper.fromNetwork(buffer));
 	}
 
 	public default void toNetwork(FriendlyByteBuf buffer, ENTRY entry)
 	{
-		entry.getTagEntry().toNetwork(buffer);
+		TagEntryHelper.toNetwork(buffer, entry.getTagEntry());
 	}
 
-	public default ENTRY fromNBT(CompoundTag tag)
+	public default ENTRY fromNbt(Tag tag)
 	{
-		return this.of(WrappedTagEntry.fromNBT(tag));
+		return this.of(TagEntryHelper.fromNbt(tag));
 	}
 
-	public default CompoundTag toNBT(ENTRY entry)
+	public default Tag toNbt(ENTRY entry)
 	{
-		return entry.getTagEntry().toNbt();
+		return TagEntryHelper.toNbt(entry.getTagEntry());
 	}
 
 	public default ENTRY of(VALUE value)
@@ -70,7 +70,7 @@ public interface RegistryTagEntryType<VALUE extends IForgeRegistryEntry<VALUE>, 
 	public default ENTRY of(VALUE value, boolean isRequired)
 	{
 		ResourceLocation id = this.getRegistry().getKey(value);
-		return this.of(new WrappedTagEntry(id, false, isRequired));
+		return this.of(isRequired ? TagEntry.element(id) : TagEntry.optionalElement(id));
 	}
 
 	public default ENTRY of(TagKey<VALUE> tagKey)
@@ -80,7 +80,8 @@ public interface RegistryTagEntryType<VALUE extends IForgeRegistryEntry<VALUE>, 
 
 	public default ENTRY of(TagKey<VALUE> tagKey, boolean isRequired)
 	{
-		return this.of(new WrappedTagEntry(tagKey.location(), true, isRequired));
+		ResourceLocation location = tagKey.location();
+		return this.of(isRequired ? TagEntry.tag(location) : TagEntry.optionalTag(location));
 	}
 
 }

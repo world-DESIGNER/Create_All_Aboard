@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.drmangotea.createindustry.blocks.CIBlocks;
+import com.drmangotea.createindustry.registry.CIBlocks;
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.foundation.fluid.FluidIngredient;
 
@@ -13,20 +13,20 @@ import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.tags.TagEntry;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.common.crafting.conditions.ItemExistsCondition;
-import net.minecraftforge.fluids.FluidAttributes;
+import net.minecraftforge.fluids.FluidType;
 import steve_gall.create_trainwrecked.common.CreateTrainwrecked;
 import steve_gall.create_trainwrecked.common.crafting.ConditionFinishedRecipe;
 import steve_gall.create_trainwrecked.common.crafting.TrainEngineCoolantRecipe;
 import steve_gall.create_trainwrecked.common.crafting.TrainEngineTypeRecipe;
 import steve_gall.create_trainwrecked.common.util.FluidTagEntry;
 import steve_gall.create_trainwrecked.common.util.ItemTagEntry;
-import steve_gall.create_trainwrecked.common.util.WrappedTagEntry;
 
 public class ModRecipeProvider extends RecipeProvider
 {
@@ -79,10 +79,10 @@ public class ModRecipeProvider extends RecipeProvider
 		FinishedRecipe finish = builder.finish(new ResourceLocation(this.modId, "train/engines/" + name));
 		List<ICondition> conditions = new ArrayList<>();
 
-		WrappedTagEntry blockType = builder.blockType().getTagEntry();
-		if (!blockType.isTag() && !blockType.id().getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE))
+		TagEntry blockType = builder.blockType().getTagEntry();
+		if (!blockType.isTag() && !blockType.getId().getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE))
 		{
-			conditions.add(new ItemExistsCondition(blockType.id()));
+			conditions.add(new ItemExistsCondition(blockType.getId()));
 		}
 
 		consumer.accept(new ConditionFinishedRecipe(finish, conditions));
@@ -97,7 +97,7 @@ public class ModRecipeProvider extends RecipeProvider
 
 		TrainEngineCoolantRecipe.Builder<?> snow_block = new TrainEngineCoolantRecipe.Builder<>();
 		snow_block.itemIngredient(Ingredient.of(Blocks.SNOW_BLOCK));
-		snow_block.cooling(water.cooling() * FluidAttributes.BUCKET_VOLUME / water.fluidIngredient().getRequiredAmount());
+		snow_block.cooling(water.cooling() * FluidType.BUCKET_VOLUME / water.fluidIngredient().getRequiredAmount());
 		this.save(pFinishedRecipeConsumer, snow_block, "item_snow_block");
 
 		TrainEngineCoolantRecipe.Builder<?> snowball = new TrainEngineCoolantRecipe.Builder<>();
@@ -112,7 +112,7 @@ public class ModRecipeProvider extends RecipeProvider
 
 		TrainEngineCoolantRecipe.Builder<?> ice = new TrainEngineCoolantRecipe.Builder<>();
 		ice.itemIngredient(Ingredient.of(Items.ICE));
-		ice.cooling(water.cooling() * FluidAttributes.BUCKET_VOLUME / water.fluidIngredient().getRequiredAmount());
+		ice.cooling(water.cooling() * FluidType.BUCKET_VOLUME / water.fluidIngredient().getRequiredAmount());
 		this.save(pFinishedRecipeConsumer, ice, "item_ice");
 
 		TrainEngineCoolantRecipe.Builder<?> packed_ice = new TrainEngineCoolantRecipe.Builder<>();

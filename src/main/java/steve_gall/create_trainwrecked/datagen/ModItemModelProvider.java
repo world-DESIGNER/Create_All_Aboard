@@ -29,7 +29,7 @@ public class ModItemModelProvider extends ItemModelProvider
 
 	public ItemModelBuilder handheld(ItemLike item, ResourceLocation texture)
 	{
-		return this.withExistingParent(name(item), "item/handheld").texture("layer0", texture);
+		return this.withExistingParent(name(item), "item/generated").texture("layer0", texture);
 	}
 
 	public ResourceLocation itemTexture(ItemLike item)

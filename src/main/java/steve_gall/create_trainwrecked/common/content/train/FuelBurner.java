@@ -61,7 +61,7 @@ public class FuelBurner
 
 		public FuelStatus(CompoundTag tag)
 		{
-			this.type = FluidTagEntry.TYPE.fromNbt(tag.getCompound("type"));
+			this.type = FluidTagEntry.TYPE.fromNBT(tag.getCompound("type"));
 			this.remained = tag.getDouble("remained");
 		}
 
@@ -121,7 +121,7 @@ public class FuelBurner
 		public CompoundTag write()
 		{
 			CompoundTag tag = new CompoundTag();
-			tag.put("type", this.type.toNbt());
+			tag.put("type", this.type.toNBT());
 			tag.putDouble("remained", this.remained);
 
 			return tag;

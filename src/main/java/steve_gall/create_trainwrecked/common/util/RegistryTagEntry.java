@@ -64,10 +64,10 @@ public abstract class RegistryTagEntry<VALUE, INGREDIENT>
 	}
 
 	@SuppressWarnings("unchecked")
-	public Tag toNbt()
+	public Tag toNBT()
 	{
 		RegistryTagEntryType<VALUE, INGREDIENT, RegistryTagEntry<VALUE, INGREDIENT>> type = (RegistryTagEntryType<VALUE, INGREDIENT, RegistryTagEntry<VALUE, INGREDIENT>>) this.getType();
-		return type.toNbt(this);
+		return type.toNBT(this);
 	}
 
 }

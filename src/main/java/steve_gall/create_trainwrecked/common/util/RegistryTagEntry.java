@@ -49,6 +49,26 @@ public abstract class RegistryTagEntry<VALUE, INGREDIENT>
 		return this.tagEntry;
 	}
 
+	@Override
+	public int hashCode()
+	{
+		return this.toString().hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+		{
+			return true;
+		}
+		else
+		{
+			return (obj instanceof RegistryTagEntry<?, ?> other) && this.toString().equals(other.toString());
+		}
+
+	}
+
 	@SuppressWarnings("unchecked")
 	public JsonElement toJson()
 	{
@@ -67,7 +87,7 @@ public abstract class RegistryTagEntry<VALUE, INGREDIENT>
 	public Tag toNBT()
 	{
 		RegistryTagEntryType<VALUE, INGREDIENT, RegistryTagEntry<VALUE, INGREDIENT>> type = (RegistryTagEntryType<VALUE, INGREDIENT, RegistryTagEntry<VALUE, INGREDIENT>>) this.getType();
-		return type.toNBT(this);
+		return type.toNbt(this);
 	}
 
 }

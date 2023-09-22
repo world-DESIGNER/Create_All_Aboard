@@ -35,12 +35,12 @@ public class TagEntryHelper
 		return encode(JsonOps.INSTANCE, tagEntry);
 	}
 
-	public static TagEntry fromNBT(Tag tag)
+	public static TagEntry fromNbt(Tag tag)
 	{
 		return decode(NbtOps.INSTANCE, tag);
 	}
 
-	public static Tag toNBT(TagEntry tagEntry)
+	public static Tag toNbt(TagEntry tagEntry)
 	{
 		return encode(NbtOps.INSTANCE, tagEntry);
 	}

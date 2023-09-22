@@ -52,14 +52,14 @@ public interface RegistryTagEntryType<VALUE, INGREDIENT, ENTRY extends RegistryT
 		TagEntryHelper.toNetwork(buffer, entry.getTagEntry());
 	}
 
-	public default ENTRY fromNBT(Tag tag)
+	public default ENTRY fromNbt(Tag tag)
 	{
-		return this.of(TagEntryHelper.fromNBT(tag));
+		return this.of(TagEntryHelper.fromNbt(tag));
 	}
 
-	public default Tag toNBT(ENTRY entry)
+	public default Tag toNbt(ENTRY entry)
 	{
-		return TagEntryHelper.toNBT(entry.getTagEntry());
+		return TagEntryHelper.toNbt(entry.getTagEntry());
 	}
 
 	public default ENTRY of(VALUE value)

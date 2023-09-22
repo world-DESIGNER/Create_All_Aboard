@@ -3,7 +3,9 @@
 	"package": "steve_gall.create_trainwrecked.client.mixin",
 	"minVersion": "0.0.0",
 	"compatibilityLevel": "JAVA_17",
-	"client": [],
+	"client": [
+		"TrainRelocatorMixin"
+	],
 	"mixins": [],
 	"injectors": {
 		"defaultRequire": 1

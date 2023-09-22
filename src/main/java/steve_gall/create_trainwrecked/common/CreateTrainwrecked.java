@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
+import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
@@ -27,6 +28,11 @@ public class CreateTrainwrecked
 	public static final String MODE_NAME = ModList.get().getModContainerById(CreateTrainwrecked.MOD_ID).orElse(null).getModInfo().getDisplayName();
 	public static final Logger LOGGER = LogUtils.getLogger();
 
+	public static final IHaveGoggleInformation DEFAULT_HAVE_GOGGLE_INFO = new IHaveGoggleInformation()
+	{
+
+	};
+
 	public CreateTrainwrecked()
 	{
 		CreateTrainwreckedConfig.registerConfigs(ModLoadingContext.get());
@@ -42,12 +48,22 @@ public class CreateTrainwrecked
 
 	public static String translationKey(CharSequence path)
 	{
-		return translationKey(MOD_ID, path);
+		return translationKey("", MOD_ID, path);
+	}
+
+	public static String translationKey(ResourceLocation id)
+	{
+		return translationKey("", id.getNamespace(), id.getPath());
 	}
 
 	public static String translationKey(CharSequence category, CharSequence path)
 	{
 		return translationKey(category, MOD_ID, path);
+	}
+
+	public static String translationKey(CharSequence category, ResourceLocation id)
+	{
+		return translationKey(category, id.getNamespace(), id.getPath());
 	}
 
 	public static String translationKey(CharSequence category, CharSequence namespace, CharSequence path)

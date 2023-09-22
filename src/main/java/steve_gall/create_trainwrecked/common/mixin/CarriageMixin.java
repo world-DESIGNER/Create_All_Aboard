@@ -34,7 +34,7 @@ public abstract class CarriageMixin implements CarriageExtension
 	private void write(DimensionPalette dimensions, CallbackInfoReturnable<CompoundTag> cir)
 	{
 		CompoundTag tag = cir.getReturnValue();
-		tag.put("engines", NBTHelper.writeCompoundList(this.getEngines(), e -> e.writeNBT()));
+		tag.put("engines", NBTHelper.writeCompoundList(this.getEngines(), Engine::toNbt));
 	}
 
 	@Unique

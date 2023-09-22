@@ -7,6 +7,7 @@ import com.simibubi.create.content.trains.entity.Train;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
@@ -15,7 +16,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import steve_gall.create_trainwrecked.common.CreateTrainwrecked;
 import steve_gall.create_trainwrecked.common.crafting.TrainEngineTypeRecipe;
 import steve_gall.create_trainwrecked.common.init.ModRecipeTypes;
-import steve_gall.create_trainwrecked.common.util.NumberHelper;
 
 public class Engine
 {
@@ -34,20 +34,44 @@ public class Engine
 	private boolean overheated;
 	private int overheatTimer;
 
-	public Engine(CompoundTag tag)
-	{
-		this.fuelBurner = new FuelBurner();
-		this.readNBT(tag);
-		this.recipe = null;
-	}
-
 	public Engine(EnginPos enginPos)
 	{
 		this.fuelBurner = new FuelBurner();
 		this.localPos = enginPos.localPos();
 		this.blockState = enginPos.blockState();
 		this.item = enginPos.item();
+
 		this.recipe = enginPos.recipe();
+	}
+
+	public Engine(CompoundTag tag)
+	{
+		this.fuelBurner = new FuelBurner(tag.getCompound("fuelBurner"));
+		this.localPos = NbtUtils.readBlockPos(tag.getCompound("localPos"));
+		this.blockState = NbtUtils.readBlockState(tag.getCompound("blockState"));
+		this.item = ItemStack.of(tag.getCompound("item"));
+
+		this.recipe = null;
+		this.fuelUsedRatio = tag.getDouble("fuelUsedRatio");
+		this.heat = tag.getDouble("heat");
+		this.speed = tag.getDouble("speed");
+		this.overheated = tag.getBoolean("overheated");
+		this.overheatTimer = tag.getInt("overheatTimer");
+	}
+
+	public Engine(FriendlyByteBuf buffer)
+	{
+		this.fuelBurner = new FuelBurner(buffer);
+		this.localPos = buffer.readBlockPos();
+		this.blockState = NbtUtils.readBlockState(buffer.readNbt());
+		this.item = buffer.readItem();
+
+		this.recipe = null;
+		this.fuelUsedRatio = buffer.readDouble();
+		this.heat = buffer.readDouble();
+		this.speed = buffer.readDouble();
+		this.overheated = buffer.readBoolean();
+		this.overheatTimer = buffer.readInt();
 	}
 
 	public void onFuelBurned(double toBurn, double burned, double allocatedSpeed)
@@ -105,25 +129,37 @@ public class Engine
 			this.setOverheat(this.getOverheatTimer() - 1);
 		}
 
-		System.out.println("heat: " + NumberHelper.format(this.getHeat() / (heatCapacity / 100.0D), 2) + "%, " + this.getHeat() + " J, " + this.getOverheatTimer());
 	}
 
-	public CompoundTag writeNBT()
+	public static CompoundTag toNbt(Engine engine)
 	{
 		CompoundTag tag = new CompoundTag();
-		tag.put("fuelBurner", this.fuelBurner.write());
-		tag.put("localPos", NbtUtils.writeBlockPos(this.localPos));
-		tag.put("blockState", NbtUtils.writeBlockState(this.blockState));
-		tag.put("item", this.item.serializeNBT());
+		tag.put("fuelBurner", engine.fuelBurner.writeNbt());
+		tag.put("localPos", NbtUtils.writeBlockPos(engine.localPos));
+		tag.put("blockState", NbtUtils.writeBlockState(engine.blockState));
+		tag.put("item", engine.item.serializeNBT());
+
+		tag.putDouble("fuelUsedRatio", engine.fuelUsedRatio);
+		tag.putDouble("heat", engine.heat);
+		tag.putDouble("speed", engine.speed);
+		tag.putBoolean("overheated", engine.overheated);
+		tag.putInt("overheatTimer", engine.overheatTimer);
+
 		return tag;
 	}
 
-	public void readNBT(CompoundTag tag)
+	public static void toNetwork(FriendlyByteBuf buffer, Engine engine)
 	{
-		this.fuelBurner.read(tag.getCompound("fuelBurner"));
-		this.localPos = NbtUtils.readBlockPos(tag.getCompound("localPos"));
-		this.blockState = NbtUtils.readBlockState(tag.getCompound("blockState"));
-		this.item = ItemStack.of(tag.getCompound("item"));
+		engine.getFuelBurner().writeNetwork(buffer);
+		buffer.writeBlockPos(engine.localPos);
+		buffer.writeNbt(NbtUtils.writeBlockState(engine.blockState));
+		buffer.writeItem(engine.item);
+
+		buffer.writeDouble(engine.fuelUsedRatio);
+		buffer.writeDouble(engine.heat);
+		buffer.writeDouble(engine.speed);
+		buffer.writeBoolean(engine.overheated);
+		buffer.writeInt(engine.overheatTimer);
 	}
 
 	public FuelBurner getFuelBurner()

@@ -42,10 +42,10 @@ public class ModRecipeProvider extends RecipeProvider
 	protected void buildCraftingRecipes(Consumer<FinishedRecipe> pFinishedRecipeConsumer)
 	{
 		this.engineTypes(pFinishedRecipeConsumer);
-		this.engineCoolings(pFinishedRecipeConsumer);
+		this.engineCoolants(pFinishedRecipeConsumer);
 	}
 
-	private void engineTypes(Consumer<FinishedRecipe> pFinishedRecipeConsumer)
+	public void engineTypes(Consumer<FinishedRecipe> pFinishedRecipeConsumer)
 	{
 		TrainEngineTypeRecipe.Builder<?> steam = new TrainEngineTypeRecipe.Builder<>();
 		steam.blockType(ItemTagEntry.TYPE.of(AllBlocks.STEAM_ENGINE.get()));
@@ -88,7 +88,7 @@ public class ModRecipeProvider extends RecipeProvider
 		consumer.accept(new ConditionFinishedRecipe(finish, conditions));
 	}
 
-	private void engineCoolings(Consumer<FinishedRecipe> pFinishedRecipeConsumer)
+	public void engineCoolants(Consumer<FinishedRecipe> pFinishedRecipeConsumer)
 	{
 		TrainEngineCoolantRecipe.Builder<?> water = new TrainEngineCoolantRecipe.Builder<>();
 		water.fluidIngredient(FluidIngredient.fromFluid(Fluids.WATER, 1));

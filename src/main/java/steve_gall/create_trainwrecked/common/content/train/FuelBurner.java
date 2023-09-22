@@ -10,6 +10,7 @@ import com.simibubi.create.foundation.utility.NBTHelper;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -26,12 +27,24 @@ public class FuelBurner
 		this.map = new HashMap<>();
 	}
 
+	public FuelBurner(CompoundTag tag)
+	{
+		this();
+		this.readNbt(tag);
+	}
+
+	public FuelBurner(FriendlyByteBuf buffer)
+	{
+		this();
+		this.readNetwork(buffer);
+	}
+
 	public double burn(Train train, FluidTagEntry fuel, double amount)
 	{
 		return this.map.computeIfAbsent(fuel, FuelStatus::new).burn(train, amount);
 	}
 
-	public void read(CompoundTag tag)
+	public void readNbt(CompoundTag tag)
 	{
 		this.map.clear();
 		NBTHelper.iterateCompoundList(tag.getList("map", Tag.TAG_COMPOUND), c ->
@@ -41,12 +54,27 @@ public class FuelBurner
 		});
 	}
 
-	public CompoundTag write()
+	public CompoundTag writeNbt()
 	{
 		CompoundTag tag = new CompoundTag();
-		tag.put("map", NBTHelper.writeCompoundList(new ArrayList<>(this.map.values()), FuelStatus::write));
+		tag.put("map", NBTHelper.writeCompoundList(new ArrayList<>(this.map.values()), FuelStatus::toNbt));
 
 		return tag;
+	}
+
+	public void readNetwork(FriendlyByteBuf buffer)
+	{
+		this.map.clear();
+		for (FuelStatus status : buffer.readList(FuelStatus::new))
+		{
+			this.map.put(status.getType(), status);
+		}
+
+	}
+
+	public void writeNetwork(FriendlyByteBuf buffer)
+	{
+		buffer.writeCollection(this.map.values(), FuelStatus::toNetwork);
 	}
 
 	public class FuelStatus
@@ -61,8 +89,14 @@ public class FuelBurner
 
 		public FuelStatus(CompoundTag tag)
 		{
-			this.type = FluidTagEntry.TYPE.fromNBT(tag.get("type"));
+			this.type = FluidTagEntry.TYPE.fromNbt(tag.get("type"));
 			this.remained = tag.getDouble("remained");
+		}
+
+		public FuelStatus(FriendlyByteBuf buffer)
+		{
+			this.type = FluidTagEntry.TYPE.fromNetwork(buffer);
+			this.remained = buffer.readDouble();
 		}
 
 		public double burn(Train train, double toBurn)
@@ -109,22 +143,27 @@ public class FuelBurner
 				this.remained = 0.0D;
 			}
 
-			System.out.println("toBurn:" + toBurn + ", extracting: " + extracting + ", extracted: " + extracted + ", burning: " + burned + ", remained: " + this.remained);
 			return burned;
 		}
 
-		public FluidTagEntry getType()
-		{
-			return this.type;
-		}
-
-		public CompoundTag write()
+		public CompoundTag toNbt()
 		{
 			CompoundTag tag = new CompoundTag();
 			tag.put("type", this.type.toNBT());
 			tag.putDouble("remained", this.remained);
 
 			return tag;
+		}
+
+		public static void toNetwork(FriendlyByteBuf buffer, FuelStatus status)
+		{
+			FluidTagEntry.TYPE.toNetwork(buffer, status.type);
+			buffer.writeDouble(status.remained);
+		}
+
+		public FluidTagEntry getType()
+		{
+			return this.type;
 		}
 
 	}

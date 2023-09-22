@@ -34,19 +34,26 @@ import com.simibubi.create.foundation.advancement.AllAdvancements;
 import com.simibubi.create.foundation.utility.Lang;
 import com.simibubi.create.infrastructure.config.AllConfigs;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.network.PacketDistributor;
 import steve_gall.create_trainwrecked.common.CreateTrainwrecked;
 import steve_gall.create_trainwrecked.common.config.CreateTrainwreckedConfig;
+import steve_gall.create_trainwrecked.common.content.contraption.MountedStorageManagerExtension;
 import steve_gall.create_trainwrecked.common.crafting.TrainEngineTypeRecipe;
 import steve_gall.create_trainwrecked.common.mixin.StationBlockEntityAccessor;
+import steve_gall.create_trainwrecked.common.util.NumberHelper;
 
 public class TrainHelper
 {
@@ -358,7 +365,6 @@ public class TrainHelper
 			engine.tick(train, level);
 		}
 
-		System.out.println("targetSpeed: " + String.format("%.3f", train.targetSpeed * 20) + " b/s, speed: " + String.format("%.3f", train.speed * 20) + " b/s");
 	}
 
 	public static int getCarriagesTotalBlockCount(Train train)
@@ -483,7 +489,7 @@ public class TrainHelper
 				absNextSpeed = 0.0D;
 			}
 
-			if (train.targetSpeed < 0)
+			if (speed < 0)
 			{
 				absNextSpeed = -absNextSpeed;
 			}
@@ -493,6 +499,12 @@ public class TrainHelper
 		else
 		{
 			train.speed = 0.0D;
+
+			for (Engine engine : streamEngines(train).toList())
+			{
+				engine.setSpeed(0.0D);
+			}
+
 		}
 
 		// when fuel not enough during test
@@ -577,6 +589,51 @@ public class TrainHelper
 		else
 		{
 			return speed <= 0 ? TrainHelper.acceleration(train) : TrainHelper.deacceleration(train);
+		}
+
+	}
+
+	public static void addToGoggleTooltip(Train train, List<Component> tooltip, boolean isPlayerSneaking, CarriageContraptionEntity carriageContraptionEntity, BlockHitResult carriageContraptionRayTraceResult)
+	{
+		double speed = ((CarriageSyncDataExtension) carriageContraptionEntity.getCarriageData()).getTrainSpeed() * 20;
+		Lang.builder().add(Component.translatable("Speed: %s blocks/sec", Component.literal(NumberHelper.format(speed, 2)).withStyle(ChatFormatting.GOLD))).forGoggles(tooltip);
+		Lang.text("Engine Info:").forGoggles(tooltip);
+
+		List<Engine> engines = streamEngines(train).toList();
+
+		for (Engine engine : engines)
+		{
+			TrainEngineTypeRecipe recipe = engine.getRecipe();
+			int heatCapacity = recipe.getHeatCapacity();
+			Lang.builder().add(engine.getItem().getHoverName().copy().withStyle(ChatFormatting.GRAY)).forGoggles(tooltip, 1);
+
+			if (heatCapacity > 0)
+			{
+				double heatRatio = engine.getHeat() / heatCapacity;
+				MutableComponent component = Component.empty();
+				component.withStyle(ChatFormatting.GRAY);
+				component.append(Component.literal("Heat: "));
+				component.append(Component.literal(NumberHelper.format(heatRatio * 100.0D, 2) + "%").setStyle(Style.EMPTY.withColor(Mth.hsvToRgb((float) ((1.0D - heatRatio) / 3.0F), (float) (heatRatio), 1.0F))));
+
+				if (engine.isOverheated())
+				{
+					component.append(", ").append(Component.literal("Overheated").withStyle(ChatFormatting.RED));
+				}
+
+				Lang.builder().add(component).forGoggles(tooltip, 1);
+
+				if (engine.isOverheated())
+				{
+					Lang.builder().add(Component.translatable("%s sec to be available", Component.literal(NumberHelper.format(engine.getOverheatTimer() / 20.0D, 1)).withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.GRAY)).forGoggles(tooltip, 1);
+				}
+
+			}
+
+		}
+
+		for (Carriage carriage : train.carriages)
+		{
+			CreateTrainwrecked.DEFAULT_HAVE_GOGGLE_INFO.containedFluidTooltip(tooltip, isPlayerSneaking, LazyOptional.of(((MountedStorageManagerExtension) carriage.storage)::getSyncedFluids));
 		}
 
 	}

@@ -8,6 +8,7 @@
 		"CarriageContraptionEntityMixin",
 		"CarriageContraptionMixin",
 		"CarriageMixin",
+		"CarriageSyncDataMixin",
 		"MountedStorageManagerMixin",
 		"NavigationMixin",
 		"StationBlockEntityAccessor",

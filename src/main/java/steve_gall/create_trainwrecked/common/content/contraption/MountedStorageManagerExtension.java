@@ -1,10 +1,13 @@
 package steve_gall.create_trainwrecked.common.content.contraption;
 
-import com.simibubi.create.content.contraptions.MountedFluidStorage;
+import java.util.Collection;
 
-import net.minecraft.core.BlockPos;
+import steve_gall.create_trainwrecked.common.fluid.FluidTankData;
+import steve_gall.create_trainwrecked.common.fluid.FluidTankWrappingHandler;
 
 public interface MountedStorageManagerExtension
 {
-	MountedFluidStorage getfluidStorage(BlockPos localPos);
+	void setSyncedFluids(Collection<FluidTankData> fluids);
+
+	FluidTankWrappingHandler getSyncedFluids();
 }

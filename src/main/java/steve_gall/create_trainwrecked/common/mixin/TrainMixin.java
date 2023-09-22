@@ -83,7 +83,7 @@ public abstract class TrainMixin implements TrainExtension
 	private static void read(CompoundTag tag, Map<UUID, TrackGraph> trackNetworks, DimensionPalette dimensions, CallbackInfoReturnable<Train> cir)
 	{
 		TrainExtension extension = (TrainExtension) cir.getReturnValue();
-		extension.getFuelBurner().read(tag.getCompound("fuelBurner"));
+		extension.getFuelBurner().readNbt(tag.getCompound("fuelBurner"));
 		extension.getCoolingSystem().read(tag.getCompound("coolingSystem"));
 	}
 
@@ -91,7 +91,7 @@ public abstract class TrainMixin implements TrainExtension
 	public void write(DimensionPalette dimensions, CallbackInfoReturnable<CompoundTag> cir)
 	{
 		CompoundTag tag = cir.getReturnValue();
-		tag.put("fuelBurner", this.getFuelBurner().write());
+		tag.put("fuelBurner", this.getFuelBurner().writeNbt());
 		tag.put("coolingSystem", this.getCoolingSystem().write());
 	}
 

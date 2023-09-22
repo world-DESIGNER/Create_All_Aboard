@@ -28,6 +28,7 @@ public class Engine
 	private ItemStack item;
 
 	private TrainEngineTypeRecipe recipe;
+	private double fuelUsedRatio;
 	private double heat;
 	private double speed;
 	private boolean overheated;
@@ -49,8 +50,10 @@ public class Engine
 		this.recipe = enginPos.recipe();
 	}
 
-	public void onFuelBurned(double burned, double allocatedSpeed)
+	public void onFuelBurned(double toBurn, double burned, double allocatedSpeed)
 	{
+		this.fuelUsedRatio = toBurn > 0.0D ? (burned / toBurn) : 1.0D;
+
 		TrainEngineTypeRecipe recipe = this.getRecipe();
 
 		if (recipe.getFuelPerSpeed() > 0)
@@ -77,11 +80,8 @@ public class Engine
 			this.recipe = recipes.stream().filter(r -> r.getBlock().test(this.item)).findFirst().orElse(null);
 		}
 
-		// System.out.println("heat: " + this.getHeat() + ", " + this.getHeat() / this.getRecipe().getHeatCapacity());
-	}
+		this.fuelUsedRatio = 0.0D;
 
-	public void onAfterTick(Train train)
-	{
 		TrainEngineTypeRecipe recipe = this.getRecipe();
 		int heatCapacity = recipe.getHeatCapacity();
 
@@ -149,6 +149,11 @@ public class Engine
 	public TrainEngineTypeRecipe getRecipe()
 	{
 		return this.recipe != null ? this.recipe : NOT_FOUND_RECIPE;
+	}
+
+	public double getFuelUsedRatio()
+	{
+		return this.fuelUsedRatio;
 	}
 
 	public void setSpeed(double speed)

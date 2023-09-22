@@ -17,6 +17,7 @@ import com.simibubi.create.content.trains.bogey.AbstractBogeyBlockEntity;
 import com.simibubi.create.content.trains.entity.Carriage;
 import com.simibubi.create.content.trains.entity.CarriageBogey;
 import com.simibubi.create.content.trains.entity.CarriageContraption;
+import com.simibubi.create.content.trains.entity.CarriageContraptionEntity;
 import com.simibubi.create.content.trains.entity.Train;
 import com.simibubi.create.content.trains.entity.TrainPacket;
 import com.simibubi.create.content.trains.entity.TravellingPoint;
@@ -360,6 +361,24 @@ public class TrainHelper
 		System.out.println("targetSpeed: " + String.format("%.3f", train.targetSpeed * 20) + " b/s, speed: " + String.format("%.3f", train.speed * 20) + " b/s");
 	}
 
+	public static int getCarriagesTotalBlockCount(Train train)
+	{
+		int totalBlocks = 0;
+
+		for (Carriage carriage : train.carriages)
+		{
+			CarriageContraptionEntity entity = carriage.anyAvailableEntity();
+
+			if (entity != null)
+			{
+				totalBlocks += entity.getContraption().getBlocks().size();
+			}
+
+		}
+
+		return totalBlocks;
+	}
+
 	public static double getPredictSpeed(Train train, double speed, double targetSpeed, float accelerationMod)
 	{
 		if (Mth.equal(speed, targetSpeed))
@@ -424,11 +443,12 @@ public class TrainHelper
 				if (recipe.isFuelShare())
 				{
 					double sharedBurned = trainE.getFuelBurner().burn(train, recipe.getFuelType(), toBurn);
+					double eachToBurn = toBurn / engines.size();
 					double eachBurned = sharedBurned / engines.size();
 
 					for (Engine engine : engines)
 					{
-						engine.onFuelBurned(eachBurned, allocatedSpeed);
+						engine.onFuelBurned(eachToBurn, eachBurned, allocatedSpeed);
 					}
 
 				}
@@ -437,7 +457,7 @@ public class TrainHelper
 					for (Engine engine : engines)
 					{
 						double burned = engine.getFuelBurner().burn(train, recipe.getFuelType(), toBurn);
-						engine.onFuelBurned(burned, allocatedSpeed);
+						engine.onFuelBurned(toBurn, burned, allocatedSpeed);
 					}
 
 				}
@@ -449,6 +469,21 @@ public class TrainHelper
 
 			}
 
+			double maxBlocksPerCarriage = 0.0D;
+
+			for (Engine engine : streamEngines(train).toList())
+			{
+				maxBlocksPerCarriage += engine.getFuelUsedRatio() * engine.getRecipe().getMaxBlockCountPerCarriage();
+			}
+
+			int maxBlocks = (int) (maxBlocksPerCarriage * train.carriages.size());
+			int totalBlocks = getCarriagesTotalBlockCount(train);
+
+			if (!Double.isInfinite(maxBlocksPerCarriage) && maxBlocks < totalBlocks)
+			{
+				absNextSpeed = 0.0D;
+			}
+
 			if (targetSpeed < 0)
 			{
 				absNextSpeed = -absNextSpeed;
@@ -458,16 +493,11 @@ public class TrainHelper
 		}
 
 		// when fuel not enough during test
-		// train.speed = getPredictSpeed(train, train.speed, train.targetSpeed, acelerationMod);;
+		// train.speed = getPredictSpeed(train, train.speed, train.targetSpeed, acelerationMod);
 
 		if (train.manualTick & !Mth.equal(train.speed, 0.0D))
 		{
 			train.leaveStation();
-		}
-
-		for (Engine engine : streamEngines(train).toList())
-		{
-			engine.onAfterTick(train);
 		}
 
 	}

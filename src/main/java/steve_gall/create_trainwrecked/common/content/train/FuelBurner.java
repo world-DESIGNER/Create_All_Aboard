@@ -61,7 +61,7 @@ public class FuelBurner
 
 		public FuelStatus(CompoundTag tag)
 		{
-			this.type = FluidTagEntry.TYPE.fromNBT(tag.getCompound("type"));
+			this.type = FluidTagEntry.TYPE.fromNBT(tag.get("type"));
 			this.remained = tag.getDouble("remained");
 		}
 

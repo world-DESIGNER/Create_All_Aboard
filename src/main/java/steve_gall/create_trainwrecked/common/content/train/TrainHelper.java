@@ -427,9 +427,8 @@ public class TrainHelper
 		if (!Mth.equal(speed, 0.0D))
 		{
 			double maxSpeed = train.maxSpeed();
-			double targetSpeed = train.targetSpeed;
 			double reductionRatio = getCarriageSpeedReductionRatio(train);
-			double targetSpeedRatio = Math.abs(targetSpeed) / maxSpeed;
+			double speedRatio = Math.abs(speed) / maxSpeed;
 			double absNextSpeed = 0.0D;
 
 			for (Entry<TrainEngineTypeRecipe, List<Engine>> entry : engineMap.entrySet())
@@ -437,7 +436,7 @@ public class TrainHelper
 				TrainEngineTypeRecipe recipe = entry.getKey();
 				List<Engine> engines = entry.getValue();
 				int duplicatedRecipeCount = engines.size() - 1;
-				double allocatedSpeed = targetSpeedRatio * recipe.getMaxSpeed();
+				double allocatedSpeed = speedRatio * recipe.getMaxSpeed();
 				double toBurn = recipe.getFuelUsage(duplicatedRecipeCount, allocatedSpeed) / 20.0D;
 
 				if (recipe.isFuelShare())
@@ -484,7 +483,7 @@ public class TrainHelper
 				absNextSpeed = 0.0D;
 			}
 
-			if (targetSpeed < 0)
+			if (train.targetSpeed < 0)
 			{
 				absNextSpeed = -absNextSpeed;
 			}

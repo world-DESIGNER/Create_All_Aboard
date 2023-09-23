@@ -32,7 +32,6 @@ public class Engine
 	private double heat;
 	private double speed;
 	private boolean overheated;
-	private int overheatTimer;
 
 	public Engine(EnginPos enginPos)
 	{
@@ -56,7 +55,6 @@ public class Engine
 		this.heat = tag.getDouble("heat");
 		this.speed = tag.getDouble("speed");
 		this.overheated = tag.getBoolean("overheated");
-		this.overheatTimer = tag.getInt("overheatTimer");
 	}
 
 	public Engine(FriendlyByteBuf buffer)
@@ -71,7 +69,6 @@ public class Engine
 		this.heat = buffer.readDouble();
 		this.speed = buffer.readDouble();
 		this.overheated = buffer.readBoolean();
-		this.overheatTimer = buffer.readInt();
 	}
 
 	public void onFuelBurned(double toBurn, double burned, double allocatedSpeed)
@@ -107,26 +104,44 @@ public class Engine
 		this.fuelUsedRatio = 0.0D;
 
 		TrainEngineTypeRecipe recipe = this.getRecipe();
-		int heatCapacity = recipe.getHeatCapacity();
 
-		if (heatCapacity <= 0)
+		if (recipe.getHeatCapacity() <= 0)
 		{
 			return;
 		}
 
-		this.setHeat(this.getHeat() - recipe.getAirCoolingRate() / 20);
+		this.coolingAir(train);
+		this.coolingCoolant(train);
+		this.updateOverheat(train);
+	}
 
+	public void coolingAir(Train train)
+	{
+		TrainEngineTypeRecipe recipe = this.getRecipe();
+		double heat = this.getHeat();
+		this.setHeat(heat - recipe.getAirCoolingRate() / 20);
+	}
+
+	public void coolingCoolant(Train train)
+	{
 		double heat = this.getHeat();
 		double cooled = ((TrainExtension) train).getCoolingSystem().useCoolant(train, heat);
 		this.setHeat(heat - cooled);
+	}
 
-		if (this.getHeat() > heatCapacity)
+	private void updateOverheat(Train train)
+	{
+		TrainEngineTypeRecipe recipe = this.getRecipe();
+		double heat = this.getHeat();
+		int heatCapacity = recipe.getHeatCapacity();
+
+		if (heat > heatCapacity)
 		{
-			this.setOverheat(recipe.getOverheatDuration());
+			this.setOverheat(true);
 		}
-		else if (this.isOverheated())
+		else if (recipe.getOverheatedResettingHeatRatio() >= (heat / heatCapacity))
 		{
-			this.setOverheat(this.getOverheatTimer() - 1);
+			this.setOverheat(false);
 		}
 
 	}
@@ -143,7 +158,6 @@ public class Engine
 		tag.putDouble("heat", engine.heat);
 		tag.putDouble("speed", engine.speed);
 		tag.putBoolean("overheated", engine.overheated);
-		tag.putInt("overheatTimer", engine.overheatTimer);
 
 		return tag;
 	}
@@ -159,7 +173,6 @@ public class Engine
 		buffer.writeDouble(engine.heat);
 		buffer.writeDouble(engine.speed);
 		buffer.writeBoolean(engine.overheated);
-		buffer.writeInt(engine.overheatTimer);
 	}
 
 	public FuelBurner getFuelBurner()
@@ -212,35 +225,23 @@ public class Engine
 		this.heat = Math.max(heat, 0.0D);
 	}
 
-	public void setOverheat(int duration)
+	public void setOverheat(boolean overheated)
 	{
-		if (duration > 0)
+		if (overheated)
 		{
 			this.overheated = true;
-			this.overheatTimer = duration;
 			this.setSpeed(0.0D);
 		}
 		else
 		{
-			this.resetOverheat();
+			this.overheated = false;
 		}
 
-	}
-
-	public void resetOverheat()
-	{
-		this.overheated = false;
-		this.overheatTimer = 0;
 	}
 
 	public boolean isOverheated()
 	{
 		return this.overheated;
-	}
-
-	public int getOverheatTimer()
-	{
-		return this.overheatTimer;
 	}
 
 }

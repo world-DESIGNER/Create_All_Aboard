@@ -1,7 +1,7 @@
 {
   "type": "create_trainwrecked:train_engine_type",
   "acceleration": 0.8333333,
-  "airCoolingRate": 20,
+  "airCoolingRate": 20.0,
   "blockType": "create:steam_engine",
   "carriageStressMultiplier": 0.75,
   "conditions": [
@@ -19,5 +19,5 @@
   "heatCapacity": 0,
   "heatPerFuel": 0,
   "maxSpeed": 50.0,
-  "overheatDuration": 6000
+  "overheatedResettingHeatRatio": 0.0
 }

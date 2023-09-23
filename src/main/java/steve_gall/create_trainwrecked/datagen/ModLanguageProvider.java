@@ -39,9 +39,20 @@ public class ModLanguageProvider extends LanguageProvider
 
 		this.addJEI();
 
-		this.add(TrainHelper.NO_ENGINES, "Engine Not Found");
-		this.add(TrainHelper.TOO_MANY_CARRIAGES, "Too Many Carriages, With the current engines, up to %s can be configured, Current carriages: %s");
-		this.add(TrainHelper.TOO_MANY_BLOCKS, "Too Many Contraption Blocks, With the current engines, up to %s can be placed, Current blocks: %s");
+		this.add(TrainHelper.TRAIN_ASSEMBLEY_NO_ENGINES, "Engine Not Found");
+		this.add(TrainHelper.TRAIN_ASSEMBLEY_TOO_MANY_CARRIAGES, "Too Many Carriages, With the current engines, up to %s can be configured, Current carriages: %s");
+		this.add(TrainHelper.TRAIN_ASSEMBLEY_TOO_MANY_BLOCKS, "Too Many Contraption Blocks, With the current engines, up to %s can be placed, Current blocks: %s");
+
+		this.add(TrainHelper.TRAIN_GOGGLE_OVERHEATED, "Overheated");
+		this.add(TrainHelper.TRAIN_GOGGLE_OVERHEATED_1, "It appears that this train's engine is overheated.");
+		this.add(TrainHelper.TRAIN_GOGGLE_OVERHEATED_2, "Use ice or wait %ss to cool down the engine.");
+
+		this.add(TrainHelper.TRAIN_GOGGLE_TRAIN_INFO, "Train Info:");
+		this.add(TrainHelper.TRAIN_GOGGLE_TRAIN_SPEED, "Speed: %1$s / %2$s");
+		this.add(TrainHelper.TRAIN_GOGGLE_ENGINE_INFO, "Engine Info:");
+		this.add(TrainHelper.TRAIN_GOGGLE_ENGINE_HEAT, "Heat: %s");
+		this.add(TrainHelper.TRAIN_GOGGLE_ENGINE_MOST_HEAT, "Most Heat: %s");
+		this.add(TrainHelper.TRAIN_GOGGLE_ENGINE_OVERHEATEDS, "Overheateds: %s");
 
 		PonderLocalization.generateSceneLang();
 		JsonObject object = new JsonObject();
@@ -58,14 +69,14 @@ public class ModLanguageProvider extends LanguageProvider
 	{
 		this.add(TrainEngineTypeCategory.TEXT_TITLE, "Train Engine Type");
 		this.add(TrainEngineTypeCategory.TEXT_MAX_CARRIAGES, "Max. Carriags: %s");
-		this.add(TrainEngineTypeCategory.TEXT_MAX_BLOCKS_PER_CARRIAGE, "Max. Blocks %s blocks/carriage");
-		this.add(TrainEngineTypeCategory.TEXT_MAX_SPEED, "Max. Speed: %s blocks/sec");
-		this.add(TrainEngineTypeCategory.TEXT_ACCELERATION, "Acceleration: %s blocks/sec²");
-		this.add(TrainEngineTypeCategory.TEXT_MAX_FUEL_USAGE, "Max. Fuel Usage: %s mB/sec");
+		this.add(TrainEngineTypeCategory.TEXT_MAX_BLOCKS_PER_CARRIAGE, "Max. Blocks %s m/carriage");
+		this.add(TrainEngineTypeCategory.TEXT_MAX_SPEED, "Max. Speed: %s m/s");
+		this.add(TrainEngineTypeCategory.TEXT_ACCELERATION, "Acceleration: %s m/s²");
+		this.add(TrainEngineTypeCategory.TEXT_MAX_FUEL_USAGE, "Max. Fuel Usage: %s mB/s");
 		this.add(TrainEngineTypeCategory.TEXT_HEAT_PER_FUEL, "Heat Per Fuel: %s J/mB");
-		this.add(TrainEngineTypeCategory.TEXT_AIR_COOLING_RATE, "Air Cooling Rate: %s J/sec");
+		this.add(TrainEngineTypeCategory.TEXT_AIR_COOLING_RATE, "Air Cooling Rate: %s J/s");
 		this.add(TrainEngineTypeCategory.TEXT_HEAT_CAPACITY, "Heat Capacity: %s J");
-		this.add(TrainEngineTypeCategory.TEXT_HEAT_DURABILITY, "Heat Durability: %s sec");
+		this.add(TrainEngineTypeCategory.TEXT_HEAT_DURABILITY, "Heat Durability: %s s");
 
 		this.add(TrainEngineCoolantCategory.TEXT_TITLE, "Train Engine Coolant");
 		this.add(TrainEngineCoolantCategory.TEXT_COOLING, "Cooling: %s J");

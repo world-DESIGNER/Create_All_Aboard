@@ -56,7 +56,6 @@ public abstract class TrainRelocatorMixin
 			{
 				TrainHelper.addToGoggleTooltip(train, tooltip, shiftKeyDown, carriageContraptionEntity, rayTraceResult);
 				cir.setReturnValue(true);
-
 			}
 
 		}

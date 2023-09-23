@@ -32,6 +32,7 @@ import com.simibubi.create.content.trains.track.ITrackBlock;
 import com.simibubi.create.content.trains.track.TrackTargetingBehaviour;
 import com.simibubi.create.foundation.advancement.AllAdvancements;
 import com.simibubi.create.foundation.utility.Lang;
+import com.simibubi.create.foundation.utility.LangBuilder;
 import com.simibubi.create.infrastructure.config.AllConfigs;
 
 import net.minecraft.ChatFormatting;
@@ -49,7 +50,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.network.PacketDistributor;
 import steve_gall.create_trainwrecked.common.CreateTrainwrecked;
-import steve_gall.create_trainwrecked.common.config.CreateTrainwreckedConfig;
 import steve_gall.create_trainwrecked.common.content.contraption.MountedStorageManagerExtension;
 import steve_gall.create_trainwrecked.common.crafting.TrainEngineTypeRecipe;
 import steve_gall.create_trainwrecked.common.mixin.StationBlockEntityAccessor;
@@ -57,9 +57,20 @@ import steve_gall.create_trainwrecked.common.util.NumberHelper;
 
 public class TrainHelper
 {
-	public static String NO_ENGINES = CreateTrainwrecked.translationKey("train_assembly.no_engines");
-	public static String TOO_MANY_CARRIAGES = CreateTrainwrecked.translationKey("train_assembly.too_many_carriages");
-	public static String TOO_MANY_BLOCKS = CreateTrainwrecked.translationKey("train_assembly.too_many_blocks");
+	public static String TRAIN_ASSEMBLEY_NO_ENGINES = CreateTrainwrecked.translationKey("train_assembly.no_engines");
+	public static String TRAIN_ASSEMBLEY_TOO_MANY_CARRIAGES = CreateTrainwrecked.translationKey("train_assembly.too_many_carriages");
+	public static String TRAIN_ASSEMBLEY_TOO_MANY_BLOCKS = CreateTrainwrecked.translationKey("train_assembly.too_many_blocks");
+
+	public static String TRAIN_GOGGLE_OVERHEATED = CreateTrainwrecked.translationKey("train_google.overheated");
+	public static String TRAIN_GOGGLE_OVERHEATED_1 = CreateTrainwrecked.translationKey("train_google.overheated.1");
+	public static String TRAIN_GOGGLE_OVERHEATED_2 = CreateTrainwrecked.translationKey("train_google.overheated.2");
+
+	public static String TRAIN_GOGGLE_TRAIN_INFO = CreateTrainwrecked.translationKey("train_google.train_info");
+	public static String TRAIN_GOGGLE_TRAIN_SPEED = CreateTrainwrecked.translationKey("train_google.train_speed");
+	public static String TRAIN_GOGGLE_ENGINE_INFO = CreateTrainwrecked.translationKey("train_google.engine_info");
+	public static String TRAIN_GOGGLE_ENGINE_HEAT = CreateTrainwrecked.translationKey("train_google.engine_heat");
+	public static String TRAIN_GOGGLE_ENGINE_MOST_HEAT = CreateTrainwrecked.translationKey("train_google.engine_most_heat");
+	public static String TRAIN_GOGGLE_ENGINE_OVERHEATEDS = CreateTrainwrecked.translationKey("train_google.engine_overheateds");
 
 	public static void assemble(StationBlockEntity self, UUID playerUUID)
 	{
@@ -282,7 +293,7 @@ public class TrainHelper
 
 		if (!atLeastOneEngines)
 		{
-			accessor.invokeException(new AssemblyException(Component.translatable(NO_ENGINES)), -1);
+			accessor.invokeException(new AssemblyException(Component.translatable(TRAIN_ASSEMBLEY_NO_ENGINES)), -1);
 			return;
 		}
 
@@ -290,7 +301,7 @@ public class TrainHelper
 
 		if (!Double.isInfinite(totalEngineCarriageStressHeap) && maxCarriageCount < carriages.size())
 		{
-			accessor.invokeException(new AssemblyException(Component.translatable(TOO_MANY_CARRIAGES, maxCarriageCount, carriages.size())), -1);
+			accessor.invokeException(new AssemblyException(Component.translatable(TRAIN_ASSEMBLEY_TOO_MANY_CARRIAGES, maxCarriageCount, carriages.size())), -1);
 			return;
 		}
 
@@ -298,7 +309,7 @@ public class TrainHelper
 
 		if (!Double.isInfinite(maxBlocksPerCarriage) && maxBlocks < totalBlocks)
 		{
-			accessor.invokeException(new AssemblyException(Component.translatable(TOO_MANY_BLOCKS, maxBlocks, totalBlocks)), -1);
+			accessor.invokeException(new AssemblyException(Component.translatable(TRAIN_ASSEMBLEY_TOO_MANY_BLOCKS, maxBlocks, totalBlocks)), -1);
 			return;
 		}
 
@@ -428,7 +439,7 @@ public class TrainHelper
 
 		}
 
-		Map<TrainEngineTypeRecipe, List<Engine>> engineMap = streamAliveEngines(train).collect(Collectors.groupingBy(e -> e.getRecipe()));
+		Map<TrainEngineTypeRecipe, List<Engine>> engineMap = streamAliveEngines(train).collect(Collectors.groupingBy(Engine::getRecipe));
 
 		if (!Mth.equal(speed, 0.0D))
 		{
@@ -526,20 +537,7 @@ public class TrainHelper
 			heap += engine.getRecipe().getCarriageSpeedStressHeap();
 		}
 
-		return Mth.clamp(1.0D - (getCarriageStress(train.carriages.size()) / heap), 0.0D, 1.0D);
-	}
-
-	public static float getCarriageStress(int carriageCount)
-	{
-		if (carriageCount <= 1)
-		{
-			return 0.0F;
-		}
-		else
-		{
-			return (carriageCount - 1) * CreateTrainwreckedConfig.COMMON.carriageSpeedStress.get();
-		}
-
+		return Mth.clamp(1.0D - (TrainEngineTypeRecipe.getCarriageStress(train.carriages.size()) / heap), 0.0D, 1.0D);
 	}
 
 	public static float maxSpeedBeforeReduction(Train train)
@@ -595,36 +593,110 @@ public class TrainHelper
 
 	public static void addToGoggleTooltip(Train train, List<Component> tooltip, boolean isPlayerSneaking, CarriageContraptionEntity carriageContraptionEntity, BlockHitResult carriageContraptionRayTraceResult)
 	{
-		double speed = ((CarriageSyncDataExtension) carriageContraptionEntity.getCarriageData()).getTrainSpeed() * 20;
-		Lang.builder().add(Component.translatable("Speed: %s blocks/sec", Component.literal(NumberHelper.format(speed, 2)).withStyle(ChatFormatting.GOLD))).forGoggles(tooltip);
-		Lang.text("Engine Info:").forGoggles(tooltip);
-
 		List<Engine> engines = streamEngines(train).toList();
 
-		for (Engine engine : engines)
+		if (engines.size() == 1)
 		{
-			TrainEngineTypeRecipe recipe = engine.getRecipe();
-			int heatCapacity = recipe.getHeatCapacity();
-			Lang.builder().add(engine.getItem().getHoverName().copy().withStyle(ChatFormatting.GRAY)).forGoggles(tooltip, 1);
+			Engine engine = engines.get(0);
 
-			if (heatCapacity > 0)
+			if (engine.isOverheated())
 			{
+				TrainEngineTypeRecipe recipe = engine.getRecipe();
+				int heatCapacity = recipe.getHeatCapacity();
 				double heatRatio = engine.getHeat() / heatCapacity;
-				MutableComponent component = Component.empty();
-				component.withStyle(ChatFormatting.GRAY);
-				component.append(Component.literal("Heat: "));
-				component.append(Component.literal(NumberHelper.format(heatRatio * 100.0D, 2) + "%").setStyle(Style.EMPTY.withColor(Mth.hsvToRgb((float) ((1.0D - heatRatio) / 3.0F), (float) (heatRatio), 1.0F))));
+				double airCoolingDuration = ((heatRatio - recipe.getOverheatedResettingHeatRatio()) * heatCapacity) / recipe.getAirCoolingRate();
+				Lang.builder().add(Component.translatable(TRAIN_GOGGLE_OVERHEATED)).style(ChatFormatting.GOLD).style(ChatFormatting.BOLD).forGoggles(tooltip);
+				Lang.builder().add(Component.translatable(TRAIN_GOGGLE_OVERHEATED_1)).style(ChatFormatting.GRAY).forGoggles(tooltip);
+				Lang.builder().add(Component.translatable(TRAIN_GOGGLE_OVERHEATED_2, Component.literal(NumberHelper.format(airCoolingDuration, 1)).withStyle(ChatFormatting.WHITE))).style(ChatFormatting.GRAY).forGoggles(tooltip);
+				return;
+			}
 
-				if (engine.isOverheated())
+		}
+
+		double speed = ((CarriageSyncDataExtension) carriageContraptionEntity.getCarriageData()).getTrainSpeed() * 20;
+		Lang.builder().add(Component.translatable(TRAIN_GOGGLE_TRAIN_INFO)).forGoggles(tooltip);
+		MutableComponent speedComponent = Component.literal(NumberHelper.format(speed, 1) + "m/s").withStyle(ChatFormatting.GOLD);
+		MutableComponent maxSpeedComponent = Component.literal(NumberHelper.format(train.maxSpeed() * 20, 1) + "m/s").withStyle(ChatFormatting.DARK_GRAY);
+		Lang.builder().add(Component.translatable(TRAIN_GOGGLE_TRAIN_SPEED, speedComponent, maxSpeedComponent)).style(ChatFormatting.GRAY).forGoggles(tooltip, 1);
+		Lang.builder().add(Component.translatable(TRAIN_GOGGLE_ENGINE_INFO)).forGoggles(tooltip);
+
+		if (engines.size() == 1)
+		{
+			for (Engine engine : engines)
+			{
+				TrainEngineTypeRecipe recipe = engine.getRecipe();
+				int heatCapacity = recipe.getHeatCapacity();
+				Lang.builder().add(engine.getItem().getHoverName().copy()).style(ChatFormatting.GRAY).forGoggles(tooltip, 1);
+
+				List<MutableComponent> statusComponents = new ArrayList<>();
+
+				if (heatCapacity > 0)
 				{
-					component.append(", ").append(Component.literal("Overheated").withStyle(ChatFormatting.RED));
+					double heatRatio = engine.getHeat() / heatCapacity;
+					MutableComponent heatPercentComponent = getHeatPercentComponent(heatRatio);
+					statusComponents.add(Component.translatable(TRAIN_GOGGLE_ENGINE_HEAT, heatPercentComponent));
 				}
 
-				Lang.builder().add(component).forGoggles(tooltip, 1);
-
-				if (engine.isOverheated())
+				if (statusComponents.size() > 0)
 				{
-					Lang.builder().add(Component.translatable("%s sec to be available", Component.literal(NumberHelper.format(engine.getOverheatTimer() / 20.0D, 1)).withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.GRAY)).forGoggles(tooltip, 1);
+					LangBuilder builder = Lang.builder();
+
+					for (int i = 0; i < statusComponents.size(); i++)
+					{
+						if (i > 0)
+						{
+							builder.add(Component.literal(", "));
+						}
+
+						builder.add(statusComponents.get(i));
+
+					}
+
+					builder.style(ChatFormatting.GRAY).forGoggles(tooltip, 1);
+				}
+
+			}
+
+		}
+		else
+		{
+
+			for (Entry<TrainEngineTypeRecipe, List<Engine>> entry : engines.stream().collect(Collectors.groupingBy(Engine::getRecipe)).entrySet())
+			{
+				TrainEngineTypeRecipe recipe = entry.getKey();
+				Component name = null;
+
+				for (Engine engine : entry.getValue())
+				{
+					name = engine.getItem().getHoverName();
+					break;
+				}
+
+				MutableComponent countComponent = Component.literal(NumberHelper.format(entry.getValue().size())).withStyle(ChatFormatting.WHITE);
+				Lang.builder().add(Component.translatable("%s: %s", name != null ? name : Component.empty(), countComponent)).style(ChatFormatting.GRAY).forGoggles(tooltip, 1);
+
+				int heatCapacity = recipe.getHeatCapacity();
+
+				if (heatCapacity > 0)
+				{
+					int overheates = 0;
+					double hostHeat = 0.0D;
+
+					for (Engine engine : entry.getValue())
+					{
+						if (engine.isOverheated())
+						{
+							overheates++;
+						}
+
+						hostHeat = Math.max(engine.getHeat(), hostHeat);
+					}
+
+					double mostHeatRatio = hostHeat / heatCapacity;
+					MutableComponent mostHeatPercentComponent = getHeatPercentComponent(mostHeatRatio);
+					MutableComponent overheatedsComponent = Component.literal(NumberHelper.format(overheates)).withStyle(overheates > 0 ? ChatFormatting.RED : ChatFormatting.WHITE);
+					Lang.builder().add(Component.translatable(TRAIN_GOGGLE_ENGINE_MOST_HEAT, mostHeatPercentComponent)).style(ChatFormatting.GRAY).forGoggles(tooltip, 2);
+					Lang.builder().add(Component.translatable(TRAIN_GOGGLE_ENGINE_OVERHEATEDS, overheatedsComponent)).style(ChatFormatting.GRAY).forGoggles(tooltip, 2);
 				}
 
 			}
@@ -636,6 +708,11 @@ public class TrainHelper
 			CreateTrainwrecked.DEFAULT_HAVE_GOGGLE_INFO.containedFluidTooltip(tooltip, isPlayerSneaking, LazyOptional.of(((MountedStorageManagerExtension) carriage.storage)::getSyncedFluids));
 		}
 
+	}
+
+	public static MutableComponent getHeatPercentComponent(double heatRatio)
+	{
+		return Component.literal(NumberHelper.format(heatRatio * 100.0D, 1) + "%").setStyle(Style.EMPTY.withColor(Mth.hsvToRgb((float) ((1.0D - heatRatio) / 3.0F), (float) (heatRatio), 1.0F)));
 	}
 
 	private TrainHelper()

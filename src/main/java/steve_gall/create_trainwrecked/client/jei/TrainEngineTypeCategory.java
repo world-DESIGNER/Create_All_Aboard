@@ -90,10 +90,10 @@ public class TrainEngineTypeCategory extends ModJEIRecipeCategory<TrainEngineTyp
 			font.draw(stack, Component.translatable(TEXT_HEAT_CAPACITY, NumberHelper.format(recipe.getHeatCapacity())), textX, textY, textColor);
 			textY += font.lineHeight;
 
-			font.draw(stack, Component.translatable(TEXT_HEAT_PER_FUEL, NumberHelper.format(recipe.getHeatPerFuel())), textX, textY, textColor);
+			font.draw(stack, Component.translatable(TEXT_HEAT_PER_FUEL, NumberHelper.format(recipe.getHeatPerFuel(), 2)), textX, textY, textColor);
 			textY += font.lineHeight;
 
-			font.draw(stack, Component.translatable(TEXT_AIR_COOLING_RATE, NumberHelper.format(recipe.getAirCoolingRate())), textX, textY, textColor);
+			font.draw(stack, Component.translatable(TEXT_AIR_COOLING_RATE, NumberHelper.format(recipe.getAirCoolingRate(), 2)), textX, textY, textColor);
 			textY += font.lineHeight;
 
 			double heatDuration = recipe.getHeatDuration(maxFuelUsage);

@@ -1,7 +1,7 @@
 {
   "type": "create_trainwrecked:train_engine_type",
   "acceleration": 6.0,
-  "airCoolingRate": 20,
+  "airCoolingRate": 100.0,
   "blockType": "createindustry:diesel_engine",
   "carriageStressMultiplier": 1.0,
   "conditions": [
@@ -16,8 +16,8 @@
   "fuelPerSpeed": 1.0,
   "fuelShare": false,
   "fuelType": "#forge:diesel",
-  "heatCapacity": 84000,
+  "heatCapacity": 60000,
   "heatPerFuel": 10,
   "maxSpeed": 30.0,
-  "overheatDuration": 6000
+  "overheatedResettingHeatRatio": 0.1
 }

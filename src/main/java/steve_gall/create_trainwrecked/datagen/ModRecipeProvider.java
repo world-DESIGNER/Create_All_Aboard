@@ -56,9 +56,9 @@ public class ModRecipeProvider extends RecipeProvider
 		steam.fuelShare(true);
 		steam.fuelMinimum(6480.0F / 60.0F);
 		steam.fuelPerRecipePow(2.0F);
+		steam.overheatedResettingHeatRatio(0.0F);
 		steam.airCoolingRate(20);
 		steam.heatCapacity((int) (((steam.maxSpeed() * steam.fuelPerSpeed() * steam.heatPerFuel()) - steam.airCoolingRate()) * 2 * 60));
-		steam.overheatDuration(5 * 60 * 20);
 		this.save(pFinishedRecipeConsumer, steam, "steam");
 
 		TrainEngineTypeRecipe.Builder<?> diesel = new TrainEngineTypeRecipe.Builder<>();
@@ -68,10 +68,17 @@ public class ModRecipeProvider extends RecipeProvider
 		diesel.fuelType(FluidTagEntry.TYPE.of(FluidTags.create(new ResourceLocation("forge", "diesel"))));
 		diesel.fuelPerSpeed(1.0F);
 		diesel.heatPerFuel(10);
-		diesel.airCoolingRate(20);
-		diesel.heatCapacity((int) (((diesel.maxSpeed() * diesel.fuelPerSpeed() * diesel.heatPerFuel()) - diesel.airCoolingRate()) * 5 * 60));
-		diesel.overheatDuration(5 * 60 * 20);
+		diesel.overheatedResettingHeatRatio(0.1F);
+		this.solveHeatVariables(diesel, 10 * 60, 5 * 60);
 		this.save(pFinishedRecipeConsumer, diesel, "diesel");
+	}
+
+	public void solveHeatVariables(TrainEngineTypeRecipe.Builder<?> engineType, float airCoolingDurationToZero, float heatDurability)
+	{
+		float fuelUsage = engineType.maxSpeed() * engineType.fuelPerSpeed() * engineType.heatPerFuel();
+		float denominator = 1.0F + (airCoolingDurationToZero / heatDurability);
+		engineType.airCoolingRate(fuelUsage / denominator);
+		engineType.heatCapacity((int) (heatDurability * (fuelUsage - engineType.airCoolingRate())));
 	}
 
 	public void save(Consumer<FinishedRecipe> consumer, TrainEngineTypeRecipe.Builder<?> builder, String name)

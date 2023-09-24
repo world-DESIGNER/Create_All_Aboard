@@ -2,6 +2,7 @@ package steve_gall.create_trainwrecked.common.content.train;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -53,6 +54,7 @@ import steve_gall.create_trainwrecked.common.CreateTrainwrecked;
 import steve_gall.create_trainwrecked.common.content.contraption.MountedStorageManagerExtension;
 import steve_gall.create_trainwrecked.common.crafting.TrainEngineTypeRecipe;
 import steve_gall.create_trainwrecked.common.mixin.StationBlockEntityAccessor;
+import steve_gall.create_trainwrecked.common.util.FluidTagEntry;
 import steve_gall.create_trainwrecked.common.util.NumberHelper;
 
 public class TrainHelper
@@ -396,25 +398,97 @@ public class TrainHelper
 		return totalBlocks;
 	}
 
-	public static double getPredictSpeed(Train train, double speed, double targetSpeed, float accelerationMod)
+	public static double getNextSpeed(Train train, double speed, double targetSpeed, float accelerationMod)
 	{
 		if (Mth.equal(speed, targetSpeed))
 		{
 			return speed;
 		}
+		else if (((speed < targetSpeed) && speed >= 0) || ((speed > targetSpeed) && speed <= 0))
+		{
+			double delta = TrainHelper.acceleration(train) * accelerationMod;
+			double beforePlan = 0.0D;
 
+			if (speed < targetSpeed)
+			{
+				beforePlan = Math.min(speed + delta, targetSpeed);
+			}
+			else
+			{
+				beforePlan = Math.max(speed - delta, targetSpeed);
+			}
+
+			Map<TrainEngineTypeRecipe, List<Engine>> engineMap = streamAliveEngines(train).collect(Collectors.groupingBy(Engine::getRecipe));
+			Map<TrainEngineTypeRecipe, EngineSpeedPlan> plan = makeEngineSpeedPlan(train, engineMap, beforePlan * 20.0D);
+			double planedDelta = 0.0D;
+
+			for (Entry<TrainEngineTypeRecipe, EngineSpeedPlan> pair : plan.entrySet())
+			{
+				TrainEngineTypeRecipe recipe = pair.getKey();
+				EngineSpeedPlan enginePlan = pair.getValue();
+				FuelBurning fuel = enginePlan.fuel();
+
+				for (Engine engine : engineMap.get(recipe))
+				{
+					planedDelta += recipe.getAcceleration() * engine.getPredictFuelUsingRatio(fuel.toBurn(), fuel.burned());
+				}
+
+			}
+
+			planedDelta /= 400.0D;
+
+			if (speed < targetSpeed)
+			{
+				speed = Math.min(speed + planedDelta, targetSpeed);
+			}
+			else
+			{
+				speed = Math.max(speed - planedDelta, targetSpeed);
+			}
+
+			return speed;
+		}
+		else
+		{
+			return approachTargetSpeed(train, Math.abs(speed), targetSpeed, accelerationMod);
+		}
+
+	}
+
+	public static double approachTargetSpeed(Train train, double speed, double targetSpeed, float accelerationMod)
+	{
 		double delta = getSpeedDelta(train, speed, targetSpeed) * accelerationMod;
 
-		if (speed < targetSpeed)
+		if (Mth.equal(speed, targetSpeed))
 		{
-			speed = Math.min(speed + delta, targetSpeed);
+			return speed;
+		}
+		else if (speed < targetSpeed)
+		{
+			return Math.min(speed + delta, targetSpeed);
 		}
 		else if (speed > targetSpeed)
 		{
-			speed = Math.max(speed - delta, targetSpeed);
+			return Math.max(speed - delta, targetSpeed);
+		}
+		else
+		{
+			return speed;
 		}
 
-		return speed;
+	}
+
+	public static float getSpeedDelta(Train train, double speed, double targetSpeed)
+	{
+		if (speed < targetSpeed)
+		{
+			return speed >= 0 ? TrainHelper.acceleration(train) : TrainHelper.deacceleration(train);
+		}
+		else
+		{
+			return speed <= 0 ? TrainHelper.acceleration(train) : TrainHelper.deacceleration(train);
+		}
+
 	}
 
 	public static void applyFuelSpeed(Train train)
@@ -430,7 +504,7 @@ public class TrainHelper
 			{
 				acelerationMod = approachAccelerationMod;
 				trainE.setApproachAccelerationMod(0.0F);
-				speed = getPredictSpeed(train, speed, train.targetSpeed, approachAccelerationMod);
+				speed = getNextSpeed(train, speed, train.targetSpeed, approachAccelerationMod);
 			}
 			else
 			{
@@ -439,48 +513,28 @@ public class TrainHelper
 
 		}
 
-		Map<TrainEngineTypeRecipe, List<Engine>> engineMap = streamAliveEngines(train).collect(Collectors.groupingBy(Engine::getRecipe));
-
 		if (!Mth.equal(speed, 0.0D))
 		{
-			double maxSpeed = train.maxSpeed();
+			Map<TrainEngineTypeRecipe, List<Engine>> engineMap = streamAliveEngines(train).collect(Collectors.groupingBy(Engine::getRecipe));
+			Map<TrainEngineTypeRecipe, EngineSpeedPlan> plan = makeEngineSpeedPlan(train, engineMap, speed);
 			double reductionRatio = getCarriageSpeedReductionRatio(train);
-			double speedRatio = Math.abs(speed) / maxSpeed;
-			double absNextSpeed = 0.0D;
+			double targetSpeed = 0.0D;
 
-			for (Entry<TrainEngineTypeRecipe, List<Engine>> entry : engineMap.entrySet())
+			for (Entry<TrainEngineTypeRecipe, EngineSpeedPlan> pair : plan.entrySet())
 			{
-				TrainEngineTypeRecipe recipe = entry.getKey();
-				List<Engine> engines = entry.getValue();
-				int duplicatedRecipeCount = engines.size() - 1;
-				double allocatedSpeed = speedRatio * recipe.getMaxSpeed();
-				double toBurn = recipe.getFuelUsage(duplicatedRecipeCount, allocatedSpeed) / 20.0D;
+				TrainEngineTypeRecipe recipe = pair.getKey();
+				double eachSpeed = pair.getValue().speed();
+				List<Engine> engines = engineMap.get(recipe);
+				int engineCount = engines.size();
+				FuelBurning burnData = burnFuel(train, recipe, engineCount, eachSpeed, false);
 
-				if (recipe.isFuelShare())
-				{
-					double sharedBurned = trainE.getFuelBurner().burn(train, recipe.getFuelType(), toBurn);
-					double eachToBurn = toBurn / engines.size();
-					double eachBurned = sharedBurned / engines.size();
-
-					for (Engine engine : engines)
-					{
-						engine.onFuelBurned(eachToBurn, eachBurned, allocatedSpeed);
-					}
-
-				}
-				else
-				{
-					for (Engine engine : engines)
-					{
-						double burned = engine.getFuelBurner().burn(train, recipe.getFuelType(), toBurn);
-						engine.onFuelBurned(toBurn, burned, allocatedSpeed);
-					}
-
-				}
+				double eachToBurn = burnData.toBurn() / engineCount;
+				double eachBurned = burnData.burned() / engineCount;
 
 				for (Engine engine : engines)
 				{
-					absNextSpeed += engine.getSpeed() * reductionRatio;
+					engine.onFuelBurned(eachToBurn, eachBurned, eachSpeed);
+					targetSpeed += engine.getSpeed() * reductionRatio;
 				}
 
 			}
@@ -497,15 +551,15 @@ public class TrainHelper
 
 			if (!Double.isInfinite(maxBlocksPerCarriage) && maxBlocks < totalBlocks)
 			{
-				absNextSpeed = 0.0D;
+				targetSpeed = 0.0D;
 			}
 
 			if (speed < 0)
 			{
-				absNextSpeed = -absNextSpeed;
+				targetSpeed = -targetSpeed;
 			}
 
-			train.speed = getPredictSpeed(train, train.speed, absNextSpeed, acelerationMod);
+			train.speed = approachTargetSpeed(train, train.speed, targetSpeed / 20.0D, acelerationMod);
 		}
 		else
 		{
@@ -526,6 +580,89 @@ public class TrainHelper
 			train.leaveStation();
 		}
 
+	}
+
+	private static Map<TrainEngineTypeRecipe, EngineSpeedPlan> makeEngineSpeedPlan(Train train, Map<TrainEngineTypeRecipe, List<Engine>> engineMap, double speed)
+	{
+		double maxSpeed = train.maxSpeed();
+		double speedRatio = Math.abs(speed) / maxSpeed;
+		Map<TrainEngineTypeRecipe, Double> speedPlans = new HashMap<>();
+		Map<TrainEngineTypeRecipe, EngineSpeedPlan> speedPredict = new HashMap<>();
+
+		for (Entry<TrainEngineTypeRecipe, List<Engine>> entry : engineMap.entrySet())
+		{
+			TrainEngineTypeRecipe recipe = entry.getKey();
+			speedPlans.put(recipe, speedRatio * recipe.getMaxSpeed());
+			speedPredict.put(recipe, new EngineSpeedPlan(new FuelBurning(0.0D, 0.0D), 0.0D));
+		}
+
+		while (true)
+		{
+			double totalNeeded = 0.0D;
+			List<TrainEngineTypeRecipe> enoughs = new ArrayList<>();
+			List<TrainEngineTypeRecipe> neededs = new ArrayList<>();
+
+			for (TrainEngineTypeRecipe recipe : speedPlans.keySet())
+			{
+				int engineCount = engineMap.get(recipe).size();
+				double eachSpeedPlan = speedPlans.get(recipe);
+				FuelBurning burnData = burnFuel(train, recipe, engineCount, eachSpeedPlan, true);
+
+				double eachToBurn = burnData.toBurn() / engineCount;
+				double eachBurned = burnData.burned() / engineCount;
+				double eachPredict = recipe.getPredictSpeed(eachToBurn, eachBurned, eachSpeedPlan);
+				speedPredict.put(recipe, new EngineSpeedPlan(burnData, eachPredict));
+
+				if (Mth.equal(eachPredict, eachSpeedPlan) || eachPredict >= eachSpeedPlan)
+				{
+					enoughs.add(recipe);
+				}
+				else
+				{
+					neededs.add(recipe);
+					totalNeeded += (eachSpeedPlan - eachPredict) * engineCount;
+				}
+
+			}
+
+			if (Mth.equal(totalNeeded, 0.0D) || enoughs.size() == 0)
+			{
+				break;
+			}
+
+			for (TrainEngineTypeRecipe recipe : neededs)
+			{
+				speedPlans.remove(recipe);
+			}
+
+			double planAdding = totalNeeded / enoughs.size();
+
+			for (TrainEngineTypeRecipe recipe : enoughs)
+			{
+				double prevPlan = speedPlans.get(recipe);
+				double nextPlan = prevPlan + planAdding / engineMap.get(recipe).size();
+				speedPlans.put(recipe, nextPlan);
+			}
+
+		}
+
+		return speedPredict;
+	}
+
+	public static FuelBurning burnFuel(Train train, TrainEngineTypeRecipe recipe, int engineCount, double speed, boolean simulate)
+	{
+		int duplicatedRecipeCount = engineCount - 1;
+		double fuelPerTick = recipe.getFuelUsage(duplicatedRecipeCount, speed) / 20.0D;
+		double toBurn = fuelPerTick;
+
+		if (!recipe.isFuelShare())
+		{
+			toBurn = fuelPerTick * engineCount;
+		}
+
+		FluidTagEntry fuelType = recipe.getFuelType();
+		double burned = ((TrainExtension) train).getFuelBurner().burn(train, fuelType, toBurn, simulate);
+		return new FuelBurning(toBurn, burned);
 	}
 
 	public static double getCarriageSpeedReductionRatio(Train train)
@@ -574,19 +711,6 @@ public class TrainHelper
 		else
 		{
 			return AllConfigs.server().trains.trainAcceleration.getF() / 400;
-		}
-
-	}
-
-	public static float getSpeedDelta(Train train, double speed, double targetSpeed)
-	{
-		if (speed < targetSpeed)
-		{
-			return speed >= 0 ? TrainHelper.acceleration(train) : TrainHelper.deacceleration(train);
-		}
-		else
-		{
-			return speed <= 0 ? TrainHelper.acceleration(train) : TrainHelper.deacceleration(train);
 		}
 
 	}

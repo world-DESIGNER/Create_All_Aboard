@@ -60,6 +60,25 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 		this.fuel = this.fuelType.toIngredient();
 	}
 
+	public double getPredictSpeed(double toBurn, double burned, double allocatedSpeed)
+	{
+		double fuelPerSpeed = this.getFuelPerSpeed();
+
+		if (fuelPerSpeed > 0)
+		{
+			return burned * 20.0D / fuelPerSpeed;
+		}
+		else if (burned > 0)
+		{
+			return allocatedSpeed;
+		}
+		else
+		{
+			return 0.0D;
+		}
+
+	}
+
 	public double getFuelUsage(int sameRecipeCount, double speed)
 	{
 		float minimum = this.getFuelMinimum();

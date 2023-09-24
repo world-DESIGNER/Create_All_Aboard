@@ -39,9 +39,9 @@ public class FuelBurner
 		this.readNetwork(buffer);
 	}
 
-	public double burn(Train train, FluidTagEntry fuel, double amount)
+	public double burn(Train train, FluidTagEntry fuel, double amount, boolean simulate)
 	{
-		return this.map.computeIfAbsent(fuel, FuelStatus::new).burn(train, amount);
+		return this.map.computeIfAbsent(fuel, FuelStatus::new).burn(train, amount, simulate);
 	}
 
 	public void readNbt(CompoundTag tag)
@@ -99,7 +99,7 @@ public class FuelBurner
 			this.remained = buffer.readDouble();
 		}
 
-		public double burn(Train train, double toBurn)
+		public double burn(Train train, double toBurn, boolean simulate)
 		{
 			int extracting = Mth.ceil(Math.max(toBurn - this.remained, 0.0D));
 			int extracted = 0;
@@ -118,7 +118,7 @@ public class FuelBurner
 						}
 
 						FluidStack burning = FluidHelper.deriveAmount(fluidStack, extracting - extracted);
-						FluidStack burned = fluidStroage.drain(burning, FluidAction.EXECUTE);
+						FluidStack burned = fluidStroage.drain(burning, simulate ? FluidAction.SIMULATE : FluidAction.EXECUTE);
 
 						if (!burned.isEmpty())
 						{
@@ -136,9 +136,13 @@ public class FuelBurner
 			if (extracted + this.remained >= toBurn)
 			{
 				burned = toBurn;
-				this.remained += extracted - toBurn;
+
+				if (!simulate)
+				{
+					this.remained += extracted - toBurn;
+				}
 			}
-			else
+			else if (!simulate)
 			{
 				this.remained = 0.0D;
 			}

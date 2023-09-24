@@ -22,7 +22,6 @@ public class Engine
 	public static final ResourceLocation RECIPE_NOT_FOUND_ID = CreateTrainwrecked.asResource("recipe_not_found");
 	public static final TrainEngineTypeRecipe NOT_FOUND_RECIPE = new TrainEngineTypeRecipe.Builder<>().build(RECIPE_NOT_FOUND_ID);
 
-	private final FuelBurner fuelBurner;
 	private BlockPos localPos;
 	private BlockState blockState;
 	private ItemStack item;
@@ -35,7 +34,6 @@ public class Engine
 
 	public Engine(EnginPos enginPos)
 	{
-		this.fuelBurner = new FuelBurner();
 		this.localPos = enginPos.localPos();
 		this.blockState = enginPos.blockState();
 		this.item = enginPos.item();
@@ -45,7 +43,6 @@ public class Engine
 
 	public Engine(CompoundTag tag)
 	{
-		this.fuelBurner = new FuelBurner(tag.getCompound("fuelBurner"));
 		this.localPos = NbtUtils.readBlockPos(tag.getCompound("localPos"));
 		this.blockState = NbtUtils.readBlockState(tag.getCompound("blockState"));
 		this.item = ItemStack.of(tag.getCompound("item"));
@@ -59,7 +56,6 @@ public class Engine
 
 	public Engine(FriendlyByteBuf buffer)
 	{
-		this.fuelBurner = new FuelBurner(buffer);
 		this.localPos = buffer.readBlockPos();
 		this.blockState = NbtUtils.readBlockState(buffer.readNbt());
 		this.item = buffer.readItem();
@@ -73,24 +69,19 @@ public class Engine
 
 	public void onFuelBurned(double toBurn, double burned, double allocatedSpeed)
 	{
-		this.fuelUsedRatio = toBurn > 0.0D ? (burned / toBurn) : 1.0D;
+		this.fuelUsedRatio = this.getPredictFuelUsingRatio(toBurn, burned);
 
 		TrainEngineTypeRecipe recipe = this.getRecipe();
+		double speed = recipe.getPredictSpeed(toBurn, burned, allocatedSpeed);
+		this.setSpeed(speed);
 
-		if (recipe.getFuelPerSpeed() > 0)
-		{
-			this.setSpeed(burned / recipe.getFuelPerSpeed());
-		}
-		else if (burned > 0)
-		{
-			this.setSpeed(allocatedSpeed / 20.0D);
-		}
-		else
-		{
-			this.setSpeed(0.0D);
-		}
+		double heat = this.getHeat();
+		this.setHeat(heat + (burned * recipe.getHeatPerFuel()));
+	}
 
-		this.setHeat(this.getHeat() + (burned * recipe.getHeatPerFuel()));
+	public double getPredictFuelUsingRatio(double toBurn, double burned)
+	{
+		return toBurn > 0.0D ? (burned / toBurn) : 1.0D;
 	}
 
 	public void tick(Train train, Level level)
@@ -149,7 +140,6 @@ public class Engine
 	public static CompoundTag toNbt(Engine engine)
 	{
 		CompoundTag tag = new CompoundTag();
-		tag.put("fuelBurner", engine.fuelBurner.writeNbt());
 		tag.put("localPos", NbtUtils.writeBlockPos(engine.localPos));
 		tag.put("blockState", NbtUtils.writeBlockState(engine.blockState));
 		tag.put("item", engine.item.serializeNBT());
@@ -164,7 +154,6 @@ public class Engine
 
 	public static void toNetwork(FriendlyByteBuf buffer, Engine engine)
 	{
-		engine.getFuelBurner().writeNetwork(buffer);
 		buffer.writeBlockPos(engine.localPos);
 		buffer.writeNbt(NbtUtils.writeBlockState(engine.blockState));
 		buffer.writeItem(engine.item);
@@ -173,11 +162,6 @@ public class Engine
 		buffer.writeDouble(engine.heat);
 		buffer.writeDouble(engine.speed);
 		buffer.writeBoolean(engine.overheated);
-	}
-
-	public FuelBurner getFuelBurner()
-	{
-		return this.fuelBurner;
 	}
 
 	public BlockPos getBlockPos()

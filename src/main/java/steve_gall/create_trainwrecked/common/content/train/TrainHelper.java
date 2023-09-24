@@ -70,8 +70,8 @@ public class TrainHelper
 	public static String TRAIN_GOGGLE_TRAIN_INFO = CreateTrainwrecked.translationKey("train_google.train_info");
 	public static String TRAIN_GOGGLE_TRAIN_SPEED = CreateTrainwrecked.translationKey("train_google.train_speed");
 	public static String TRAIN_GOGGLE_ENGINE_INFO = CreateTrainwrecked.translationKey("train_google.engine_info");
-	public static String TRAIN_GOGGLE_ENGINE_HEAT = CreateTrainwrecked.translationKey("train_google.engine_heat");
-	public static String TRAIN_GOGGLE_ENGINE_MOST_HEAT = CreateTrainwrecked.translationKey("train_google.engine_most_heat");
+	public static String TRAIN_GOGGLE_ENGINE_TEMP = CreateTrainwrecked.translationKey("train_google.engine_temp");
+	public static String TRAIN_GOGGLE_ENGINE_HIGHEST_TEMP = CreateTrainwrecked.translationKey("train_google.engine_highest_heat");
 	public static String TRAIN_GOGGLE_ENGINE_OVERHEATEDS = CreateTrainwrecked.translationKey("train_google.engine_overheateds");
 
 	public static void assemble(StationBlockEntity self, UUID playerUUID)
@@ -758,7 +758,7 @@ public class TrainHelper
 				{
 					double heatRatio = engine.getHeat() / heatCapacity;
 					MutableComponent heatPercentComponent = getHeatPercentComponent(heatRatio);
-					statusComponents.add(Component.translatable(TRAIN_GOGGLE_ENGINE_HEAT, heatPercentComponent));
+					statusComponents.add(Component.translatable(TRAIN_GOGGLE_ENGINE_TEMP, heatPercentComponent));
 				}
 
 				if (statusComponents.size() > 0)
@@ -819,7 +819,7 @@ public class TrainHelper
 					double mostHeatRatio = hostHeat / heatCapacity;
 					MutableComponent mostHeatPercentComponent = getHeatPercentComponent(mostHeatRatio);
 					MutableComponent overheatedsComponent = Component.literal(NumberHelper.format(overheates)).withStyle(overheates > 0 ? ChatFormatting.RED : ChatFormatting.WHITE);
-					Lang.builder().add(Component.translatable(TRAIN_GOGGLE_ENGINE_MOST_HEAT, mostHeatPercentComponent)).style(ChatFormatting.GRAY).forGoggles(tooltip, 2);
+					Lang.builder().add(Component.translatable(TRAIN_GOGGLE_ENGINE_HIGHEST_TEMP, mostHeatPercentComponent)).style(ChatFormatting.GRAY).forGoggles(tooltip, 2);
 					Lang.builder().add(Component.translatable(TRAIN_GOGGLE_ENGINE_OVERHEATEDS, overheatedsComponent)).style(ChatFormatting.GRAY).forGoggles(tooltip, 2);
 				}
 

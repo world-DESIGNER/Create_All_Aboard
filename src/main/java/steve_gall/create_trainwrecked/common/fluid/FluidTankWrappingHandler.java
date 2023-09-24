@@ -49,12 +49,53 @@ public class FluidTankWrappingHandler implements IFluidHandler
 	@Override
 	public @NotNull FluidStack drain(FluidStack resource, FluidAction action)
 	{
+		if (action.simulate() && !resource.isEmpty())
+		{
+			int toDrain = resource.getAmount();
+			int drained = 0;
+
+			for (FluidTankData tank : this.list)
+			{
+				FluidStack stack = tank.stack();
+
+				if (stack.isFluidEqual(resource))
+				{
+					drained += Math.min(stack.getAmount(), toDrain);
+					toDrain -= drained;
+
+					if (toDrain <= 0)
+					{
+						break;
+					}
+
+				}
+
+			}
+
+			return FluidHelper.deriveAmount(resource, drained);
+		}
+
 		return FluidStack.EMPTY;
 	}
 
 	@Override
 	public @NotNull FluidStack drain(int maxDrain, FluidAction action)
 	{
+		if (action.simulate())
+		{
+			for (FluidTankData tank : this.list)
+			{
+				FluidStack stack = tank.stack();
+
+				if (!stack.isEmpty())
+				{
+					return this.drain(FluidHelper.deriveAmount(stack, maxDrain), action);
+				}
+
+			}
+
+		}
+
 		return FluidStack.EMPTY;
 	}
 

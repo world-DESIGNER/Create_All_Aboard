@@ -1,6 +1,8 @@
 package steve_gall.create_trainwrecked.common.content.train;
 
-public record EngineSpeedPlan(FuelBurning fuel, double speed)
+import java.util.List;
+
+public record EngineSpeedPlan(List<Engine> engines, FuelBurning fuel, double speed)
 {
 
 }

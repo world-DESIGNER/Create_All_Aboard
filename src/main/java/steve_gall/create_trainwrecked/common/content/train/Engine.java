@@ -67,21 +67,21 @@ public class Engine
 		this.overheated = buffer.readBoolean();
 	}
 
-	public void onFuelBurned(double toBurn, double burned, double allocatedSpeed)
+	public void onFuelBurned(FuelBurning fuel, double allocatedSpeed)
 	{
-		this.fuelUsedRatio = this.getPredictFuelUsingRatio(toBurn, burned);
+		this.fuelUsedRatio = this.getFuelUsingRatio(fuel);
 
 		TrainEngineTypeRecipe recipe = this.getRecipe();
-		double speed = recipe.getPredictSpeed(toBurn, burned, allocatedSpeed);
+		double speed = recipe.getPredictSpeed(fuel.toBurn(), fuel.burned(), allocatedSpeed);
 		this.setSpeed(speed);
 
 		double heat = this.getHeat();
-		this.setHeat(heat + (burned * recipe.getHeatPerFuel()));
+		this.setHeat(heat + (fuel.burned() * recipe.getHeatPerFuel()));
 	}
 
-	public double getPredictFuelUsingRatio(double toBurn, double burned)
+	public double getFuelUsingRatio(FuelBurning fuel)
 	{
-		return toBurn > 0.0D ? (burned / toBurn) : 1.0D;
+		return fuel.toBurn() > 0.0D ? (fuel.burned() / fuel.toBurn()) : 1.0D;
 	}
 
 	public void tick(Train train, Level level)
@@ -130,7 +130,7 @@ public class Engine
 		{
 			this.setOverheat(true);
 		}
-		else if (recipe.getOverheatedResettingHeatRatio() >= (heat / heatCapacity))
+		else if (recipe.overheatedResettingTemp() >= (heat / heatCapacity))
 		{
 			this.setOverheat(false);
 		}

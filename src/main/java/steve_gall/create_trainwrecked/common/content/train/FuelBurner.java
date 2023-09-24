@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.simibubi.create.content.contraptions.minecart.TrainCargoManager;
 import com.simibubi.create.content.trains.entity.Carriage;
 import com.simibubi.create.content.trains.entity.Train;
 import com.simibubi.create.foundation.utility.NBTHelper;
@@ -15,6 +16,7 @@ import net.minecraft.util.Mth;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
+import steve_gall.create_trainwrecked.common.content.contraption.MountedStorageManagerExtension;
 import steve_gall.create_trainwrecked.common.fluid.FluidHelper;
 import steve_gall.create_trainwrecked.common.util.FluidTagEntry;
 
@@ -108,7 +110,14 @@ public class FuelBurner
 			{
 				for (Carriage carriage : train.carriages)
 				{
-					IFluidHandler fluidStroage = carriage.storage.getFluids();
+					TrainCargoManager storage = carriage.storage;
+					IFluidHandler fluidStroage = storage.getFluids();
+
+					if (fluidStroage == null)
+					{
+						// Work on client
+						fluidStroage = ((MountedStorageManagerExtension) storage).getSyncedFluids();
+					}
 
 					for (FluidStack fluidStack : this.type.toIngredient().getMatchingFluidStacks())
 					{

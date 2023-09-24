@@ -56,7 +56,7 @@ public class ModRecipeProvider extends RecipeProvider
 		steam.fuelShare(true);
 		steam.fuelMinimum(6480.0F / 60.0F);
 		steam.fuelPerRecipePow(2.0F);
-		steam.overheatedResettingHeatRatio(0.0F);
+		steam.overheatedResettingTemp(0.0F);
 		steam.airCoolingRate(20);
 		steam.heatCapacity((int) (((steam.maxSpeed() * steam.fuelPerSpeed() * steam.heatPerFuel()) - steam.airCoolingRate()) * 2 * 60));
 		this.save(pFinishedRecipeConsumer, steam, "steam");
@@ -68,7 +68,7 @@ public class ModRecipeProvider extends RecipeProvider
 		diesel.fuelType(FluidTagEntry.TYPE.of(FluidTags.create(new ResourceLocation("forge", "diesel"))));
 		diesel.fuelPerSpeed(1.0F);
 		diesel.heatPerFuel(10);
-		diesel.overheatedResettingHeatRatio(0.1F);
+		diesel.overheatedResettingTemp(0.1F);
 		this.solveHeatVariables(diesel, 10 * 60, 5 * 60);
 		this.save(pFinishedRecipeConsumer, diesel, "diesel");
 	}

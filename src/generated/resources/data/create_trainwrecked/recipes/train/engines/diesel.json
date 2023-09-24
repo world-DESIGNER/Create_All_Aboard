@@ -19,5 +19,5 @@
   "heatCapacity": 60000,
   "heatPerFuel": 10,
   "maxSpeed": 30.0,
-  "overheatedResettingHeatRatio": 0.1
+  "overheatedResettingTemp": 0.1
 }

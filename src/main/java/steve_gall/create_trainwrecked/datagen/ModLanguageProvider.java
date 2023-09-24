@@ -49,7 +49,9 @@ public class ModLanguageProvider extends LanguageProvider
 
 		this.add(TrainHelper.TRAIN_GOGGLE_TRAIN_INFO, "Train Info:");
 		this.add(TrainHelper.TRAIN_GOGGLE_TRAIN_SPEED, "Speed: %1$s / %2$s");
+		this.add(TrainHelper.TRAIN_GOGGLE_TRAIN_BLOCKS, "Blocks: %1$s / %2$s");
 		this.add(TrainHelper.TRAIN_GOGGLE_ENGINE_INFO, "Engine Info:");
+		this.add(TrainHelper.TRAIN_GOGGLE_ENGINE_COUNT, "%1$s: %2$s");
 		this.add(TrainHelper.TRAIN_GOGGLE_ENGINE_TEMP, "Temp.: %s");
 		this.add(TrainHelper.TRAIN_GOGGLE_ENGINE_HIGHEST_TEMP, "Highest Temp.: %s");
 		this.add(TrainHelper.TRAIN_GOGGLE_ENGINE_OVERHEATEDS, "Overheateds: %s");

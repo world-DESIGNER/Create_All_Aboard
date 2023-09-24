@@ -33,7 +33,7 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 	private final int heatCapacity;
 	private final int heatPerFuel;
 	private final float airCoolingRate;
-	private final float overheatedResettingHeatRatio;
+	private final float overheatedResettingTemp;
 
 	private final Ingredient block;
 	private final FluidIngredient fuel;
@@ -54,7 +54,7 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 		this.heatCapacity = builder.heatCapacity();
 		this.heatPerFuel = builder.heatPerFuel();
 		this.airCoolingRate = builder.airCoolingRate();
-		this.overheatedResettingHeatRatio = builder.overheatedResettingHeatRatio();
+		this.overheatedResettingTemp = builder.overheatedResettingTemp();
 
 		this.block = this.blockType.toIngredient();
 		this.fuel = this.fuelType.toIngredient();
@@ -179,7 +179,7 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 		pJson.addProperty("heatCapacity", this.getHeatCapacity());
 		pJson.addProperty("heatPerFuel", this.getHeatPerFuel());
 		pJson.addProperty("airCoolingRate", this.getAirCoolingRate());
-		pJson.addProperty("overheatedResettingHeatRatio", this.getOverheatedResettingHeatRatio());
+		pJson.addProperty("overheatedResettingTemp", this.overheatedResettingTemp());
 	}
 
 	@Override
@@ -198,7 +198,7 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 		pBuffer.writeInt(this.getHeatCapacity());
 		pBuffer.writeInt(this.getHeatPerFuel());
 		pBuffer.writeFloat(this.getAirCoolingRate());
-		pBuffer.writeFloat(this.getOverheatedResettingHeatRatio());
+		pBuffer.writeFloat(this.overheatedResettingTemp());
 	}
 
 	@Override
@@ -282,9 +282,9 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 		return this.airCoolingRate;
 	}
 
-	public float getOverheatedResettingHeatRatio()
+	public float overheatedResettingTemp()
 	{
-		return this.overheatedResettingHeatRatio;
+		return this.overheatedResettingTemp;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -303,7 +303,7 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 		private int heatCapacity = 0;
 		private int heatPerFuel = 0;
 		private float airCoolingRate = 0.0F;
-		private float overheatedResettingHeatRatio = 0.0F;
+		private float overheatedResettingTemp = 0.0F;
 
 		public Builder()
 		{
@@ -326,7 +326,7 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 			this.heatCapacity(GsonHelper.getAsInt(pJson, "heatCapacity"));
 			this.heatPerFuel(GsonHelper.getAsInt(pJson, "heatPerFuel"));
 			this.airCoolingRate(GsonHelper.getAsFloat(pJson, "airCoolingRate"));
-			this.overheatedResettingHeatRatio(GsonHelper.getAsFloat(pJson, "overheatedResettingHeatRatio"));
+			this.overheatedResettingTemp(GsonHelper.getAsFloat(pJson, "overheatedResettingTemp"));
 		}
 
 		@Override
@@ -345,7 +345,7 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 			this.heatCapacity(pBuffer.readInt());
 			this.heatPerFuel(pBuffer.readInt());
 			this.airCoolingRate(pBuffer.readFloat());
-			this.overheatedResettingHeatRatio(pBuffer.readFloat());
+			this.overheatedResettingTemp(pBuffer.readFloat());
 		}
 
 		@Override
@@ -497,14 +497,14 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 			return (T) this;
 		}
 
-		public float overheatedResettingHeatRatio()
+		public float overheatedResettingTemp()
 		{
-			return this.overheatedResettingHeatRatio;
+			return this.overheatedResettingTemp;
 		}
 
-		public T overheatedResettingHeatRatio(float overheatedResettingHeatRatio)
+		public T overheatedResettingTemp(float overheatedResettingTemp)
 		{
-			this.overheatedResettingHeatRatio = Math.max(overheatedResettingHeatRatio, 0.0F);
+			this.overheatedResettingTemp = Math.max(overheatedResettingTemp, 0.0F);
 			return (T) this;
 		}
 

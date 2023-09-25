@@ -66,6 +66,7 @@ public class ModRecipeProvider extends RecipeProvider
 		diesel.maxSpeed(30.0F);
 		diesel.acceleration(diesel.maxSpeed() / 5.0F);
 		diesel.fuelType(FluidTagEntry.TYPE.of(FluidTags.create(new ResourceLocation("forge", "diesel"))));
+		diesel.fuelType(FluidTagEntry.TYPE.of(FluidTags.create(new ResourceLocation("forge", "biodiesel"))));
 		diesel.fuelPerSpeed(1.0F);
 		diesel.heatPerFuel(10);
 		diesel.overheatedResettingTemp(0.1F);
@@ -86,10 +87,15 @@ public class ModRecipeProvider extends RecipeProvider
 		FinishedRecipe finish = builder.finish(new ResourceLocation(this.modId, "train/engines/" + name));
 		List<ICondition> conditions = new ArrayList<>();
 
-		TagEntry blockType = builder.blockType().getTagEntry();
-		if (!blockType.isTag() && !blockType.getId().getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE))
+		for (ItemTagEntry blockType : builder.blockType())
 		{
-			conditions.add(new ItemExistsCondition(blockType.getId()));
+			TagEntry tagEntry = blockType.getTagEntry();
+
+			if (!tagEntry.isTag() && !tagEntry.getId().getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE))
+			{
+				conditions.add(new ItemExistsCondition(tagEntry.getId()));
+			}
+
 		}
 
 		consumer.accept(new ConditionFinishedRecipe(finish, conditions));

@@ -22,6 +22,8 @@ import net.minecraftforge.fluids.FluidType;
 import steve_gall.create_trainwrecked.common.crafting.TrainEngineTypeRecipe;
 import steve_gall.create_trainwrecked.common.fluid.FluidHelper;
 import steve_gall.create_trainwrecked.common.init.ModRecipeTypes;
+import steve_gall.create_trainwrecked.common.util.FluidTagEntry;
+import steve_gall.create_trainwrecked.common.util.ItemTagEntry;
 import steve_gall.create_trainwrecked.common.util.NumberHelper;
 
 public class TrainEngineTypeCategory extends ModJEIRecipeCategory<TrainEngineTypeRecipe>
@@ -106,9 +108,9 @@ public class TrainEngineTypeCategory extends ModJEIRecipeCategory<TrainEngineTyp
 	@Override
 	public void setRecipe(IRecipeLayoutBuilder layout, TrainEngineTypeRecipe recipe, IFocusGroup focus)
 	{
-		layout.addSlot(RecipeIngredientRole.INPUT, 2, 2).addIngredients(recipe.getBlock());
+		layout.addSlot(RecipeIngredientRole.INPUT, 2, 2).addItemStacks(ItemTagEntry.TYPE.getIngredientMatchingStacks(recipe.getBlocks()).toList());
 
-		List<FluidStack> fluids = FluidHelper.deriveAmount(recipe.getFuelType().toIngredient().getMatchingFluidStacks(), FluidType.BUCKET_VOLUME).toList();
+		List<FluidStack> fluids = FluidHelper.deriveAmount(FluidTagEntry.TYPE.getIngredientMatchingStacks(recipe.getFuels()).toList(), FluidType.BUCKET_VOLUME).toList();
 		layout.addSlot(RecipeIngredientRole.INPUT, 26, 2).addIngredients(ForgeTypes.FLUID_STACK, fluids);
 	}
 

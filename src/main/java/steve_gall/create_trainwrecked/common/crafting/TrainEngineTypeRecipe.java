@@ -1,5 +1,9 @@
 package steve_gall.create_trainwrecked.common.crafting;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import com.google.gson.JsonObject;
 import com.simibubi.create.foundation.fluid.FluidIngredient;
 
@@ -20,11 +24,11 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 {
 	protected final ResourceLocation id;
 
-	private final ItemTagEntry blockType;
+	private final List<ItemTagEntry> blockType;
 	private final float maxSpeed;
 	private final float acceleration;
 	private final float carriageStressMultiplier;
-	private final FluidTagEntry fuelType;
+	private final List<FluidTagEntry> fuelType;
 	private final boolean fuelShare;
 	private final float fuelMinimum;
 	private final float fuelPerSpeed;
@@ -35,17 +39,17 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 	private final float airCoolingRate;
 	private final float overheatedResettingTemp;
 
-	private final Ingredient block;
-	private final FluidIngredient fuel;
+	private final List<Ingredient> blocks;
+	private final List<FluidIngredient> fuels;
 
 	private TrainEngineTypeRecipe(ResourceLocation id, Builder<?> builder)
 	{
 		this.id = id;
-		this.blockType = builder.blockType();
+		this.blockType = Collections.unmodifiableList(builder.blockType());
 		this.maxSpeed = builder.maxSpeed();
 		this.acceleration = builder.acceleration();
 		this.carriageStressMultiplier = builder.carriageStressMultiplier();
-		this.fuelType = builder.fuelType();
+		this.fuelType = Collections.unmodifiableList(builder.fuelType());
 		this.fuelShare = builder.fuelShare();
 		this.fuelMinimum = builder.fuelMinimum();
 		this.fuelPerSpeed = builder.fuelPerSpeed();
@@ -56,8 +60,8 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 		this.airCoolingRate = builder.airCoolingRate();
 		this.overheatedResettingTemp = builder.overheatedResettingTemp();
 
-		this.block = this.blockType.toIngredient();
-		this.fuel = this.fuelType.toIngredient();
+		this.blocks = this.blockType.stream().map(ItemTagEntry::toIngredient).toList();
+		this.fuels = this.fuelType.stream().map(FluidTagEntry::toIngredient).toList();
 	}
 
 	public double getPredictSpeed(double toBurn, double burned, double allocatedSpeed)
@@ -166,11 +170,11 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 	@Override
 	public void toJson(JsonObject pJson)
 	{
-		pJson.add("blockType", this.getBlockType().toJson());
+		pJson.add("blockType", ItemTagEntry.TYPE.listToJson(this.getBlockType()));
 		pJson.addProperty("maxSpeed", this.getMaxSpeed());
 		pJson.addProperty("acceleration", this.getAcceleration());
 		pJson.addProperty("carriageStressMultiplier", this.getCarriageStressMultiplier());
-		pJson.add("fuelType", this.getFuelType().toJson());
+		pJson.add("fuelType", FluidTagEntry.TYPE.listToJson(this.getFuelType()));
 		pJson.addProperty("fuelShare", this.isFuelShare());
 		pJson.addProperty("fuelMinimum", this.getFuelMinimum());
 		pJson.addProperty("fuelPerSpeed", this.getFuelPerSpeed());
@@ -185,11 +189,11 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 	@Override
 	public void toNetwork(FriendlyByteBuf pBuffer)
 	{
-		this.getBlockType().toNetwork(pBuffer);
+		ItemTagEntry.TYPE.listToNetowrk(pBuffer, this.getBlockType());
 		pBuffer.writeFloat(this.getMaxSpeed());
 		pBuffer.writeFloat(this.getAcceleration());
 		pBuffer.writeFloat(this.getCarriageStressMultiplier());
-		this.getFuelType().toNetwork(pBuffer);
+		FluidTagEntry.TYPE.listToNetowrk(pBuffer, this.getFuelType());
 		pBuffer.writeBoolean(this.isFuelShare());
 		pBuffer.writeFloat(this.getFuelMinimum());
 		pBuffer.writeFloat(this.getFuelPerSpeed());
@@ -207,14 +211,14 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 		return this.id;
 	}
 
-	public ItemTagEntry getBlockType()
+	public List<ItemTagEntry> getBlockType()
 	{
 		return this.blockType;
 	}
 
-	public Ingredient getBlock()
+	public List<Ingredient> getBlocks()
 	{
-		return this.block;
+		return this.blocks;
 	}
 
 	public float getMaxSpeed()
@@ -232,14 +236,14 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 		return this.carriageStressMultiplier;
 	}
 
-	public FluidTagEntry getFuelType()
+	public List<FluidTagEntry> getFuelType()
 	{
 		return this.fuelType;
 	}
 
-	public FluidIngredient getFuel()
+	public List<FluidIngredient> getFuels()
 	{
-		return this.fuel;
+		return this.fuels;
 	}
 
 	public boolean isFuelShare()
@@ -290,11 +294,11 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 	@SuppressWarnings("unchecked")
 	public static class Builder<T extends Builder<T>> extends SimpleRecipeBuilder<T, TrainEngineTypeRecipe>
 	{
-		private ItemTagEntry blockType = ItemTagEntry.TYPE.empty();
+		private final List<ItemTagEntry> blockType = new ArrayList<>();
 		private float maxSpeed = 0.0F;
 		private float acceleration = 0.0F;
 		private float carriageStressMultiplier = 1.0F;
-		private FluidTagEntry fuelType = FluidTagEntry.TYPE.empty();
+		private List<FluidTagEntry> fuelType = new ArrayList<>();
 		private boolean fuelShare = false;
 		private float fuelMinimum = 0.0F;
 		private float fuelPerSpeed = 0.0F;
@@ -313,11 +317,11 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 		@Override
 		public void fromJson(JsonObject pJson)
 		{
-			this.blockType(ItemTagEntry.TYPE.getAsTagEntry(pJson, "blockType"));
+			this.blockType().addAll(ItemTagEntry.TYPE.getAsTagEntryList(pJson, "blockType"));
 			this.maxSpeed(GsonHelper.getAsFloat(pJson, "maxSpeed"));
 			this.acceleration(GsonHelper.getAsFloat(pJson, "acceleration"));
 			this.carriageStressMultiplier(GsonHelper.getAsFloat(pJson, "carriageStressMultiplier"));
-			this.fuelType(FluidTagEntry.TYPE.getAsTagEntry(pJson, "fuelType"));
+			this.fuelType().addAll(FluidTagEntry.TYPE.getAsTagEntryList(pJson, "fuelType"));
 			this.fuelShare(GsonHelper.getAsBoolean(pJson, "fuelShare"));
 			this.fuelMinimum(GsonHelper.getAsFloat(pJson, "fuelMinimum"));
 			this.fuelPerSpeed(GsonHelper.getAsFloat(pJson, "fuelPerSpeed"));
@@ -332,11 +336,11 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 		@Override
 		public void fromNetwork(FriendlyByteBuf pBuffer)
 		{
-			this.blockType(ItemTagEntry.TYPE.fromNetwork(pBuffer));
+			this.blockType().addAll(ItemTagEntry.TYPE.listFromNetwork(pBuffer));
 			this.maxSpeed(pBuffer.readFloat());
 			this.acceleration(pBuffer.readFloat());
 			this.carriageStressMultiplier(pBuffer.readFloat());
-			this.fuelType(FluidTagEntry.TYPE.fromNetwork(pBuffer));
+			this.fuelType().addAll(FluidTagEntry.TYPE.listFromNetwork(pBuffer));
 			this.fuelShare(pBuffer.readBoolean());
 			this.fuelMinimum(pBuffer.readFloat());
 			this.fuelPerSpeed(pBuffer.readFloat());
@@ -354,14 +358,14 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 			return new TrainEngineTypeRecipe(id, this);
 		}
 
-		public ItemTagEntry blockType()
+		public List<ItemTagEntry> blockType()
 		{
 			return this.blockType;
 		}
 
 		public T blockType(ItemTagEntry blockType)
 		{
-			this.blockType = blockType;
+			this.blockType.add(blockType);
 			return (T) this;
 		}
 
@@ -398,14 +402,14 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 			return (T) this;
 		}
 
-		public FluidTagEntry fuelType()
+		public List<FluidTagEntry> fuelType()
 		{
 			return this.fuelType;
 		}
 
 		public T fuelType(FluidTagEntry fuelType)
 		{
-			this.fuelType = fuelType;
+			this.fuelType.add(fuelType);
 			return (T) this;
 		}
 

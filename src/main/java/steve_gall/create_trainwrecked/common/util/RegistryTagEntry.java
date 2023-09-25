@@ -1,5 +1,7 @@
 package steve_gall.create_trainwrecked.common.util;
 
+import java.util.stream.Stream;
+
 import com.google.gson.JsonElement;
 
 import net.minecraft.nbt.Tag;
@@ -8,7 +10,7 @@ import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagKey;
 import net.minecraftforge.registries.IForgeRegistry;
 
-public abstract class RegistryTagEntry<VALUE, INGREDIENT>
+public abstract class RegistryTagEntry<VALUE, STACK, INGREDIENT>
 {
 	private final TagEntry tagEntry;
 
@@ -17,15 +19,9 @@ public abstract class RegistryTagEntry<VALUE, INGREDIENT>
 		this.tagEntry = tagEntry;
 	}
 
-	@Override
-	public String toString()
-	{
-		return this.getTagEntry().toString();
-	}
-
 	public INGREDIENT toIngredient()
 	{
-		RegistryTagEntryType<VALUE, INGREDIENT, ?> type = this.getType();
+		RegistryTagEntryType<VALUE, STACK, INGREDIENT, ?> type = this.getType();
 		IForgeRegistry<VALUE> registry = type.getRegistry();
 		TagEntry tagEntry = this.getTagEntry();
 
@@ -42,11 +38,27 @@ public abstract class RegistryTagEntry<VALUE, INGREDIENT>
 
 	}
 
-	public abstract RegistryTagEntryType<VALUE, INGREDIENT, ? extends RegistryTagEntry<VALUE, INGREDIENT>> getType();
+	public abstract RegistryTagEntryType<VALUE, STACK, INGREDIENT, ? extends RegistryTagEntry<VALUE, STACK, INGREDIENT>> getType();
+
+	public Stream<STACK> getMatchingStacks()
+	{
+		return this.getType().getIngredientMatchingStacks(this.toIngredient());
+	}
+
+	public boolean test(STACK stack)
+	{
+		return this.getType().testIngredient(this.toIngredient(), stack);
+	}
 
 	public TagEntry getTagEntry()
 	{
 		return this.tagEntry;
+	}
+
+	@Override
+	public String toString()
+	{
+		return this.getTagEntry().toString();
 	}
 
 	@Override
@@ -64,7 +76,7 @@ public abstract class RegistryTagEntry<VALUE, INGREDIENT>
 		}
 		else
 		{
-			return (obj instanceof RegistryTagEntry<?, ?> other) && this.toString().equals(other.toString());
+			return obj instanceof RegistryTagEntry<?, ?, ?> other && this.toString().equals(other.toString());
 		}
 
 	}
@@ -72,21 +84,21 @@ public abstract class RegistryTagEntry<VALUE, INGREDIENT>
 	@SuppressWarnings("unchecked")
 	public JsonElement toJson()
 	{
-		RegistryTagEntryType<VALUE, INGREDIENT, RegistryTagEntry<VALUE, INGREDIENT>> type = (RegistryTagEntryType<VALUE, INGREDIENT, RegistryTagEntry<VALUE, INGREDIENT>>) this.getType();
+		RegistryTagEntryType<VALUE, STACK, INGREDIENT, RegistryTagEntry<VALUE, STACK, INGREDIENT>> type = (RegistryTagEntryType<VALUE, STACK, INGREDIENT, RegistryTagEntry<VALUE, STACK, INGREDIENT>>) this.getType();
 		return type.toJson(this);
 	}
 
 	@SuppressWarnings("unchecked")
 	public void toNetwork(FriendlyByteBuf buffer)
 	{
-		RegistryTagEntryType<VALUE, INGREDIENT, RegistryTagEntry<VALUE, INGREDIENT>> type = (RegistryTagEntryType<VALUE, INGREDIENT, RegistryTagEntry<VALUE, INGREDIENT>>) this.getType();
+		RegistryTagEntryType<VALUE, STACK, INGREDIENT, RegistryTagEntry<VALUE, STACK, INGREDIENT>> type = (RegistryTagEntryType<VALUE, STACK, INGREDIENT, RegistryTagEntry<VALUE, STACK, INGREDIENT>>) this.getType();
 		type.toNetwork(buffer, this);
 	}
 
 	@SuppressWarnings("unchecked")
-	public Tag toNBT()
+	public Tag toNbt()
 	{
-		RegistryTagEntryType<VALUE, INGREDIENT, RegistryTagEntry<VALUE, INGREDIENT>> type = (RegistryTagEntryType<VALUE, INGREDIENT, RegistryTagEntry<VALUE, INGREDIENT>>) this.getType();
+		RegistryTagEntryType<VALUE, STACK, INGREDIENT, RegistryTagEntry<VALUE, STACK, INGREDIENT>> type = (RegistryTagEntryType<VALUE, STACK, INGREDIENT, RegistryTagEntry<VALUE, STACK, INGREDIENT>>) this.getType();
 		return type.toNbt(this);
 	}
 

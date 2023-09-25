@@ -15,6 +15,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import steve_gall.create_trainwrecked.common.crafting.TrainEngineTypeRecipe;
 import steve_gall.create_trainwrecked.common.init.ModRecipeTypes;
+import steve_gall.create_trainwrecked.common.util.ItemTagEntry;
 
 public class CarriageContraptionHelper
 {
@@ -24,7 +25,7 @@ public class CarriageContraptionHelper
 		BlockState blockState = level.getBlockState(pos);
 		ItemStack item = new ItemStack(blockState.getBlock());
 		List<TrainEngineTypeRecipe> recipes = level.getRecipeManager().getAllRecipesFor(ModRecipeTypes.TRAIN_ENGINE_TYPE.get());
-		TrainEngineTypeRecipe recipe = recipes.stream().filter(r -> r.getBlock().test(item)).findFirst().orElse(null);
+		TrainEngineTypeRecipe recipe = recipes.stream().filter(r -> ItemTagEntry.TYPE.testIngredient(r.getBlocks(), item)).findFirst().orElse(null);
 
 		if (recipe != null)
 		{

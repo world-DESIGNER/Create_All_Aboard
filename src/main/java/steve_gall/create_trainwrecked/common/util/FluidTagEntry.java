@@ -4,8 +4,9 @@ import com.simibubi.create.foundation.fluid.FluidIngredient;
 
 import net.minecraft.tags.TagEntry;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraftforge.fluids.FluidStack;
 
-public class FluidTagEntry extends RegistryTagEntry<Fluid, FluidIngredient>
+public class FluidTagEntry extends RegistryTagEntry<Fluid, FluidStack, FluidIngredient>
 {
 	public static final FluidTagEntryType TYPE = new FluidTagEntryType();
 
@@ -15,7 +16,7 @@ public class FluidTagEntry extends RegistryTagEntry<Fluid, FluidIngredient>
 	}
 
 	@Override
-	public RegistryTagEntryType<Fluid, FluidIngredient, FluidTagEntry> getType()
+	public RegistryTagEntryType<Fluid, FluidStack, FluidIngredient, FluidTagEntry> getType()
 	{
 		return TYPE;
 	}

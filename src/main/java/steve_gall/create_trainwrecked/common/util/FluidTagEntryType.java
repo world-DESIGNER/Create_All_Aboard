@@ -1,15 +1,18 @@
 package steve_gall.create_trainwrecked.common.util;
 
+import java.util.stream.Stream;
+
 import com.simibubi.create.foundation.fluid.FluidIngredient;
 
 import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
 
-public class FluidTagEntryType implements RegistryTagEntryType<Fluid, FluidIngredient, FluidTagEntry>
+public class FluidTagEntryType implements RegistryTagEntryType<Fluid, FluidStack, FluidIngredient, FluidTagEntry>
 {
 	@Override
 	public Fluid getEmptyValue()
@@ -39,6 +42,18 @@ public class FluidTagEntryType implements RegistryTagEntryType<Fluid, FluidIngre
 	public FluidIngredient toIngredient(Fluid value)
 	{
 		return FluidIngredient.fromFluid(value, 1);
+	}
+
+	@Override
+	public Stream<FluidStack> getIngredientMatchingStacks(FluidIngredient ingredient)
+	{
+		return ingredient.getMatchingFluidStacks().stream();
+	}
+
+	@Override
+	public boolean testIngredient(FluidIngredient ingredient, FluidStack stack)
+	{
+		return ingredient.test(stack);
 	}
 
 }

@@ -15,7 +15,10 @@
   "fuelPerRecipePow": 0.0,
   "fuelPerSpeed": 1.0,
   "fuelShare": false,
-  "fuelType": "#forge:diesel",
+  "fuelType": [
+    "#forge:diesel",
+    "#forge:biodiesel"
+  ],
   "heatCapacity": 60000,
   "heatPerFuel": 10,
   "maxSpeed": 30.0,

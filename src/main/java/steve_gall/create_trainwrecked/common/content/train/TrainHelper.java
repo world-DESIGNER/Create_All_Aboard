@@ -559,7 +559,7 @@ public class TrainHelper
 		if (!Mth.equal(speed, 0.0D))
 		{
 			Map<TrainEngineTypeRecipe, EngineSpeedPlan> plan = makeEngineSpeedPlan(train, speed);
-			double reductionRatio = getCarriageSpeedReductionRatio(train);
+			double reductionRatio = getCarriagesSpeedReductionRatio(train);
 			double targetSpeed = 0.0D;
 
 			for (Entry<TrainEngineTypeRecipe, EngineSpeedPlan> pair : plan.entrySet())
@@ -689,14 +689,14 @@ public class TrainHelper
 			totalToBurn = fuelPerTick * engineCount;
 		}
 
-		FluidTagEntry fuelType = recipe.getFuelType();
+		List<FluidTagEntry> fuelType = recipe.getFuelType();
 		double totalBurned = ((TrainExtension) train).getFuelBurner().burn(train, fuelType, totalToBurn, simulate);
 		double eachToBurn = totalToBurn / engineCount;
 		double eachBurned = totalBurned / engineCount;
 		return new FuelBurning(eachToBurn, eachBurned);
 	}
 
-	public static double getCarriageSpeedReductionRatio(Train train)
+	public static double getCarriagesSpeedReductionRatio(Train train)
 	{
 		double heap = 0.0D;
 
@@ -717,7 +717,7 @@ public class TrainHelper
 	public static float maxSpeed(Train train)
 	{
 		float original = maxSpeedBeforeReduction(train);
-		return (float) Math.max(original * getCarriageSpeedReductionRatio(train), 0.0F);
+		return (float) Math.max(original * getCarriagesSpeedReductionRatio(train), 0.0F);
 	}
 
 	public static float maxTurnSpeed(Train train)
@@ -728,7 +728,7 @@ public class TrainHelper
 	public static float acceleration(Train train)
 	{
 		Double collect = streamAliveEngines(train).collect(Collectors.summingDouble(v -> v.getRecipe().getAcceleration()));
-		return (collect != null ? collect.floatValue() : AllConfigs.server().trains.trainAcceleration.getF()) / 400;
+		return (collect != null ? (float) (collect.doubleValue() * getCarriagesSpeedReductionRatio(train)) : AllConfigs.server().trains.trainAcceleration.getF()) / 400;
 	}
 
 	public static float deacceleration(Train train)

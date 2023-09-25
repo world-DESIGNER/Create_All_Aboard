@@ -2,6 +2,7 @@ package steve_gall.create_trainwrecked.common.content.train;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.simibubi.create.content.contraptions.minecart.TrainCargoManager;
@@ -41,9 +42,23 @@ public class FuelBurner
 		this.readNetwork(buffer);
 	}
 
-	public double burn(Train train, FluidTagEntry fuel, double amount, boolean simulate)
+	public double burn(Train train, List<FluidTagEntry> fuelType, double amount, boolean simulate)
 	{
-		return this.map.computeIfAbsent(fuel, FuelStatus::new).burn(train, amount, simulate);
+		double totalBurned = 0.0D;
+
+		for (FluidTagEntry entry : fuelType)
+		{
+			if (amount <= 0.0D)
+			{
+				break;
+			}
+
+			double burned = this.map.computeIfAbsent(entry, FuelStatus::new).burn(train, amount, simulate);
+			totalBurned += burned;
+			amount -= burned;
+		}
+
+		return totalBurned;
 	}
 
 	public void readNbt(CompoundTag tag)
@@ -119,7 +134,7 @@ public class FuelBurner
 						fluidStroage = ((MountedStorageManagerExtension) storage).getSyncedFluids();
 					}
 
-					for (FluidStack fluidStack : this.type.toIngredient().getMatchingFluidStacks())
+					for (FluidStack fluidStack : this.type.getMatchingStacks().toList())
 					{
 						if (extracted >= extracting)
 						{
@@ -162,7 +177,7 @@ public class FuelBurner
 		public CompoundTag toNbt()
 		{
 			CompoundTag tag = new CompoundTag();
-			tag.put("type", this.type.toNBT());
+			tag.put("type", this.type.toNbt());
 			tag.putDouble("remained", this.remained);
 
 			return tag;

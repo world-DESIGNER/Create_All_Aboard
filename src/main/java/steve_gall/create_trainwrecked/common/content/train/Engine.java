@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import steve_gall.create_trainwrecked.common.CreateTrainwrecked;
 import steve_gall.create_trainwrecked.common.crafting.TrainEngineTypeRecipe;
 import steve_gall.create_trainwrecked.common.init.ModRecipeTypes;
+import steve_gall.create_trainwrecked.common.util.ItemTagEntry;
 
 public class Engine
 {
@@ -89,7 +90,7 @@ public class Engine
 		if (this.recipe == null)
 		{
 			List<TrainEngineTypeRecipe> recipes = level.getRecipeManager().getAllRecipesFor(ModRecipeTypes.TRAIN_ENGINE_TYPE.get());
-			this.recipe = recipes.stream().filter(r -> r.getBlock().test(this.item)).findFirst().orElse(null);
+			this.recipe = recipes.stream().filter(r -> ItemTagEntry.TYPE.testIngredient(r.getBlocks(), this.item)).findFirst().orElse(null);
 		}
 
 		this.fuelUsedRatio = 0.0D;

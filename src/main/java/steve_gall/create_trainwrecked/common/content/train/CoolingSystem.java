@@ -42,7 +42,11 @@ public class CoolingSystem
 
 	public int getCooling(ItemStack item)
 	{
-		if (this.itemRecipes != null)
+		if (item.isEmpty() || this.itemRecipes == null)
+		{
+			return 0;
+		}
+		else
 		{
 			for (TrainEngineCoolantRecipe recipe : this.itemRecipes)
 			{
@@ -60,7 +64,11 @@ public class CoolingSystem
 
 	public TrainEngineCoolantRecipe getCoolingRecipe(FluidStack fluid)
 	{
-		if (this.fluidRecipes != null)
+		if (fluid.isEmpty() || this.fluidRecipes == null)
+		{
+			return null;
+		}
+		else
 		{
 			for (TrainEngineCoolantRecipe recipe : this.fluidRecipes)
 			{
@@ -71,9 +79,9 @@ public class CoolingSystem
 
 			}
 
+			return null;
 		}
 
-		return null;
 	}
 
 	public double useCoolant(Train train, double heat)
@@ -129,10 +137,10 @@ public class CoolingSystem
 
 			for (int slot = 0; slot < slots; slot++)
 			{
-				ItemStack item = items.getStackInSlot(slot);
+				ItemStack item = items.extractItem(slot, 1, true);
 				int cooling = this.getCooling(item);
 
-				if (cooling > 0 & !items.extractItem(slot, 1, false).isEmpty())
+				if (cooling > 0 && !items.extractItem(slot, 1, false).isEmpty())
 				{
 					this.cooling += cooling;
 					return true;

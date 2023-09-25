@@ -121,7 +121,7 @@ public class Engine
 		this.setHeat(heat - cooled);
 	}
 
-	private void updateOverheat(Train train)
+	public void updateOverheat(Train train)
 	{
 		TrainEngineTypeRecipe recipe = this.getRecipe();
 		double heat = this.getHeat();

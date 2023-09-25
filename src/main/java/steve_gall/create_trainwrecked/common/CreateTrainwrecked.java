@@ -4,7 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
-import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
@@ -27,11 +26,6 @@ public class CreateTrainwrecked
 	public static final String MOD_ID = "create_trainwrecked";
 	public static final String MODE_NAME = ModList.get().getModContainerById(CreateTrainwrecked.MOD_ID).orElse(null).getModInfo().getDisplayName();
 	public static final Logger LOGGER = LogUtils.getLogger();
-
-	public static final IHaveGoggleInformation DEFAULT_HAVE_GOGGLE_INFO = new IHaveGoggleInformation()
-	{
-
-	};
 
 	public CreateTrainwrecked()
 	{

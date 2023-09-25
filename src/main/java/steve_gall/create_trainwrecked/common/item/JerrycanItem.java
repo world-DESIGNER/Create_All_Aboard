@@ -34,6 +34,7 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 import steve_gall.create_trainwrecked.common.CreateTrainwrecked;
 import steve_gall.create_trainwrecked.common.config.CreateTrainwreckedConfig;
 import steve_gall.create_trainwrecked.common.fluid.FluidHelper;
+import steve_gall.create_trainwrecked.common.util.NumberHelper;
 
 public class JerrycanItem extends Item
 {
@@ -60,6 +61,8 @@ public class JerrycanItem extends Item
 		{
 			for (int i = 0; i < jerrycan.getTanks(); i++)
 			{
+				pTooltip.add(Component.translatable(this.getDescriptionId() + ".tooltip.capacity", NumberHelper.format(jerrycan.getTankCapacity(i)) + " mB"));
+
 				FluidStack fluid = jerrycan.getFluidInTank(i);
 
 				if (fluid.isEmpty())
@@ -68,10 +71,9 @@ public class JerrycanItem extends Item
 				}
 				else
 				{
-					pTooltip.add(Component.translatable(this.getDescriptionId() + ".tooltip.amount", fluid.getDisplayName(), fluid.getAmount()));
+					pTooltip.add(Component.translatable(this.getDescriptionId() + ".tooltip.amount", fluid.getDisplayName(), NumberHelper.format(fluid.getAmount()) + " mB"));
 				}
 
-				pTooltip.add(Component.translatable(this.getDescriptionId() + ".tooltip.capacity", jerrycan.getTankCapacity(i)));
 			}
 
 		}
@@ -193,7 +195,22 @@ public class JerrycanItem extends Item
 		IFluidHandler from = shiftKeyDown ? jerrycan : fluidStorage;
 		IFluidHandler to = shiftKeyDown ? fluidStorage : jerrycan;
 
-		FluidStack draining = from.drain(transfer, FluidAction.SIMULATE);
+		int toTanks = to.getTanks();
+		FluidStack toDraining = null;
+
+		for (int toTank = 0; toTank < toTanks; toTank++)
+		{
+			FluidStack testDraining = FluidHelper.deriveAmount(to.getFluidInTank(toTank), transfer);
+			FluidStack testDrained = from.drain(testDraining, FluidAction.SIMULATE);
+
+			if (!testDrained.isEmpty())
+			{
+				toDraining = testDrained;
+			}
+
+		}
+
+		FluidStack draining = toDraining != null ? toDraining : from.drain(transfer, FluidAction.SIMULATE);
 
 		if (draining.isEmpty())
 		{
@@ -213,7 +230,7 @@ public class JerrycanItem extends Item
 		int filled = to.fill(drained, FluidAction.EXECUTE);
 		FluidStack moved = FluidHelper.deriveAmount(draining, filled);
 
-		pPlayer.displayClientMessage(Component.translatable(shiftKeyDown ? TOOLTIP_FILLED : TOOLTIP_DRAINED, moved.getDisplayName(), moved.getAmount()), true);
+		pPlayer.displayClientMessage(Component.translatable(shiftKeyDown ? TOOLTIP_FILLED : TOOLTIP_DRAINED, moved.getDisplayName(), NumberHelper.format(moved.getAmount()) + " mB"), true);
 		return moved;
 	}
 

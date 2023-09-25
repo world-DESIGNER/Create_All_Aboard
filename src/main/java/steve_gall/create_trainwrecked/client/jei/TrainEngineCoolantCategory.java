@@ -59,7 +59,7 @@ public class TrainEngineCoolantCategory extends ModJEIRecipeCategory<TrainEngine
 		Font font = minecraft.font;
 
 		int textColor = 0x404040;
-		font.draw(stack, Component.translatable(TEXT_COOLING, NumberHelper.format(recipe.getCooling())), 22, 6, textColor);
+		font.draw(stack, Component.translatable(TEXT_COOLING, NumberHelper.format(recipe.getCooling()) + " J"), 22, 6, textColor);
 	}
 
 	@Override

@@ -47,11 +47,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.network.PacketDistributor;
 import steve_gall.create_trainwrecked.common.CreateTrainwrecked;
 import steve_gall.create_trainwrecked.common.content.contraption.MountedStorageManagerExtension;
 import steve_gall.create_trainwrecked.common.crafting.TrainEngineTypeRecipe;
+import steve_gall.create_trainwrecked.common.fluid.FluidHelper;
 import steve_gall.create_trainwrecked.common.mixin.StationBlockEntityAccessor;
 import steve_gall.create_trainwrecked.common.util.FluidTagEntry;
 import steve_gall.create_trainwrecked.common.util.NumberHelper;
@@ -74,6 +76,8 @@ public class TrainHelper
 	public static String TRAIN_GOGGLE_ENGINE_TEMP = CreateTrainwrecked.translationKey("train_google.engine_temp");
 	public static String TRAIN_GOGGLE_ENGINE_HIGHEST_TEMP = CreateTrainwrecked.translationKey("train_google.engine_highest_heat");
 	public static String TRAIN_GOGGLE_ENGINE_OVERHEATEDS = CreateTrainwrecked.translationKey("train_google.engine_overheateds");
+	public static String TRAIN_GOGGLE_FLUID_CAPACITY = CreateTrainwrecked.translationKey("train_google.fluid_capacity");
+	public static String TRAIN_GOGGLE_FLUID_AMOUNT = CreateTrainwrecked.translationKey("train_google.fluid_amount");
 
 	public static void assemble(StationBlockEntity self, UUID playerUUID)
 	{
@@ -844,9 +848,46 @@ public class TrainHelper
 
 		}
 
+		Map<FluidStack, Long> amountMap = new HashMap<>();
+		long totalCapacity = 0L;
+		boolean hasTank = false;
+
 		for (Carriage carriage : train.carriages)
 		{
-			CreateTrainwrecked.DEFAULT_HAVE_GOGGLE_INFO.containedFluidTooltip(tooltip, isPlayerSneaking, LazyOptional.of(((MountedStorageManagerExtension) carriage.storage)::getSyncedFluids));
+			IFluidHandler fluids = ((MountedStorageManagerExtension) carriage.storage).getSyncedFluids();
+
+			for (int tank = 0; tank < fluids.getTanks(); tank++)
+			{
+				hasTank = true;
+				totalCapacity += fluids.getTankCapacity(tank);
+				FluidStack fluid = fluids.getFluidInTank(tank);
+
+				if (fluid.isEmpty())
+				{
+					continue;
+				}
+
+				FluidStack type = FluidHelper.deriveAmount(fluid, 1);
+				long amount = amountMap.computeIfAbsent(type, t -> 0L);
+				amount += fluid.getAmount();
+				amountMap.put(type, amount);
+			}
+
+		}
+
+		if (hasTank)
+		{
+			Lang.translate("gui.goggles.fluid_container").forGoggles(tooltip);
+			Lang.builder().add(Component.translatable(TRAIN_GOGGLE_FLUID_CAPACITY, Component.literal(NumberHelper.format(totalCapacity)).withStyle(ChatFormatting.WHITE))).forGoggles(tooltip, 1);
+
+			for (Entry<FluidStack, Long> entry : amountMap.entrySet())
+			{
+				Component displayName = entry.getKey().getDisplayName();
+				Component percentComponent = Component.literal(NumberHelper.format(entry.getValue() / (totalCapacity / 100.0D), 1) + "%").withStyle(ChatFormatting.GOLD);
+				Component amountComponent = Component.literal(NumberHelper.format(entry.getValue())).withStyle(ChatFormatting.GOLD);
+				Lang.builder().add(Component.translatable(TRAIN_GOGGLE_FLUID_AMOUNT, displayName, percentComponent, amountComponent)).style(ChatFormatting.GRAY).forGoggles(tooltip, 1);
+			}
+
 		}
 
 	}

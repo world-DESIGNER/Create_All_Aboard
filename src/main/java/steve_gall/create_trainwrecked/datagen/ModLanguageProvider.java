@@ -27,11 +27,11 @@ public class ModLanguageProvider extends LanguageProvider
 	{
 		this.add(ModItems.JERRYCAN.get(), "Jerrycan");
 		this.add(ModItems.JERRYCAN.get().getDescriptionId() + ".tooltip.empty", "Empty");
-		this.add(ModItems.JERRYCAN.get().getDescriptionId() + ".tooltip.amount", "%1$s: %2$s mB");
-		this.add(ModItems.JERRYCAN.get().getDescriptionId() + ".tooltip.capacity", "Capacity: %s mB");
+		this.add(ModItems.JERRYCAN.get().getDescriptionId() + ".tooltip.amount", "%1$s: %2$s");
+		this.add(ModItems.JERRYCAN.get().getDescriptionId() + ".tooltip.capacity", "Capacity: %s");
 
-		this.add(JerrycanItem.TOOLTIP_FILLED, "%1$s %2$s mB filled");
-		this.add(JerrycanItem.TOOLTIP_DRAINED, "%1$s %2$s mB drained");
+		this.add(JerrycanItem.TOOLTIP_FILLED, "%1$s %2$s filled");
+		this.add(JerrycanItem.TOOLTIP_DRAINED, "%1$s %2$s drained");
 		this.add(JerrycanItem.TOOLTIP_ITEM_EMPTY, "Jerrycan is empty");
 		this.add(JerrycanItem.TOOLTIP_ITEM_FULL, "Can't drain fluid, jerrycan can't accept fluid");
 		this.add(JerrycanItem.TOOLTIP_STORAGE_EMPTY, "Fluid storage is empty");
@@ -55,6 +55,8 @@ public class ModLanguageProvider extends LanguageProvider
 		this.add(TrainHelper.TRAIN_GOGGLE_ENGINE_TEMP, "Temp.: %s");
 		this.add(TrainHelper.TRAIN_GOGGLE_ENGINE_HIGHEST_TEMP, "Highest Temp.: %s");
 		this.add(TrainHelper.TRAIN_GOGGLE_ENGINE_OVERHEATEDS, "Overheateds: %s");
+		this.add(TrainHelper.TRAIN_GOGGLE_FLUID_CAPACITY, "Capacity: %s");
+		this.add(TrainHelper.TRAIN_GOGGLE_FLUID_AMOUNT, "%1$s: %2$s, %3$s");
 
 		PonderLocalization.generateSceneLang();
 		JsonObject object = new JsonObject();
@@ -70,18 +72,18 @@ public class ModLanguageProvider extends LanguageProvider
 	private void addJEI()
 	{
 		this.add(TrainEngineTypeCategory.TEXT_TITLE, "Train Engine Type");
-		this.add(TrainEngineTypeCategory.TEXT_MAX_CARRIAGES, "Max. Carriags: %s");
-		this.add(TrainEngineTypeCategory.TEXT_MAX_BLOCKS_PER_CARRIAGE, "Max. Blocks %s m/carriage");
-		this.add(TrainEngineTypeCategory.TEXT_MAX_SPEED, "Max. Speed: %s m/s");
-		this.add(TrainEngineTypeCategory.TEXT_ACCELERATION, "Acceleration: %s m/s²");
-		this.add(TrainEngineTypeCategory.TEXT_MAX_FUEL_USAGE, "Max. Fuel Usage: %s mB/s");
-		this.add(TrainEngineTypeCategory.TEXT_HEAT_PER_FUEL, "Heat Per Fuel: %s J/mB");
-		this.add(TrainEngineTypeCategory.TEXT_AIR_COOLING_RATE, "Air Cooling Rate: %s J/s");
-		this.add(TrainEngineTypeCategory.TEXT_HEAT_CAPACITY, "Heat Capacity: %s J");
-		this.add(TrainEngineTypeCategory.TEXT_HEAT_DURABILITY, "Heat Durability: %s s");
+		this.add(TrainEngineTypeCategory.TEXT_MAX_CARRIAGES, "Max. Carriags: %s carriags");
+		this.add(TrainEngineTypeCategory.TEXT_MAX_BLOCKS_PER_CARRIAGE, "Max. Blocks %s blocks/carriage");
+		this.add(TrainEngineTypeCategory.TEXT_MAX_SPEED, "Max. Speed: %s");
+		this.add(TrainEngineTypeCategory.TEXT_ACCELERATION, "Acceleration: %s");
+		this.add(TrainEngineTypeCategory.TEXT_MAX_FUEL_USAGE, "Max. Fuel Usage: %s");
+		this.add(TrainEngineTypeCategory.TEXT_HEAT_PER_FUEL, "Heat Per Fuel: %s");
+		this.add(TrainEngineTypeCategory.TEXT_AIR_COOLING_RATE, "Air Cooling Rate: %s");
+		this.add(TrainEngineTypeCategory.TEXT_HEAT_CAPACITY, "Heat Capacity: %s");
+		this.add(TrainEngineTypeCategory.TEXT_HEAT_DURABILITY, "Heat Durability: %s");
 
 		this.add(TrainEngineCoolantCategory.TEXT_TITLE, "Train Engine Coolant");
-		this.add(TrainEngineCoolantCategory.TEXT_COOLING, "Cooling: %s J");
+		this.add(TrainEngineCoolantCategory.TEXT_COOLING, "Cooling: %s");
 	}
 
 }

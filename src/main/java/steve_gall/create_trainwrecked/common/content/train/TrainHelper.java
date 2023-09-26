@@ -774,7 +774,7 @@ public class TrainHelper
 
 		double speed = ((CarriageSyncDataExtension) carriageContraptionEntity.getCarriageData()).getTrainSpeed() * 20;
 		int carriagesTotalBlockCount = getCarriagesTotalBlockCount(train);
-		CarriageBlocksLimit carriagesTotalBlockLimit = getCarriagesTotalBlockLimit(train, speed);
+		CarriageBlocksLimit carriagesTotalBlockLimit = getCarriagesTotalBlockLimit(train, Math.abs(speed) + acceleration(train));
 		MutableComponent speedComponent = Component.literal(NumberHelper.format(speed, 1) + "m/s").withStyle(ChatFormatting.GOLD);
 		MutableComponent maxSpeedComponent = Component.literal(NumberHelper.format(train.maxSpeed() * 20, 1) + "m/s").withStyle(ChatFormatting.DARK_GRAY);
 		MutableComponent blocksComponent = Component.literal(NumberHelper.format(carriagesTotalBlockCount)).withStyle(carriagesTotalBlockLimit.isOvered(carriagesTotalBlockCount) ? ChatFormatting.RED : ChatFormatting.GOLD);

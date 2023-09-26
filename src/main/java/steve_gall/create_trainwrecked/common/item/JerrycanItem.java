@@ -2,6 +2,8 @@ package steve_gall.create_trainwrecked.common.item;
 
 import java.util.List;
 
+import org.jetbrains.annotations.Nullable;
+
 import com.simibubi.create.content.contraptions.Contraption;
 import com.simibubi.create.content.contraptions.actors.psi.PortableStorageInterfaceBlock;
 import com.simibubi.create.content.trains.entity.CarriageContraptionEntity;
@@ -195,21 +197,7 @@ public class JerrycanItem extends Item
 		IFluidHandler from = shiftKeyDown ? jerrycan : fluidStorage;
 		IFluidHandler to = shiftKeyDown ? fluidStorage : jerrycan;
 
-		int toTanks = to.getTanks();
-		FluidStack toDraining = null;
-
-		for (int toTank = 0; toTank < toTanks; toTank++)
-		{
-			FluidStack testDraining = FluidHelper.deriveAmount(to.getFluidInTank(toTank), transfer);
-			FluidStack testDrained = from.drain(testDraining, FluidAction.SIMULATE);
-
-			if (!testDrained.isEmpty())
-			{
-				toDraining = testDrained;
-			}
-
-		}
-
+		FluidStack toDraining = this.drainExistingTest(transfer, from, to);
 		FluidStack draining = toDraining != null ? toDraining : from.drain(transfer, FluidAction.SIMULATE);
 
 		if (draining.isEmpty())
@@ -232,6 +220,27 @@ public class JerrycanItem extends Item
 
 		pPlayer.displayClientMessage(Component.translatable(shiftKeyDown ? TOOLTIP_FILLED : TOOLTIP_DRAINED, moved.getDisplayName(), NumberHelper.format(moved.getAmount()) + " mB"), true);
 		return moved;
+	}
+
+	@Nullable
+	public FluidStack drainExistingTest(int transfer, IFluidHandler from, IFluidHandler to)
+	{
+		int toTanks = to.getTanks();
+		FluidStack toDraining = null;
+
+		for (int toTank = 0; toTank < toTanks; toTank++)
+		{
+			FluidStack testDraining = FluidHelper.deriveAmount(to.getFluidInTank(toTank), transfer);
+			FluidStack testDrained = from.drain(testDraining, FluidAction.SIMULATE);
+
+			if (!testDrained.isEmpty())
+			{
+				toDraining = testDrained;
+			}
+
+		}
+
+		return toDraining;
 	}
 
 }

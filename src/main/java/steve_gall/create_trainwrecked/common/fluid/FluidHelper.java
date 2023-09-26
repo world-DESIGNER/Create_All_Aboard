@@ -3,14 +3,13 @@ package steve_gall.create_trainwrecked.common.fluid;
 import java.util.Collection;
 import java.util.stream.Stream;
 
-import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.fluids.FluidStack;
 
 public class FluidHelper
 {
 	public static FluidStack deriveAmount(FluidStack stack, int amount)
 	{
-		if (stack.getRawFluid() == Fluids.EMPTY)
+		if (stack.isEmpty())
 		{
 			return FluidStack.EMPTY;
 		}

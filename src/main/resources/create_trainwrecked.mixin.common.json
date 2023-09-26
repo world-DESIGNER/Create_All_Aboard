@@ -13,6 +13,7 @@
 		"NavigationMixin",
 		"StationBlockEntityAccessor",
 		"StationBlockEntityMixin",
+		"SteamEngineBlockMixin",
 		"TrainMixin"
 	],
 	"injectors": {

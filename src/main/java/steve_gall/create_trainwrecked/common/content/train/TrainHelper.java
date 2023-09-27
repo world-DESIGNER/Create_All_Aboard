@@ -10,9 +10,11 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllPackets;
 import com.simibubi.create.Create;
 import com.simibubi.create.content.contraptions.AssemblyException;
+import com.simibubi.create.content.contraptions.MountedFluidStorage;
 import com.simibubi.create.content.trains.bogey.AbstractBogeyBlock;
 import com.simibubi.create.content.trains.bogey.AbstractBogeyBlockEntity;
 import com.simibubi.create.content.trains.entity.Carriage;
@@ -54,6 +56,8 @@ import steve_gall.create_trainwrecked.common.CreateTrainwrecked;
 import steve_gall.create_trainwrecked.common.content.contraption.MountedStorageManagerExtension;
 import steve_gall.create_trainwrecked.common.crafting.TrainEngineTypeRecipe;
 import steve_gall.create_trainwrecked.common.fluid.FluidHelper;
+import steve_gall.create_trainwrecked.common.mixin.ContraptionAccessor;
+import steve_gall.create_trainwrecked.common.mixin.MountedStorageManagerAccessor;
 import steve_gall.create_trainwrecked.common.mixin.StationBlockEntityAccessor;
 import steve_gall.create_trainwrecked.common.util.FluidTagEntry;
 import steve_gall.create_trainwrecked.common.util.NumberHelper;
@@ -63,6 +67,7 @@ public class TrainHelper
 	public static String TRAIN_ASSEMBLEY_NO_ENGINES = CreateTrainwrecked.translationKey("train_assembly.no_engines");
 	public static String TRAIN_ASSEMBLEY_TOO_MANY_CARRIAGES = CreateTrainwrecked.translationKey("train_assembly.too_many_carriages");
 	public static String TRAIN_ASSEMBLEY_TOO_MANY_BLOCKS = CreateTrainwrecked.translationKey("train_assembly.too_many_blocks");
+	public static String TRAIN_ASSEMBLEY_CARRIAGE_NO_FLUID_INTERFACE = CreateTrainwrecked.translationKey("train_assembly.carriage_no_fluid_interface");
 
 	public static String TRAIN_GOGGLE_OVERHEATED = CreateTrainwrecked.translationKey("train_google.overheated");
 	public static String TRAIN_GOGGLE_OVERHEATED_1 = CreateTrainwrecked.translationKey("train_google.overheated.1");
@@ -285,6 +290,20 @@ public class TrainHelper
 			{
 				accessor.invokeException(new AssemblyException(Lang.translateDirect("train_assembly.single_bogey_carriage")), contraptions.size() + 1);
 				return;
+			}
+
+			Map<BlockPos, MountedFluidStorage> fluids = ((MountedStorageManagerAccessor) ((ContraptionAccessor) contraption).getStorage()).getFluidStorage();
+
+			if (fluids.size() > 0)
+			{
+				boolean hasFluidInterface = contraption.getBlocks().values().stream().anyMatch(sbi -> sbi.state.getBlock() == AllBlocks.PORTABLE_FLUID_INTERFACE.get());
+
+				if (!hasFluidInterface)
+				{
+					accessor.invokeException(new AssemblyException(Component.translatable(TRAIN_ASSEMBLEY_CARRIAGE_NO_FLUID_INTERFACE, AllBlocks.PORTABLE_FLUID_INTERFACE.asStack().getHoverName())), contraptions.size() + 1);
+					return;
+				}
+
 			}
 
 			totalBlocks += contraption.getBlocks().size();
@@ -601,7 +620,7 @@ public class TrainHelper
 		}
 
 		// when fuel not enough during test
-		// train.speed = getPredictSpeed(train, train.speed, train.targetSpeed, acelerationMod);
+		// train.speed = approachTargetSpeed(train, train.speed, train.targetSpeed, acelerationMod);
 
 		if (train.manualTick & !Mth.equal(train.speed, 0.0D))
 		{

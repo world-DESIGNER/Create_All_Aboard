@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
 
+import com.simibubi.create.AllBlocks;
 import com.simibubi.create.content.contraptions.Contraption;
-import com.simibubi.create.content.contraptions.actors.psi.PortableStorageInterfaceBlock;
 import com.simibubi.create.content.trains.entity.CarriageContraptionEntity;
 
 import net.minecraft.core.BlockPos;
@@ -174,7 +174,7 @@ public class JerrycanItem extends Item
 	{
 		StructureBlockInfo sbi = contraption.getBlocks().get(localPos);
 
-		if (contraption.entity instanceof CarriageContraptionEntity cce && sbi != null && sbi.state.getBlock() instanceof PortableStorageInterfaceBlock)
+		if (contraption.entity instanceof CarriageContraptionEntity cce && sbi != null && sbi.state.getBlock() == AllBlocks.PORTABLE_FLUID_INTERFACE.get())
 		{
 			if (!pPlayer.getLevel().isClientSide())
 			{

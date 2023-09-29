@@ -29,7 +29,7 @@ public abstract class CarriageContraptionMixin extends Contraption implements Ca
 	private List<EnginPos> assembledEnginePos = new ArrayList<>();
 
 	@Inject(method = "capture", at = @At(value = "HEAD"), cancellable = true)
-	protected void capture(Level level, BlockPos pos, CallbackInfoReturnable<Pair<StructureBlockInfo, BlockEntity>> cir)
+	private void capture(Level level, BlockPos pos, CallbackInfoReturnable<Pair<StructureBlockInfo, BlockEntity>> cir)
 	{
 		CarriageContraptionHelper.capture((CarriageContraption) (Object) this, level, pos);
 	}

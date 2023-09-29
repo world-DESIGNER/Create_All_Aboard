@@ -4,10 +4,12 @@ import java.util.Map;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.simibubi.create.Create;
 import com.simibubi.create.foundation.ponder.PonderLocalization;
 
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.common.data.LanguageProvider;
+import steve_gall.create_trainwrecked.client.content.train.StationScreenHelper;
 import steve_gall.create_trainwrecked.client.jei.TrainEngineCoolantCategory;
 import steve_gall.create_trainwrecked.client.jei.TrainEngineTypeCategory;
 import steve_gall.create_trainwrecked.common.CreateTrainwrecked;
@@ -39,11 +41,42 @@ public class ModLanguageProvider extends LanguageProvider
 
 		this.addJEI();
 
+		this.addTrainAssemble();
+		this.addTrainStation();
+		this.addTrainGoggle();
+
+		PonderLocalization.generateSceneLang();
+		JsonObject object = new JsonObject();
+		PonderLocalization.record(CreateTrainwrecked.MOD_ID, object);
+
+		for (Map.Entry<String, JsonElement> entry : object.entrySet())
+		{
+			this.add(entry.getKey(), entry.getValue().getAsString());
+		}
+
+	}
+
+	private void addTrainAssemble()
+	{
 		this.add(TrainHelper.TRAIN_ASSEMBLEY_NO_ENGINES, "Engine Not Found");
 		this.add(TrainHelper.TRAIN_ASSEMBLEY_TOO_MANY_CARRIAGES, "Too Many Carriages, With the current engines, up to %s can be configured, Current carriages: %s");
 		this.add(TrainHelper.TRAIN_ASSEMBLEY_TOO_MANY_BLOCKS, "Too Many Contraption Blocks, With the current engines, up to %s can be placed, Current blocks: %s");
 		this.add(TrainHelper.TRAIN_ASSEMBLEY_CARRIAGE_NO_FLUID_INTERFACE, "%1$s Not Found, Carriage with fluid tanks requires at least one %1$s.");
+	}
 
+	private void addTrainStation()
+	{
+		this.addTrainStation(StationScreenHelper.STATION_ENGINE_HAS_HEAT, "Cannot disassemble.", "need to cool the engines");
+	}
+
+	private void addTrainStation(String key, String title, String description)
+	{
+		this.add(Create.ID + ".station." + key, title);
+		this.add(Create.ID + ".station." + key + "_1", description);
+	}
+
+	private void addTrainGoggle()
+	{
 		this.add(TrainHelper.TRAIN_GOGGLE_OVERHEATED, "Overheated");
 		this.add(TrainHelper.TRAIN_GOGGLE_OVERHEATED_1, "It appears that this train's engine is overheated.");
 		this.add(TrainHelper.TRAIN_GOGGLE_OVERHEATED_2, "Use ice or wait %ss to cool down the engine.");
@@ -58,16 +91,6 @@ public class ModLanguageProvider extends LanguageProvider
 		this.add(TrainHelper.TRAIN_GOGGLE_ENGINE_OVERHEATEDS, "Overheateds: %s");
 		this.add(TrainHelper.TRAIN_GOGGLE_FLUID_CAPACITY, "Capacity: %s");
 		this.add(TrainHelper.TRAIN_GOGGLE_FLUID_AMOUNT, "%1$s: %2$s, %3$s");
-
-		PonderLocalization.generateSceneLang();
-		JsonObject object = new JsonObject();
-		PonderLocalization.record(CreateTrainwrecked.MOD_ID, object);
-
-		for (Map.Entry<String, JsonElement> entry : object.entrySet())
-		{
-			this.add(entry.getKey(), entry.getValue().getAsString());
-		}
-
 	}
 
 	private void addJEI()

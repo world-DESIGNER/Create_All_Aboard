@@ -1,4 +1,6 @@
 {
+  "create.station.has_heat": "Cannot disassemble.",
+  "create.station.has_heat_1": "need to cool the engines",
   "create_trainwrecked.train_assembly.carriage_no_fluid_interface": "%1$s Not Found, Carriage with fluid tanks requires at least one %1$s.",
   "create_trainwrecked.train_assembly.no_engines": "Engine Not Found",
   "create_trainwrecked.train_assembly.too_many_blocks": "Too Many Contraption Blocks, With the current engines, up to %s can be placed, Current blocks: %s",

@@ -516,7 +516,7 @@ public class TrainHelper
 		}
 		else
 		{
-			return approachTargetSpeed(train, Math.abs(speed), targetSpeed, accelerationMod);
+			return approachTargetSpeed(train, speed, targetSpeed, accelerationMod);
 		}
 
 	}
@@ -914,6 +914,29 @@ public class TrainHelper
 	public static MutableComponent getHeatPercentComponent(double temp)
 	{
 		return Component.literal(NumberHelper.format(temp * 100.0D, 1) + "%").setStyle(Style.EMPTY.withColor(Mth.hsvToRgb((float) ((1.0D - temp) / 3.0F), (float) (temp), 1.0F)));
+	}
+
+	public static boolean canDisassemble(Train train)
+	{
+		return !anyEngineHasHeat(train);
+	}
+
+	public static boolean anyEngineHasHeat(Train train)
+	{
+		for (Carriage carriage : train.carriages)
+		{
+			for (Engine engine : ((CarriageExtension) carriage).getEngines())
+			{
+				if (engine.getHeat() > 0.0D)
+				{
+					return true;
+				}
+
+			}
+
+		}
+
+		return false;
 	}
 
 	private TrainHelper()

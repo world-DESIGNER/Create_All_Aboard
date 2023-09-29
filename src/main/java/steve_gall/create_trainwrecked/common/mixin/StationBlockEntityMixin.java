@@ -24,7 +24,7 @@ public abstract class StationBlockEntityMixin extends BlockEntity
 	}
 
 	@Inject(method = "assemble", at = @At(value = "HEAD"), cancellable = true)
-	public void assemble(UUID playerUUID, CallbackInfo ci)
+	private void assemble(UUID playerUUID, CallbackInfo ci)
 	{
 		TrainHelper.assemble((StationBlockEntity) (Object) this, playerUUID);
 		ci.cancel();

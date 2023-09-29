@@ -15,6 +15,9 @@ public interface StationBlockEntityAccessor
 	int getAssemblyLength();
 
 	@Accessor
+	int getBogeyCount();
+
+	@Accessor
 	int[] getBogeyLocations();
 
 	@Accessor
@@ -23,12 +26,12 @@ public interface StationBlockEntityAccessor
 	@Accessor
 	boolean[] getUpsideDownBogeys();
 
-	@Accessor
-	int getBogeyCount();
+	@Invoker
+	void invokeClearException();
 
 	@Invoker
 	void invokeException(AssemblyException exception, int carriage);
 
-	@Invoker
-	void invokeClearException();
+	@Accessor
+	boolean isTrainCanDisassemble();
 }

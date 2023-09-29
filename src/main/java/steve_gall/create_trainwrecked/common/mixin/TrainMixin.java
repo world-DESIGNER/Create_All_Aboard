@@ -88,11 +88,18 @@ public abstract class TrainMixin implements TrainExtension
 	}
 
 	@Inject(method = "write", at = @At(value = "TAIL"), cancellable = true)
-	public void write(DimensionPalette dimensions, CallbackInfoReturnable<CompoundTag> cir)
+	private void write(DimensionPalette dimensions, CallbackInfoReturnable<CompoundTag> cir)
 	{
 		CompoundTag tag = cir.getReturnValue();
 		tag.put("fuelBurner", this.getFuelBurner().writeNbt());
 		tag.put("coolingSystem", this.getCoolingSystem().write());
+	}
+
+	@Inject(method = "canDisassemble", at = @At(value = "TAIL"), cancellable = true)
+	private void canDisassemble(CallbackInfoReturnable<Boolean> cir)
+	{
+		boolean canDisassemble = TrainHelper.canDisassemble((Train) (Object) this);
+		cir.setReturnValue(canDisassemble);
 	}
 
 	@Override

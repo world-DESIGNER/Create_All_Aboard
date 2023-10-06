@@ -166,9 +166,15 @@ public class FuelBurner
 					this.remained += extracted - toBurn;
 				}
 			}
-			else if (!simulate)
+			else
 			{
-				this.remained = 0.0D;
+				burned = extracted + this.remained;
+
+				if (!simulate)
+				{
+					this.remained = 0.0D;
+				}
+
 			}
 
 			return burned;

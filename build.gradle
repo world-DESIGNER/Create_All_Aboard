@@ -10,9 +10,9 @@ buildscript {
 }
 
 plugins {
-	id "java"
-	id "eclipse"
-	id "maven-publish"
+    id "java"
+    id "eclipse"
+    id "maven-publish"
     id "net.minecraftforge.gradle" version "5.1.+"
     id "org.parchmentmc.librarian.forgegradle" version "1.+"
 }
@@ -100,9 +100,10 @@ dependencies {
 
     // Implementation
     implementation fg.deobf("com.simibubi.create:create-${mc_version}:${create_version}:slim") { transitive = false }
-	implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-${mc_version}:${flywheel_version}")
-	implementation fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}")
-	implementation fg.deobf("curse.maven:create-industry-693815:${create_industry_version}")
+    implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-${mc_version}:${flywheel_version}")
+    implementation fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}")
+    implementation fg.deobf("curse.maven:create-industry-693815:${create_industry_version}")
+    implementation fg.deobf("curse.maven:create-low-heated-873945:${create_low_heated_version}")
     implementation fg.deobf("mezz.jei:jei-${mc_version}-forge:${jei_version}")
 
     // Runtiem Only
@@ -120,35 +121,35 @@ mixin {
 def resourceTargets = ["META-INF/mods.toml", "fabric.mod.json"]
 def intoTargets = ["$rootDir/out/production/resources/", "$rootDir/out/production/${project.name}.main/", "$rootDir/bin/main/"]
 def replaceProperties = [mc_version: mc_version,
-	mod_id: mod_id, mod_version: mod_version, mod_name: mod_name, mod_description: mod_description, mod_license: mod_license, mod_homepage: mod_homepage, mod_source: mod_source, mod_issues: mod_issues,
-	forge_api_version: forge_api_version, forge_loader_version: forge_loader_version,
-	create_version: create_version, create_version_range: create_version_range, flywheel_version: flywheel_version
+    mod_id: mod_id, mod_version: mod_version, mod_name: mod_name, mod_description: mod_description, mod_license: mod_license, mod_homepage: mod_homepage, mod_source: mod_source, mod_issues: mod_issues,
+    forge_api_version: forge_api_version, forge_loader_version: forge_loader_version,
+    create_version: create_version, create_version_range: create_version_range, flywheel_version: flywheel_version
 ]
 
 processResources {
-	inputs.properties replaceProperties
-	replaceProperties.put "project", project
+    inputs.properties replaceProperties
+    replaceProperties.put "project", project
 
-	filesMatching(resourceTargets) {
-		expand replaceProperties
-	}
+    filesMatching(resourceTargets) {
+        expand replaceProperties
+    }
 
-	intoTargets.each { target ->
-		if (file(target).exists()) {
-			copy {
-				from(sourceSets.main.resources) {
-					include resourceTargets
-					expand replaceProperties
-				}
-				into target
-			}
-		}
-	}
+    intoTargets.each { target ->
+        if (file(target).exists()) {
+            copy {
+                from(sourceSets.main.resources) {
+                    include resourceTargets
+                    expand replaceProperties
+                }
+                into target
+            }
+        }
+    }
 }
 
 tasks.withType(JavaCompile) {
-	options.encoding = "UTF-8"
-	options.release = 17
+    options.encoding = "UTF-8"
+    options.release = 17
 }
 
 jar {

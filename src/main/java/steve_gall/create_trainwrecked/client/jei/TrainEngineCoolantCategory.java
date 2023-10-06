@@ -9,7 +9,6 @@ import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
-import mezz.jei.api.helpers.IJeiHelpers;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
@@ -33,11 +32,11 @@ public class TrainEngineCoolantCategory extends ModJEIRecipeCategory<TrainEngine
 
 	private final IDrawable icon;
 
-	public TrainEngineCoolantCategory(IJeiHelpers helpers)
+	public TrainEngineCoolantCategory(ModJEI plugin)
 	{
-		super(helpers, RECIPE_TYPE, helpers.getGuiHelper().createDrawable(TEXTURE_BACKGROUND, 0, 0, 178, 20), TEXT_TITLE);
+		super(plugin, RECIPE_TYPE, plugin.getJeiHelpers().getGuiHelper().createDrawable(TEXTURE_BACKGROUND, 0, 0, 178, 20), TEXT_TITLE);
 
-		this.icon = this.getHelpers().getGuiHelper().createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(Items.ICE));
+		this.icon = plugin.getJeiHelpers().getGuiHelper().createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(Items.ICE));
 	}
 
 	@Override

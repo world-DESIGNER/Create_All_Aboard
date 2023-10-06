@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 
 import com.simibubi.create.content.trains.station.StationScreen;
 
-@Mixin(value = StationScreen.class)
+@Mixin(value = StationScreen.class, remap = false)
 public interface StationScreenAccessor extends AbstractStationScreenAccessor
 {
 	@Invoker

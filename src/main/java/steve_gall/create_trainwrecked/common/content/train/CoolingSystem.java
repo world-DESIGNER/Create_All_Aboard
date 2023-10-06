@@ -140,8 +140,9 @@ public class CoolingSystem
 				ItemStack item = items.extractItem(slot, 1, true);
 				int cooling = this.getCooling(item);
 
-				if (cooling > 0 && !items.extractItem(slot, 1, false).isEmpty())
+				if (cooling > 0)
 				{
+					items.extractItem(slot, 1, false);
 					this.cooling += cooling;
 					return true;
 				}

@@ -19,14 +19,17 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 import steve_gall.create_trainwrecked.common.content.train.CarriageContraptionExtension;
 import steve_gall.create_trainwrecked.common.content.train.CarriageContraptionHelper;
-import steve_gall.create_trainwrecked.common.content.train.EnginPos;
+import steve_gall.create_trainwrecked.common.content.train.Engine;
+import steve_gall.create_trainwrecked.common.content.train.HeatSource;
 
 @Mixin(value = CarriageContraption.class, remap = false)
 public abstract class CarriageContraptionMixin extends Contraption implements CarriageContraptionExtension
 {
 	// during assembly only
 	@Unique
-	private List<EnginPos> assembledEnginePos = new ArrayList<>();
+	private List<Engine> assembledEngines = new ArrayList<>();
+	@Unique
+	private List<HeatSource> assembledHeatSources = new ArrayList<>();
 
 	@Inject(method = "capture", at = @At(value = "HEAD"), cancellable = true)
 	private void capture(Level level, BlockPos pos, CallbackInfoReturnable<Pair<StructureBlockInfo, BlockEntity>> cir)
@@ -36,9 +39,16 @@ public abstract class CarriageContraptionMixin extends Contraption implements Ca
 
 	@Override
 	@Unique
-	public List<EnginPos> getAssembledEnginePos()
+	public List<Engine> getAssembledEngines()
 	{
-		return this.assembledEnginePos;
+		return this.assembledEngines;
+	}
+
+	@Override
+	@Unique
+	public List<HeatSource> getAssembledHeatSources()
+	{
+		return this.assembledHeatSources;
 	}
 
 	@Override

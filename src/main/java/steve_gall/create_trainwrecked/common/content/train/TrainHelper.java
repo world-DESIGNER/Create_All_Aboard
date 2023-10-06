@@ -54,6 +54,7 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.network.PacketDistributor;
 import steve_gall.create_trainwrecked.common.CreateTrainwrecked;
 import steve_gall.create_trainwrecked.common.content.contraption.MountedStorageManagerExtension;
+import steve_gall.create_trainwrecked.common.crafting.HeatStage;
 import steve_gall.create_trainwrecked.common.crafting.TrainEngineTypeRecipe;
 import steve_gall.create_trainwrecked.common.fluid.FluidHelper;
 import steve_gall.create_trainwrecked.common.mixin.ContraptionAccessor;
@@ -67,7 +68,8 @@ public class TrainHelper
 	public static String TRAIN_ASSEMBLEY_NO_ENGINES = CreateTrainwrecked.translationKey("train_assembly.no_engines");
 	public static String TRAIN_ASSEMBLEY_TOO_MANY_CARRIAGES = CreateTrainwrecked.translationKey("train_assembly.too_many_carriages");
 	public static String TRAIN_ASSEMBLEY_TOO_MANY_BLOCKS = CreateTrainwrecked.translationKey("train_assembly.too_many_blocks");
-	public static String TRAIN_ASSEMBLEY_CARRIAGE_NO_FLUID_INTERFACE = CreateTrainwrecked.translationKey("train_assembly.carriage_no_fluid_interface");
+	public static String TRAIN_ASSEMBLEY_CARRIAGE_NO_FLUID_INTERFACES = CreateTrainwrecked.translationKey("train_assembly.carriage_no_fluid_interfaces");
+	public static String TRAIN_ASSEMBLEY_NO_HEAT_SOURCES = CreateTrainwrecked.translationKey("train_assembly.no_heat_sources");
 
 	public static String TRAIN_GOGGLE_OVERHEATED = CreateTrainwrecked.translationKey("train_google.overheated");
 	public static String TRAIN_GOGGLE_OVERHEATED_1 = CreateTrainwrecked.translationKey("train_google.overheated.1");
@@ -76,6 +78,8 @@ public class TrainHelper
 	public static String TRAIN_GOGGLE_TRAIN_INFO = CreateTrainwrecked.translationKey("train_google.train_info");
 	public static String TRAIN_GOGGLE_TRAIN_SPEED = CreateTrainwrecked.translationKey("train_google.train_speed");
 	public static String TRAIN_GOGGLE_TRAIN_BLOCKS = CreateTrainwrecked.translationKey("train_google.train_blocks");
+	public static String TRAIN_GOGGLE_HEAT_SOURCE_INFO = CreateTrainwrecked.translationKey("train_google.heat_source_info");
+	public static String TRAIN_GOGGLE_HEAT_SOURCE_LEVEL = CreateTrainwrecked.translationKey("train_google.heat_source_level");
 	public static String TRAIN_GOGGLE_ENGINE_INFO = CreateTrainwrecked.translationKey("train_google.engine_info");
 	public static String TRAIN_GOGGLE_ENGINE_COUNT = CreateTrainwrecked.translationKey("train_google.engine_count");
 	public static String TRAIN_GOGGLE_ENGINE_TEMP = CreateTrainwrecked.translationKey("train_google.engine_temp");
@@ -225,10 +229,9 @@ public class TrainHelper
 		List<CarriageContraption> contraptions = new ArrayList<>();
 		List<Carriage> carriages = new ArrayList<>();
 		List<Integer> spacing = new ArrayList<>();
+		List<Engine> assemblingEngines = new ArrayList<>();
+		List<HeatSource> assemblingHeatSources = new ArrayList<>();
 		boolean atLeastOneForwardControls = false;
-		boolean atLeastOneEngines = false;
-		double totalEngineCarriageStressHeap = 0.0D;
-		double maxBlocksPerCarriage = 0.0D;
 		long totalBlocks = 0L;
 
 		for (int bogeyIndex = 0; bogeyIndex < bogeyCount; bogeyIndex++)
@@ -245,12 +248,10 @@ public class TrainHelper
 				int offset = bogeyLocations[bogeyIndex] + 1;
 				boolean success = contraption.assemble(level, upsideDownBogeys[bogeyIndex] ? upsideDownBogeyPosOffset.relative(assemblyDirection, offset) : bogeyPosOffset.relative(assemblyDirection, offset));
 				atLeastOneForwardControls |= contraption.hasForwardControls();
-				for (EnginPos enginePos : ((CarriageContraptionExtension) contraption).getAssembledEnginePos())
-				{
-					atLeastOneEngines = true;
-					totalEngineCarriageStressHeap += enginePos.recipe().getCarriageSpeedStressHeap();
-					maxBlocksPerCarriage += enginePos.recipe().getMaxBlockCountPerCarriage();
-				}
+				CarriageContraptionExtension contraptionExtension = (CarriageContraptionExtension) contraption;
+				assemblingEngines.addAll(contraptionExtension.getAssembledEngines());
+				assemblingHeatSources.addAll(contraptionExtension.getAssembledHeatSources());
+
 				contraption.setSoundQueueOffset(offset);
 				if (!success)
 				{
@@ -300,7 +301,7 @@ public class TrainHelper
 
 				if (!hasFluidInterface)
 				{
-					accessor.invokeException(new AssemblyException(Component.translatable(TRAIN_ASSEMBLEY_CARRIAGE_NO_FLUID_INTERFACE, AllBlocks.PORTABLE_FLUID_INTERFACE.asStack().getHoverName())), contraptions.size() + 1);
+					accessor.invokeException(new AssemblyException(Component.translatable(TRAIN_ASSEMBLEY_CARRIAGE_NO_FLUID_INTERFACES, AllBlocks.PORTABLE_FLUID_INTERFACE.asStack().getHoverName())), contraptions.size() + 1);
 					return;
 				}
 
@@ -317,10 +318,18 @@ public class TrainHelper
 			return;
 		}
 
-		if (!atLeastOneEngines)
+		if (assemblingEngines.size() == 0)
 		{
 			accessor.invokeException(new AssemblyException(Component.translatable(TRAIN_ASSEMBLEY_NO_ENGINES)), -1);
 			return;
+		}
+
+		double totalEngineCarriageStressHeap = 0.0D;
+		double maxBlocksPerCarriage = 0.0D;
+		for (Engine engine : assemblingEngines)
+		{
+			totalEngineCarriageStressHeap += engine.getRecipe().getCarriageSpeedStressHeap();
+			maxBlocksPerCarriage += engine.getRecipe().getMaxBlockCountPerCarriage();
 		}
 
 		int maxCarriageCount = (int) TrainEngineTypeRecipe.getMaxCarriageCount(totalEngineCarriageStressHeap);
@@ -337,6 +346,15 @@ public class TrainHelper
 		{
 			accessor.invokeException(new AssemblyException(Component.translatable(TRAIN_ASSEMBLEY_TOO_MANY_BLOCKS, maxBlocks, totalBlocks)), -1);
 			return;
+		}
+
+		if (assemblingEngines.stream().allMatch(e -> e.getRecipe().isLimitableByHeat()))
+		{
+			if (assemblingHeatSources.size() == 0)
+			{
+				accessor.invokeException(new AssemblyException(Component.translatable(TRAIN_ASSEMBLEY_NO_HEAT_SOURCES)), -1);
+				return;
+			}
 		}
 
 		for (CarriageContraption contraption : contraptions)
@@ -361,8 +379,10 @@ public class TrainHelper
 			if (contraption.containsBlockBreakers())
 				self.award(AllAdvancements.CONTRAPTION_ACTORS);
 
-			List<EnginPos> assembledEnginePos = ((CarriageContraptionExtension) contraption).getAssembledEnginePos();
-			((CarriageExtension) carriage).getEngines().addAll(assembledEnginePos.stream().map(Engine::new).toList());
+			CarriageContraptionExtension contraptionExtension = (CarriageContraptionExtension) contraption;
+			CarriageExtension carriageExtension = (CarriageExtension) carriage;
+			carriageExtension.getEngines().addAll(contraptionExtension.getAssembledEngines());
+			carriageExtension.getHeatSources().addAll(contraptionExtension.getAssembledHeatSources());
 		}
 
 		GlobalStation station = self.getStation();
@@ -392,6 +412,20 @@ public class TrainHelper
 		return streamEngines(train).filter(engine -> !engine.isOverheated());
 	}
 
+	public static Stream<HeatSource> streamHeatSources(Train train)
+	{
+		return train.carriages.stream().flatMap(c -> ((CarriageExtension) c).getHeatSources().stream());
+	}
+
+	public static void burnHeatSources(Train train)
+	{
+		if (streamAliveEngines(train).anyMatch(e -> e.getRecipe().isLimitableByHeat()))
+		{
+			streamHeatSources(train).forEach(h -> h.burnFuel(train));
+		}
+
+	}
+
 	public static void tickTrain(Train train, Level level)
 	{
 		TrainExtension extension = (TrainExtension) train;
@@ -400,6 +434,11 @@ public class TrainHelper
 		for (Engine engine : streamEngines(train).toList())
 		{
 			engine.tick(train, level);
+		}
+
+		for (HeatSource heatSource : streamHeatSources(train).toList())
+		{
+			heatSource.tick(train, level);
 		}
 
 	}
@@ -427,109 +466,82 @@ public class TrainHelper
 		return new CarriageBlocksLimit(!Double.isInfinite(maxBlocksPerCarriage), (int) (maxBlocksPerCarriage * train.carriages.size()));
 	}
 
-	public static CarriageBlocksLimit getCarriagesTotalBlockLimit(Train train, double speed)
+	public static CarriageBlocksLimit getCarriagesTotalBlockLimit(Train train, double speed, HeatState heatState)
 	{
 		double maxBlocksPerCarriage = 0.0D;
 
-		for (Entry<TrainEngineTypeRecipe, EngineSpeedPlan> entry : makeEngineSpeedPlan(train, speed).entrySet())
+		for (Entry<TrainEngineTypeRecipe, EngineSpeedPlan> entry : makeEngineSpeedPlan(train, speed, heatState).entrySet())
 		{
+			TrainEngineTypeRecipe recipe = entry.getKey();
+			int engineCount = entry.getValue().engines().size();
 			FuelBurning fuel = entry.getValue().fuel();
-
-			for (Engine engine : entry.getValue().engines())
-			{
-				maxBlocksPerCarriage += engine.getFuelUsingRatio(fuel) * engine.getRecipe().getMaxBlockCountPerCarriage();
-			}
-
+			maxBlocksPerCarriage += fuel.isUsed() ? recipe.getMaxBlockCountPerCarriage() * engineCount : 0.0D;
 		}
 
 		return getCarriagBlockLimit(train, maxBlocksPerCarriage);
 	}
 
-	public static CarriageBlocksLimit getCarriagesTotalBlockLimit(Train train)
+	public static double getNextAccelerationSpeed(Train train, double speed, double targetSpeed, float accelerationMod)
 	{
-		double maxBlocksPerCarriage = 0.0D;
+		double delta = TrainHelper.acceleration(train) * accelerationMod;
+		double beforePlan = 0.0D;
 
-		for (Engine engine : streamEngines(train).toList())
+		if (speed < targetSpeed)
 		{
-			maxBlocksPerCarriage += engine.getFuelUsedRatio() * engine.getRecipe().getMaxBlockCountPerCarriage();
-		}
-
-		return getCarriagBlockLimit(train, maxBlocksPerCarriage);
-	}
-
-	public static double getNextSpeed(Train train, double speed, double targetSpeed, float accelerationMod)
-	{
-		if (Mth.equal(speed, targetSpeed))
-		{
-			return speed;
-		}
-		else if (((speed < targetSpeed) && speed >= 0) || ((speed > targetSpeed) && speed <= 0))
-		{
-			double delta = TrainHelper.acceleration(train) * accelerationMod;
-			double beforePlan = 0.0D;
-
-			if (speed < targetSpeed)
-			{
-				beforePlan = Math.min(speed + delta, targetSpeed);
-			}
-			else
-			{
-				beforePlan = Math.max(speed - delta, targetSpeed);
-			}
-
-			double planedDelta = 0.0D;
-			double maxBlocksPerCarriage = 0.0D;
-			Map<TrainEngineTypeRecipe, EngineSpeedPlan> plan = makeEngineSpeedPlan(train, beforePlan * 20.0D);
-
-			for (Entry<TrainEngineTypeRecipe, EngineSpeedPlan> pair : plan.entrySet())
-			{
-				TrainEngineTypeRecipe recipe = pair.getKey();
-				EngineSpeedPlan enginePlan = pair.getValue();
-				FuelBurning fuel = enginePlan.fuel();
-
-				for (Engine engine : enginePlan.engines())
-				{
-					double fuelUsingRatio = engine.getFuelUsingRatio(fuel);
-					planedDelta += fuelUsingRatio * recipe.getAcceleration();
-					maxBlocksPerCarriage += fuelUsingRatio * engine.getRecipe().getMaxBlockCountPerCarriage();
-				}
-
-			}
-
-			planedDelta /= 400.0D;
-			int carriagesTotalBlockCount = getCarriagesTotalBlockCount(train);
-			CarriageBlocksLimit carriagBlockLimit = getCarriagBlockLimit(train, maxBlocksPerCarriage);
-
-			if (carriagBlockLimit.isOvered(carriagesTotalBlockCount))
-			{
-				return 0.0D;
-			}
-			else if (speed < targetSpeed)
-			{
-				return Math.min(speed + planedDelta, targetSpeed);
-			}
-			else
-			{
-				return Math.max(speed - planedDelta, targetSpeed);
-			}
-
+			beforePlan = Math.min(speed + delta, targetSpeed);
 		}
 		else
 		{
-			return approachTargetSpeed(train, speed, targetSpeed, accelerationMod);
+			beforePlan = Math.max(speed - delta, targetSpeed);
+		}
+
+		burnHeatSources(train);
+
+		HeatState heatState = getHeatState(train);
+		double planedDelta = 0.0D;
+		double maxBlocksPerCarriage = 0.0D;
+		Map<TrainEngineTypeRecipe, EngineSpeedPlan> plan = makeEngineSpeedPlan(train, beforePlan * 20.0D, heatState);
+
+		for (Entry<TrainEngineTypeRecipe, EngineSpeedPlan> entry : plan.entrySet())
+		{
+			TrainEngineTypeRecipe recipe = entry.getKey();
+			EngineSpeedPlan enginePlan = entry.getValue();
+			int engineCount = enginePlan.engines().size();
+			FuelBurning fuel = enginePlan.fuel();
+
+			planedDelta += fuel.getUsedRatio() * recipe.getAcceleration() * engineCount;
+			maxBlocksPerCarriage += fuel.isUsed() ? recipe.getMaxBlockCountPerCarriage() * engineCount : 0;
+		}
+
+		planedDelta /= 400.0D;
+		int carriagesTotalBlockCount = getCarriagesTotalBlockCount(train);
+		CarriageBlocksLimit carriagBlockLimit = getCarriagBlockLimit(train, maxBlocksPerCarriage);
+
+		if (carriagBlockLimit.isOvered(carriagesTotalBlockCount))
+		{
+			return approachTargetSpeed(train, speed, 0.0D, accelerationMod);
+		}
+		else if (speed < targetSpeed)
+		{
+			return Math.min(speed + planedDelta, targetSpeed);
+		}
+		else
+		{
+			return Math.max(speed - planedDelta, targetSpeed);
 		}
 
 	}
 
 	public static double approachTargetSpeed(Train train, double speed, double targetSpeed, float accelerationMod)
 	{
-		double delta = getSpeedDelta(train, speed, targetSpeed) * accelerationMod;
-
 		if (Mth.equal(speed, targetSpeed))
 		{
 			return speed;
 		}
-		else if (speed < targetSpeed)
+
+		double delta = getSpeedDelta(train, speed, targetSpeed) * accelerationMod;
+
+		if (speed < targetSpeed)
 		{
 			return Math.min(speed + delta, targetSpeed);
 		}
@@ -557,45 +569,59 @@ public class TrainHelper
 
 	}
 
-	public static void applyFuelSpeed(Train train)
+	public static void controlSpeed(Train train)
 	{
 		TrainExtension trainE = ((TrainExtension) train);
 		float acelerationMod = 0.0F;
 		double speed = train.speed;
 
-		{
-			float approachAccelerationMod = trainE.getApproachAccelerationMod();
+		float approachAccelerationMod = trainE.getApproachAccelerationMod();
+		boolean fuelFuelBurned = false;
 
-			if (approachAccelerationMod != 0.0F)
+		if (approachAccelerationMod != 0.0F)
+		{
+			acelerationMod = approachAccelerationMod;
+			trainE.setApproachAccelerationMod(0.0F);
+
+			if (((speed < train.targetSpeed) && speed >= 0) || ((speed > train.targetSpeed) && speed <= 0))
 			{
-				acelerationMod = approachAccelerationMod;
-				trainE.setApproachAccelerationMod(0.0F);
-				speed = getNextSpeed(train, speed, train.targetSpeed, approachAccelerationMod);
+				speed = getNextAccelerationSpeed(train, speed, train.targetSpeed, approachAccelerationMod);
+				fuelFuelBurned = true;
 			}
 			else
 			{
-				acelerationMod = 1.0F;
+				speed = approachTargetSpeed(train, speed, train.targetSpeed, approachAccelerationMod);
 			}
 
+		}
+		else
+		{
+			acelerationMod = 1.0F;
 		}
 
 		if (!Mth.equal(speed, 0.0D))
 		{
-			Map<TrainEngineTypeRecipe, EngineSpeedPlan> plan = makeEngineSpeedPlan(train, speed);
+			if (!fuelFuelBurned)
+			{
+				burnHeatSources(train);
+			}
+
+			HeatState heatState = getHeatState(train);
+			Map<TrainEngineTypeRecipe, EngineSpeedPlan> plan = makeEngineSpeedPlan(train, speed * 20.0D, heatState);
 			double reductionRatio = getCarriagesSpeedReductionRatio(train);
 			double targetSpeed = 0.0D;
 
 			for (Entry<TrainEngineTypeRecipe, EngineSpeedPlan> pair : plan.entrySet())
 			{
 				TrainEngineTypeRecipe recipe = pair.getKey();
-				double eachSpeed = pair.getValue().speed();
 				List<Engine> engines = pair.getValue().engines();
+				double eachSpeed = pair.getValue().eachSpeed();
 				int engineCount = engines.size();
-				FuelBurning fuel = burnFuel(train, recipe, engineCount, eachSpeed, false);
+				FuelBurning fuel = burnFuel(train, recipe, engineCount, eachSpeed, heatState.level(), false);
 
 				for (Engine engine : engines)
 				{
-					engine.onFuelBurned(fuel, eachSpeed);
+					engine.onFuelBurned(fuel, eachSpeed, heatState.level());
 					targetSpeed += engine.getSpeed() * reductionRatio;
 				}
 
@@ -629,25 +655,23 @@ public class TrainHelper
 
 	}
 
-	public static Map<TrainEngineTypeRecipe, EngineSpeedPlan> makeEngineSpeedPlan(Train train, double speed)
+	public static Map<TrainEngineTypeRecipe, EngineSpeedPlan> makeEngineSpeedPlan(Train train, double speed, HeatState heatState)
 	{
-		Map<TrainEngineTypeRecipe, List<Engine>> engineMap = streamAliveEngines(train).collect(Collectors.groupingBy(Engine::getRecipe));
-		return makeEngineSpeedPlan(train, engineMap, speed);
-	}
-
-	public static Map<TrainEngineTypeRecipe, EngineSpeedPlan> makeEngineSpeedPlan(Train train, Map<TrainEngineTypeRecipe, List<Engine>> engineMap, double speed)
-	{
-		double maxSpeed = train.maxSpeed();
+		double maxSpeed = maxSpeed(train) * 20.0D;
 		double speedRatio = Math.abs(speed) / maxSpeed;
 		Map<TrainEngineTypeRecipe, Double> speedPlans = new HashMap<>();
 		Map<TrainEngineTypeRecipe, EngineSpeedPlan> speedPredict = new HashMap<>();
+		Map<TrainEngineTypeRecipe, List<Engine>> engineMap = streamAliveEngines(train).collect(Collectors.groupingBy(Engine::getRecipe));
 
 		for (Entry<TrainEngineTypeRecipe, List<Engine>> entry : engineMap.entrySet())
 		{
 			TrainEngineTypeRecipe recipe = entry.getKey();
+			List<Engine> engines = entry.getValue();
 			speedPlans.put(recipe, speedRatio * recipe.getMaxSpeed());
-			speedPredict.put(recipe, new EngineSpeedPlan(entry.getValue(), new FuelBurning(0.0D, 0.0D), 0.0D));
+			speedPredict.put(recipe, new EngineSpeedPlan(engines, new FuelBurning(0.0D, 0.0D), 0.0D));
 		}
+
+		double heatSpeedLimit = heatState.speedLimit();
 
 		while (true)
 		{
@@ -660,9 +684,18 @@ public class TrainHelper
 				List<Engine> engines = engineMap.get(recipe);
 				int engineCount = engines.size();
 				double eachSpeedPlan = speedPlans.get(recipe);
-				FuelBurning fuel = burnFuel(train, recipe, engineCount, eachSpeedPlan, true);
+				double sumSpeedPlan = eachSpeedPlan * engineCount;
+				double eachLimitedPlan = eachSpeedPlan;
+				double heatSpeedOver = sumSpeedPlan - heatSpeedLimit;
 
-				double eachPredict = recipe.getPredictSpeed(fuel.toBurn(), fuel.burned(), eachSpeedPlan);
+				if (recipe.isLimitableByHeat() && heatSpeedOver > 0.0D)
+				{
+					sumSpeedPlan -= heatSpeedOver;
+					eachLimitedPlan = sumSpeedPlan / engineCount;
+				}
+
+				FuelBurning fuel = burnFuel(train, recipe, engineCount, eachLimitedPlan, heatState.level(), true);
+				double eachPredict = recipe.getPredictSpeed(fuel.toBurn(), fuel.burned(), eachLimitedPlan, heatState.level());
 				speedPredict.put(recipe, new EngineSpeedPlan(engines, fuel, eachPredict));
 
 				if (Mth.equal(eachPredict, eachSpeedPlan) || eachPredict >= eachSpeedPlan)
@@ -673,6 +706,12 @@ public class TrainHelper
 				{
 					neededs.add(recipe);
 					totalNeeded += (eachSpeedPlan - eachPredict) * engineCount;
+
+					if (recipe.isLimitableByHeat())
+					{
+						heatSpeedLimit = Math.max(heatSpeedLimit - heatSpeedOver, 0.0D);
+					}
+
 				}
 
 			}
@@ -701,18 +740,10 @@ public class TrainHelper
 		return speedPredict;
 	}
 
-	public static FuelBurning burnFuel(Train train, TrainEngineTypeRecipe recipe, int engineCount, double speed, boolean simulate)
+	public static FuelBurning burnFuel(Train train, TrainEngineTypeRecipe recipe, int engineCount, double speed, int heatLevel, boolean simulate)
 	{
-		int duplicatedRecipeCount = engineCount - 1;
-		double fuelPerTick = recipe.getFuelUsage(duplicatedRecipeCount, speed) / 20.0D;
-		double totalToBurn = fuelPerTick;
-
-		if (!recipe.isFuelShare())
-		{
-			totalToBurn = fuelPerTick * engineCount;
-		}
-
-		List<FluidTagEntry> fuelType = recipe.getFuelType();
+		List<FluidTagEntry> fuelType = recipe.getFuelTypes();
+		double totalToBurn = recipe.getFuelUsage(speed, heatLevel) / 20.0D * engineCount;
 		double totalBurned = ((TrainExtension) train).getFuelBurner().burn(train, fuelType, totalToBurn, simulate);
 		double eachToBurn = totalToBurn / engineCount;
 		double eachBurned = totalBurned / engineCount;
@@ -782,7 +813,7 @@ public class TrainHelper
 				TrainEngineTypeRecipe recipe = engine.getRecipe();
 				int heatCapacity = recipe.getHeatCapacity();
 				double temp = engine.getHeat() / heatCapacity;
-				double airCoolingDuration = ((temp - recipe.overheatedResettingTemp()) * heatCapacity) / recipe.getAirCoolingRate();
+				double airCoolingDuration = ((temp - recipe.getOverheatedResettingTemp()) * heatCapacity) / recipe.getAirCoolingRate();
 				Lang.builder().add(Component.translatable(TRAIN_GOGGLE_OVERHEATED)).style(ChatFormatting.GOLD).style(ChatFormatting.BOLD).forGoggles(tooltip);
 				Lang.builder().add(Component.translatable(TRAIN_GOGGLE_OVERHEATED_1)).style(ChatFormatting.GRAY).forGoggles(tooltip);
 				Lang.builder().add(Component.translatable(TRAIN_GOGGLE_OVERHEATED_2, Component.literal(NumberHelper.format(airCoolingDuration, 1)).withStyle(ChatFormatting.WHITE))).style(ChatFormatting.GRAY).forGoggles(tooltip);
@@ -791,9 +822,10 @@ public class TrainHelper
 
 		}
 
+		HeatState heatState = getHeatState(train);
 		double speed = ((CarriageSyncDataExtension) carriageContraptionEntity.getCarriageData()).getTrainSpeed() * 20;
 		int carriagesTotalBlockCount = getCarriagesTotalBlockCount(train);
-		CarriageBlocksLimit carriagesTotalBlockLimit = getCarriagesTotalBlockLimit(train, Math.abs(speed) + acceleration(train));
+		CarriageBlocksLimit carriagesTotalBlockLimit = getCarriagesTotalBlockLimit(train, Math.abs(speed) + acceleration(train), heatState);
 		MutableComponent speedComponent = Component.literal(NumberHelper.format(speed, 1) + "m/s").withStyle(ChatFormatting.GOLD);
 		MutableComponent maxSpeedComponent = Component.literal(NumberHelper.format(train.maxSpeed() * 20, 1) + "m/s").withStyle(ChatFormatting.DARK_GRAY);
 		MutableComponent blocksComponent = Component.literal(NumberHelper.format(carriagesTotalBlockCount)).withStyle(carriagesTotalBlockLimit.isOvered(carriagesTotalBlockCount) ? ChatFormatting.RED : ChatFormatting.GOLD);
@@ -802,6 +834,14 @@ public class TrainHelper
 		Lang.builder().add(Component.translatable(TRAIN_GOGGLE_TRAIN_INFO)).forGoggles(tooltip);
 		Lang.builder().add(Component.translatable(TRAIN_GOGGLE_TRAIN_SPEED, speedComponent, maxSpeedComponent)).style(ChatFormatting.GRAY).forGoggles(tooltip, 1);
 		Lang.builder().add(Component.translatable(TRAIN_GOGGLE_TRAIN_BLOCKS, blocksComponent, blocksLimitComponent)).style(ChatFormatting.GRAY).forGoggles(tooltip, 1);
+
+		if (heatState.sources() > 0)
+		{
+			MutableComponent heatLevelComponent = Component.literal(NumberHelper.format(heatState.level())).withStyle(ChatFormatting.GOLD);
+			MutableComponent maxHeatLevelComponent = Component.literal(NumberHelper.format(heatState.maxLevel())).withStyle(ChatFormatting.DARK_GRAY);
+			Lang.builder().add(Component.translatable(TRAIN_GOGGLE_HEAT_SOURCE_INFO)).forGoggles(tooltip);
+			Lang.builder().add(Component.translatable(TRAIN_GOGGLE_HEAT_SOURCE_LEVEL, heatLevelComponent, maxHeatLevelComponent)).style(ChatFormatting.GRAY).forGoggles(tooltip, 1);
+		}
 
 		Lang.builder().add(Component.translatable(TRAIN_GOGGLE_ENGINE_INFO)).forGoggles(tooltip);
 
@@ -837,7 +877,7 @@ public class TrainHelper
 				}
 
 				MutableComponent countComponent = Component.literal(NumberHelper.format(entry.getValue().size()));
-				Lang.builder().add(Component.translatable(TRAIN_GOGGLE_ENGINE_COUNT, name != null ? name.copy() : Component.empty(), countComponent)).forGoggles(tooltip, 1);
+				Lang.builder().add(Component.translatable(TRAIN_GOGGLE_ENGINE_COUNT, name != null ? name.copy() : Component.empty(), countComponent)).style(ChatFormatting.GRAY).forGoggles(tooltip, 1);
 
 				int heatCapacity = recipe.getHeatCapacity();
 
@@ -858,7 +898,7 @@ public class TrainHelper
 
 					double highestTemp = hostHeat / heatCapacity;
 					MutableComponent highestTempComponent = getHeatPercentComponent(highestTemp);
-					MutableComponent overheatedsComponent = Component.literal(NumberHelper.format(overheates)).withStyle(overheates > 0 ? ChatFormatting.RED : ChatFormatting.WHITE);
+					MutableComponent overheatedsComponent = Component.literal(NumberHelper.format(overheates)).withStyle(overheates > 0 ? ChatFormatting.RED : ChatFormatting.GRAY);
 					Lang.builder().add(Component.translatable(TRAIN_GOGGLE_ENGINE_HIGHEST_TEMP, highestTempComponent)).style(ChatFormatting.GRAY).forGoggles(tooltip, 2);
 					Lang.builder().add(Component.translatable(TRAIN_GOGGLE_ENGINE_OVERHEATEDS, overheatedsComponent)).style(ChatFormatting.GRAY).forGoggles(tooltip, 2);
 				}
@@ -897,13 +937,13 @@ public class TrainHelper
 		if (hasTank)
 		{
 			Lang.translate("gui.goggles.fluid_container").forGoggles(tooltip);
-			Lang.builder().add(Component.translatable(TRAIN_GOGGLE_FLUID_CAPACITY, Component.literal(NumberHelper.format(totalCapacity)).withStyle(ChatFormatting.WHITE))).forGoggles(tooltip, 1);
+			Lang.builder().add(Component.translatable(TRAIN_GOGGLE_FLUID_CAPACITY, Component.literal(NumberHelper.format(totalCapacity) + "mB"))).style(ChatFormatting.GRAY).forGoggles(tooltip, 1);
 
 			for (Entry<FluidStack, Long> entry : amountMap.entrySet())
 			{
 				Component displayName = entry.getKey().getDisplayName();
 				Component percentComponent = Component.literal(NumberHelper.format(entry.getValue() / (totalCapacity / 100.0D), 1) + "%").withStyle(ChatFormatting.GOLD);
-				Component amountComponent = Component.literal(NumberHelper.format(entry.getValue())).withStyle(ChatFormatting.GOLD);
+				Component amountComponent = Component.literal(NumberHelper.format(entry.getValue()) + "mB").withStyle(ChatFormatting.GOLD);
 				Lang.builder().add(Component.translatable(TRAIN_GOGGLE_FLUID_AMOUNT, displayName, percentComponent, amountComponent)).style(ChatFormatting.GRAY).forGoggles(tooltip, 1);
 			}
 
@@ -937,6 +977,34 @@ public class TrainHelper
 		}
 
 		return false;
+	}
+
+	public static HeatState getHeatState(Train train)
+	{
+		List<HeatSource> heatSources = streamHeatSources(train).toList();
+
+		if (heatSources.size() > 0)
+		{
+			int level = 0;
+			int maxLevel = 0;
+			float speedLimit = 0.0F;
+			float maxSpeedLimit = 0.0F;
+
+			for (HeatSource source : heatSources)
+			{
+				level += source.getLevel();
+				maxLevel += source.getMaxLevel();
+				speedLimit += HeatStage.getSpeedLimit(source.getLevel());
+				maxSpeedLimit += HeatStage.getSpeedLimit(source.getMaxLevel());
+			}
+
+			return new HeatState(level, speedLimit, heatSources.size(), maxLevel, maxSpeedLimit);
+		}
+		else
+		{
+			return new HeatState(0, 0.0F, 0, 0, 0.0F);
+		}
+
 	}
 
 	private TrainHelper()

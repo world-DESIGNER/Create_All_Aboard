@@ -22,22 +22,19 @@ import steve_gall.create_trainwrecked.common.util.ItemTagEntry;
 
 public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, NonContainerRecipe
 {
-	protected final ResourceLocation id;
-
-	private final List<ItemTagEntry> blockType;
+	private final ResourceLocation id;
+	private final List<ItemTagEntry> blockTypes;
 	private final float maxSpeed;
 	private final float acceleration;
-	private final float carriageStressMultiplier;
-	private final List<FluidTagEntry> fuelType;
-	private final boolean fuelShare;
-	private final float fuelMinimum;
-	private final float fuelPerSpeed;
-	private final float fuelPerRecipe;
-	private final float fuelPerRecipePow;
+	private final double carriageStressMultiplier;
+	private final List<FluidTagEntry> fuelTypes;
+	private final boolean limitableByHeat;
+	private final double fuelPerSpeed;
+	private final double fuelPerHeatLevel;
 	private final int heatCapacity;
-	private final int heatPerFuel;
-	private final float airCoolingRate;
-	private final float overheatedResettingTemp;
+	private final double heatPerFuel;
+	private final double airCoolingRate;
+	private final double overheatedResettingTemp;
 
 	private final List<Ingredient> blocks;
 	private final List<FluidIngredient> fuels;
@@ -45,32 +42,38 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 	private TrainEngineTypeRecipe(ResourceLocation id, Builder<?> builder)
 	{
 		this.id = id;
-		this.blockType = Collections.unmodifiableList(builder.blockType());
+		this.blockTypes = Collections.unmodifiableList(builder.blockType());
 		this.maxSpeed = builder.maxSpeed();
 		this.acceleration = builder.acceleration();
 		this.carriageStressMultiplier = builder.carriageStressMultiplier();
-		this.fuelType = Collections.unmodifiableList(builder.fuelType());
-		this.fuelShare = builder.fuelShare();
-		this.fuelMinimum = builder.fuelMinimum();
+		this.fuelTypes = Collections.unmodifiableList(builder.fuelType());
+		this.limitableByHeat = builder.limitableByHeat();
 		this.fuelPerSpeed = builder.fuelPerSpeed();
-		this.fuelPerRecipe = builder.fuelPerRecipe();
-		this.fuelPerRecipePow = builder.fuelPerRecipePow();
+		this.fuelPerHeatLevel = builder.fuelPerHeatLevel();
 		this.heatCapacity = builder.heatCapacity();
 		this.heatPerFuel = builder.heatPerFuel();
 		this.airCoolingRate = builder.airCoolingRate();
 		this.overheatedResettingTemp = builder.overheatedResettingTemp();
 
-		this.blocks = this.blockType.stream().map(ItemTagEntry::toIngredient).toList();
-		this.fuels = this.fuelType.stream().map(FluidTagEntry::toIngredient).toList();
+		this.blocks = this.blockTypes.stream().map(ItemTagEntry::toIngredient).toList();
+		this.fuels = this.fuelTypes.stream().map(FluidTagEntry::toIngredient).toList();
 	}
 
-	public double getPredictSpeed(double toBurn, double burned, double allocatedSpeed)
+	public double getPredictSpeed(double toBurn, double burned, double allocatedSpeed, int heatLevel)
 	{
 		double fuelPerSpeed = this.getFuelPerSpeed();
 
-		if (fuelPerSpeed > 0)
+		if (fuelPerSpeed > 0.0D)
 		{
-			return burned * 20.0D / fuelPerSpeed;
+			double fuelPerHeatLevel = this.getFuelPerHeatLevel();
+			double burnedBySpeed = burned;
+
+			if (fuelPerHeatLevel > 0.0D)
+			{
+				burnedBySpeed = burnedBySpeed / (heatLevel * fuelPerHeatLevel);
+			}
+
+			return burnedBySpeed * 20.0D / fuelPerSpeed;
 		}
 		else if (burned > 0)
 		{
@@ -83,13 +86,21 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 
 	}
 
-	public double getFuelUsage(int sameRecipeCount, double speed)
+	public double getFuelUsage(double speed, int heatLevel)
 	{
-		float minimum = this.getFuelMinimum();
-		float perSpeed = this.getFuelPerSpeed();
-		float perRecipe = this.getFuelPerRecipe();
-		float perRecipePow = this.getFuelPerRecipePow();
-		return minimum + (speed * perSpeed) + (perRecipe * sameRecipeCount) + (perRecipePow > 0.0F ? Math.pow(perRecipePow, sameRecipeCount) : 0.0F);
+		return getFuelUsage(this.getFuelPerSpeed(), this.getFuelPerHeatLevel(), speed, heatLevel);
+	}
+
+	public static double getFuelUsage(double fuelPerSpeed, double fuelPerHeatLevel, double speed, int heatLevel)
+	{
+		double fuelUsage = speed * fuelPerSpeed;
+
+		if (fuelPerHeatLevel > 0.0D)
+		{
+			fuelUsage *= heatLevel * fuelPerHeatLevel;
+		}
+
+		return fuelUsage;
 	}
 
 	public static float getCarriageStress(int carriageCount)
@@ -122,9 +133,9 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 
 	public double getCarriageSpeedStressHeap()
 	{
-		float carriageStressMultiplier = this.getCarriageStressMultiplier();
+		double carriageStressMultiplier = this.getCarriageStressMultiplier();
 
-		if (carriageStressMultiplier <= 0)
+		if (carriageStressMultiplier <= 0.0D)
 		{
 			return Double.POSITIVE_INFINITY;
 		}
@@ -137,9 +148,9 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 
 	public double getMaxBlockCountPerCarriage()
 	{
-		float carriageStressMultiplier = this.getCarriageStressMultiplier();
+		double carriageStressMultiplier = this.getCarriageStressMultiplier();
 
-		if (carriageStressMultiplier <= 0)
+		if (carriageStressMultiplier <= 0.0D)
 		{
 			return Double.POSITIVE_INFINITY;
 		}
@@ -170,39 +181,35 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 	@Override
 	public void toJson(JsonObject pJson)
 	{
-		pJson.add("blockType", ItemTagEntry.TYPE.listToJson(this.getBlockType()));
+		pJson.add("blockType", ItemTagEntry.TYPE.listToJson(this.getBlockTypes()));
 		pJson.addProperty("maxSpeed", this.getMaxSpeed());
 		pJson.addProperty("acceleration", this.getAcceleration());
 		pJson.addProperty("carriageStressMultiplier", this.getCarriageStressMultiplier());
-		pJson.add("fuelType", FluidTagEntry.TYPE.listToJson(this.getFuelType()));
-		pJson.addProperty("fuelShare", this.isFuelShare());
-		pJson.addProperty("fuelMinimum", this.getFuelMinimum());
+		pJson.add("fuelType", FluidTagEntry.TYPE.listToJson(this.getFuelTypes()));
+		pJson.addProperty("limitableByHeat", this.isLimitableByHeat());
 		pJson.addProperty("fuelPerSpeed", this.getFuelPerSpeed());
-		pJson.addProperty("fuelPerRecipe", this.getFuelPerRecipe());
-		pJson.addProperty("fuelPerRecipePow", this.getFuelPerRecipePow());
+		pJson.addProperty("fuelPerHeatLevel", this.getFuelPerHeatLevel());
 		pJson.addProperty("heatCapacity", this.getHeatCapacity());
 		pJson.addProperty("heatPerFuel", this.getHeatPerFuel());
 		pJson.addProperty("airCoolingRate", this.getAirCoolingRate());
-		pJson.addProperty("overheatedResettingTemp", this.overheatedResettingTemp());
+		pJson.addProperty("overheatedResettingTemp", this.getOverheatedResettingTemp());
 	}
 
 	@Override
 	public void toNetwork(FriendlyByteBuf pBuffer)
 	{
-		ItemTagEntry.TYPE.listToNetowrk(pBuffer, this.getBlockType());
+		ItemTagEntry.TYPE.listToNetowrk(pBuffer, this.getBlockTypes());
 		pBuffer.writeFloat(this.getMaxSpeed());
 		pBuffer.writeFloat(this.getAcceleration());
-		pBuffer.writeFloat(this.getCarriageStressMultiplier());
-		FluidTagEntry.TYPE.listToNetowrk(pBuffer, this.getFuelType());
-		pBuffer.writeBoolean(this.isFuelShare());
-		pBuffer.writeFloat(this.getFuelMinimum());
-		pBuffer.writeFloat(this.getFuelPerSpeed());
-		pBuffer.writeFloat(this.getFuelPerRecipe());
-		pBuffer.writeFloat(this.getFuelPerRecipePow());
+		pBuffer.writeDouble(this.getCarriageStressMultiplier());
+		FluidTagEntry.TYPE.listToNetowrk(pBuffer, this.getFuelTypes());
+		pBuffer.writeBoolean(this.isLimitableByHeat());
+		pBuffer.writeDouble(this.getFuelPerSpeed());
+		pBuffer.writeDouble(this.getFuelPerHeatLevel());
 		pBuffer.writeInt(this.getHeatCapacity());
-		pBuffer.writeInt(this.getHeatPerFuel());
-		pBuffer.writeFloat(this.getAirCoolingRate());
-		pBuffer.writeFloat(this.overheatedResettingTemp());
+		pBuffer.writeDouble(this.getHeatPerFuel());
+		pBuffer.writeDouble(this.getAirCoolingRate());
+		pBuffer.writeDouble(this.getOverheatedResettingTemp());
 	}
 
 	@Override
@@ -211,9 +218,9 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 		return this.id;
 	}
 
-	public List<ItemTagEntry> getBlockType()
+	public List<ItemTagEntry> getBlockTypes()
 	{
-		return this.blockType;
+		return this.blockTypes;
 	}
 
 	public List<Ingredient> getBlocks()
@@ -231,14 +238,14 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 		return this.acceleration;
 	}
 
-	public float getCarriageStressMultiplier()
+	public double getCarriageStressMultiplier()
 	{
 		return this.carriageStressMultiplier;
 	}
 
-	public List<FluidTagEntry> getFuelType()
+	public List<FluidTagEntry> getFuelTypes()
 	{
-		return this.fuelType;
+		return this.fuelTypes;
 	}
 
 	public List<FluidIngredient> getFuels()
@@ -246,29 +253,19 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 		return this.fuels;
 	}
 
-	public boolean isFuelShare()
+	public boolean isLimitableByHeat()
 	{
-		return this.fuelShare;
+		return this.limitableByHeat;
 	}
 
-	public float getFuelMinimum()
-	{
-		return this.fuelMinimum;
-	}
-
-	public float getFuelPerSpeed()
+	public double getFuelPerSpeed()
 	{
 		return this.fuelPerSpeed;
 	}
 
-	public float getFuelPerRecipe()
+	public double getFuelPerHeatLevel()
 	{
-		return this.fuelPerRecipe;
-	}
-
-	public float getFuelPerRecipePow()
-	{
-		return this.fuelPerRecipePow;
+		return this.fuelPerHeatLevel;
 	}
 
 	public int getHeatCapacity()
@@ -276,19 +273,35 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 		return this.heatCapacity;
 	}
 
-	public int getHeatPerFuel()
+	public double getHeatPerFuel()
 	{
 		return this.heatPerFuel;
 	}
 
-	public float getAirCoolingRate()
+	public double getAirCoolingRate()
 	{
 		return this.airCoolingRate;
 	}
 
-	public float overheatedResettingTemp()
+	public double getOverheatedResettingTemp()
 	{
 		return this.overheatedResettingTemp;
+	}
+
+	public static class Serializer extends SimpleRecipeSerializer<TrainEngineTypeRecipe, Builder<?>>
+	{
+		@Override
+		protected Builder<?> fromJson(JsonObject pJson)
+		{
+			return new Builder<>(pJson);
+		}
+
+		@Override
+		protected Builder<?> fromNetwork(FriendlyByteBuf pBuffer)
+		{
+			return new Builder<>(pBuffer);
+		}
+
 	}
 
 	@SuppressWarnings("unchecked")
@@ -297,59 +310,51 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 		private final List<ItemTagEntry> blockType = new ArrayList<>();
 		private float maxSpeed = 0.0F;
 		private float acceleration = 0.0F;
-		private float carriageStressMultiplier = 1.0F;
+		private double carriageStressMultiplier = 1.0D;
 		private List<FluidTagEntry> fuelType = new ArrayList<>();
-		private boolean fuelShare = false;
-		private float fuelMinimum = 0.0F;
-		private float fuelPerSpeed = 0.0F;
-		private float fuelPerRecipe = 0.0F;
-		private float fuelPerRecipePow = 0.0F;
+		private boolean limitableByHeat = false;
+		private double fuelPerSpeed = 0.0D;
+		private double fuelPerHeatLevel = 0.0D;
 		private int heatCapacity = 0;
-		private int heatPerFuel = 0;
-		private float airCoolingRate = 0.0F;
-		private float overheatedResettingTemp = 0.0F;
+		private double heatPerFuel = 0.0D;
+		private double airCoolingRate = 0.0D;
+		private double overheatedResettingTemp = 0.0D;
 
 		public Builder()
 		{
 
 		}
 
-		@Override
-		public void fromJson(JsonObject pJson)
+		public Builder(JsonObject pJson)
 		{
 			this.blockType().addAll(ItemTagEntry.TYPE.getAsTagEntryList(pJson, "blockType"));
 			this.maxSpeed(GsonHelper.getAsFloat(pJson, "maxSpeed"));
 			this.acceleration(GsonHelper.getAsFloat(pJson, "acceleration"));
 			this.carriageStressMultiplier(GsonHelper.getAsFloat(pJson, "carriageStressMultiplier"));
 			this.fuelType().addAll(FluidTagEntry.TYPE.getAsTagEntryList(pJson, "fuelType"));
-			this.fuelShare(GsonHelper.getAsBoolean(pJson, "fuelShare"));
-			this.fuelMinimum(GsonHelper.getAsFloat(pJson, "fuelMinimum"));
-			this.fuelPerSpeed(GsonHelper.getAsFloat(pJson, "fuelPerSpeed"));
-			this.fuelPerRecipe(GsonHelper.getAsFloat(pJson, "fuelPerRecipe"));
-			this.fuelPerRecipePow(GsonHelper.getAsFloat(pJson, "fuelPerRecipePow"));
+			this.limitableByHeat(GsonHelper.getAsBoolean(pJson, "limitableByHeat"));
+			this.fuelPerSpeed(GsonHelper.getAsDouble(pJson, "fuelPerSpeed"));
+			this.fuelPerHeatLevel(GsonHelper.getAsDouble(pJson, "fuelPerHeatLevel"));
 			this.heatCapacity(GsonHelper.getAsInt(pJson, "heatCapacity"));
-			this.heatPerFuel(GsonHelper.getAsInt(pJson, "heatPerFuel"));
-			this.airCoolingRate(GsonHelper.getAsFloat(pJson, "airCoolingRate"));
-			this.overheatedResettingTemp(GsonHelper.getAsFloat(pJson, "overheatedResettingTemp"));
+			this.heatPerFuel(GsonHelper.getAsDouble(pJson, "heatPerFuel"));
+			this.airCoolingRate(GsonHelper.getAsDouble(pJson, "airCoolingRate"));
+			this.overheatedResettingTemp(GsonHelper.getAsDouble(pJson, "overheatedResettingTemp"));
 		}
 
-		@Override
-		public void fromNetwork(FriendlyByteBuf pBuffer)
+		public Builder(FriendlyByteBuf pBuffer)
 		{
 			this.blockType().addAll(ItemTagEntry.TYPE.listFromNetwork(pBuffer));
 			this.maxSpeed(pBuffer.readFloat());
 			this.acceleration(pBuffer.readFloat());
-			this.carriageStressMultiplier(pBuffer.readFloat());
+			this.carriageStressMultiplier(pBuffer.readDouble());
 			this.fuelType().addAll(FluidTagEntry.TYPE.listFromNetwork(pBuffer));
-			this.fuelShare(pBuffer.readBoolean());
-			this.fuelMinimum(pBuffer.readFloat());
-			this.fuelPerSpeed(pBuffer.readFloat());
-			this.fuelPerRecipe(pBuffer.readFloat());
-			this.fuelPerRecipePow(pBuffer.readFloat());
+			this.limitableByHeat(pBuffer.readBoolean());
+			this.fuelPerSpeed(pBuffer.readDouble());
+			this.fuelPerHeatLevel(pBuffer.readDouble());
 			this.heatCapacity(pBuffer.readInt());
-			this.heatPerFuel(pBuffer.readInt());
-			this.airCoolingRate(pBuffer.readFloat());
-			this.overheatedResettingTemp(pBuffer.readFloat());
+			this.heatPerFuel(pBuffer.readDouble());
+			this.airCoolingRate(pBuffer.readDouble());
+			this.overheatedResettingTemp(pBuffer.readDouble());
 		}
 
 		@Override
@@ -391,14 +396,14 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 			return (T) this;
 		}
 
-		public float carriageStressMultiplier()
+		public double carriageStressMultiplier()
 		{
 			return this.carriageStressMultiplier;
 		}
 
-		public T carriageStressMultiplier(float carriageStressMultiplier)
+		public T carriageStressMultiplier(double carriageStressMultiplier)
 		{
-			this.carriageStressMultiplier = Math.max(carriageStressMultiplier, 0.0F);
+			this.carriageStressMultiplier = Math.max(carriageStressMultiplier, 0.0D);
 			return (T) this;
 		}
 
@@ -413,58 +418,36 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 			return (T) this;
 		}
 
-		public boolean fuelShare()
+		public boolean limitableByHeat()
 		{
-			return this.fuelShare;
+			return this.limitableByHeat;
 		}
 
-		public T fuelShare(boolean fuelShare)
+		public T limitableByHeat(boolean limitableByHeat)
 		{
-			this.fuelShare = fuelShare;
+			this.limitableByHeat = limitableByHeat;
 			return (T) this;
 		}
 
-		public float fuelMinimum()
-		{
-			return this.fuelMinimum;
-		}
-
-		public T fuelMinimum(float fuelMinimum)
-		{
-			this.fuelMinimum = Math.max(fuelMinimum, 0.0F);
-			return (T) this;
-		}
-
-		public float fuelPerSpeed()
+		public double fuelPerSpeed()
 		{
 			return this.fuelPerSpeed;
 		}
 
-		public T fuelPerSpeed(float fuelPerSpeed)
+		public T fuelPerSpeed(double fuelPerSpeed)
 		{
-			this.fuelPerSpeed = Math.max(fuelPerSpeed, 0.0F);
+			this.fuelPerSpeed = Math.max(fuelPerSpeed, 0.0D);
 			return (T) this;
 		}
 
-		public float fuelPerRecipe()
+		public double fuelPerHeatLevel()
 		{
-			return this.fuelPerRecipe;
+			return this.fuelPerHeatLevel;
 		}
 
-		public T fuelPerRecipe(float fuelPerRecipe)
+		public T fuelPerHeatLevel(double fuelPerHeatLevel)
 		{
-			this.fuelPerRecipe = Math.max(fuelPerRecipe, 0.0F);
-			return (T) this;
-		}
-
-		public float fuelPerRecipePow()
-		{
-			return this.fuelPerRecipePow;
-		}
-
-		public T fuelPerRecipePow(float fuelPerRecipePow)
-		{
-			this.fuelPerRecipePow = Math.max(fuelPerRecipePow, 0.0F);
+			this.fuelPerHeatLevel = Math.max(fuelPerHeatLevel, 0.0D);
 			return (T) this;
 		}
 
@@ -479,36 +462,36 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 			return (T) this;
 		}
 
-		public int heatPerFuel()
+		public double heatPerFuel()
 		{
 			return this.heatPerFuel;
 		}
 
-		public T heatPerFuel(int heatPerFuel)
+		public T heatPerFuel(double heatPerFuel)
 		{
-			this.heatPerFuel = Math.max(heatPerFuel, 0);
+			this.heatPerFuel = Math.max(heatPerFuel, 0.0D);
 			return (T) this;
 		}
 
-		public float airCoolingRate()
+		public double airCoolingRate()
 		{
 			return this.airCoolingRate;
 		}
 
-		public T airCoolingRate(float airCoolingRate)
+		public T airCoolingRate(double airCoolingRate)
 		{
-			this.airCoolingRate = airCoolingRate;
+			this.airCoolingRate = Math.max(airCoolingRate, 0.0D);
 			return (T) this;
 		}
 
-		public float overheatedResettingTemp()
+		public double overheatedResettingTemp()
 		{
 			return this.overheatedResettingTemp;
 		}
 
-		public T overheatedResettingTemp(float overheatedResettingTemp)
+		public T overheatedResettingTemp(double overheatedResettingTemp)
 		{
-			this.overheatedResettingTemp = Math.max(overheatedResettingTemp, 0.0F);
+			this.overheatedResettingTemp = Math.max(overheatedResettingTemp, 0.0D);
 			return (T) this;
 		}
 

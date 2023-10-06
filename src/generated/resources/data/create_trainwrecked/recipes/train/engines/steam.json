@@ -1,23 +1,15 @@
 {
   "type": "create_trainwrecked:train_engine_type",
   "acceleration": 0.8333333,
-  "airCoolingRate": 20.0,
+  "airCoolingRate": 0.0,
   "blockType": "create:steam_engine",
   "carriageStressMultiplier": 0.75,
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "create:steam_engine"
-    }
-  ],
-  "fuelMinimum": 108.0,
-  "fuelPerRecipe": 0.0,
-  "fuelPerRecipePow": 2.0,
-  "fuelPerSpeed": 0.0,
-  "fuelShare": true,
+  "fuelPerHeatLevel": 3.736920777279521,
+  "fuelPerSpeed": 1.0,
   "fuelType": "minecraft:water",
   "heatCapacity": 0,
-  "heatPerFuel": 0,
+  "heatPerFuel": 0.0,
+  "limitableByHeat": true,
   "maxSpeed": 50.0,
   "overheatedResettingTemp": 0.0
 }

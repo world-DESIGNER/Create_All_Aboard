@@ -18,6 +18,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import steve_gall.create_trainwrecked.common.content.train.CarriageExtension;
 import steve_gall.create_trainwrecked.common.content.train.Engine;
+import steve_gall.create_trainwrecked.common.content.train.HeatSource;
 
 @Mixin(value = Carriage.class, remap = false)
 public abstract class CarriageMixin implements CarriageExtension
@@ -25,9 +26,9 @@ public abstract class CarriageMixin implements CarriageExtension
 	@Inject(method = "read", at = @At(value = "TAIL"), cancellable = true)
 	private static void read(CompoundTag tag, TrackGraph graph, DimensionPalette dimensions, CallbackInfoReturnable<Carriage> cir)
 	{
-		List<Engine> engines = ((CarriageExtension) cir.getReturnValue()).getEngines();
-		engines.clear();
-		NBTHelper.iterateCompoundList(tag.getList("engines", Tag.TAG_COMPOUND), c -> engines.add(new Engine(c)));
+		CarriageExtension extension = (CarriageExtension) cir.getReturnValue();
+		extension.getEngines().addAll(NBTHelper.readCompoundList(tag.getList("engines", Tag.TAG_COMPOUND), Engine::new));
+		extension.getHeatSources().addAll(NBTHelper.readCompoundList(tag.getList("heatSources", Tag.TAG_COMPOUND), HeatSource::new));
 	}
 
 	@Inject(method = "write", at = @At(value = "TAIL"), cancellable = true)
@@ -35,16 +36,27 @@ public abstract class CarriageMixin implements CarriageExtension
 	{
 		CompoundTag tag = cir.getReturnValue();
 		tag.put("engines", NBTHelper.writeCompoundList(this.getEngines(), Engine::toNbt));
+		tag.put("heatSources", NBTHelper.writeCompoundList(this.getHeatSources(), HeatSource::toNbt));
 	}
 
 	@Unique
 	private List<Engine> engines = new ArrayList<>();
+
+	@Unique
+	private List<HeatSource> heatSources = new ArrayList<>();
 
 	@Override
 	@Unique
 	public List<Engine> getEngines()
 	{
 		return this.engines;
+	}
+
+	@Override
+	@Unique
+	public List<HeatSource> getHeatSources()
+	{
+		return this.heatSources;
 	}
 
 }

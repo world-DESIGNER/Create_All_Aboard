@@ -3,7 +3,6 @@ package steve_gall.create_trainwrecked.client.jei;
 import java.util.List;
 
 import mezz.jei.api.gui.drawable.IDrawable;
-import mezz.jei.api.helpers.IJeiHelpers;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
@@ -15,14 +14,14 @@ import net.minecraft.world.item.crafting.RecipeManager;
 
 public abstract class ModJEICategory<RECIPE> implements IRecipeCategory<RECIPE>
 {
-	private final IJeiHelpers helpers;
+	private final ModJEI plugin;
 	private final RecipeType<RECIPE> type;
 	private final IDrawable background;
 	private final Component title;
 
-	public ModJEICategory(IJeiHelpers helpers, RecipeType<RECIPE> type, IDrawable background, String titleKey)
+	public ModJEICategory(ModJEI plugin, RecipeType<RECIPE> type, IDrawable background, String titleKey)
 	{
-		this.helpers = helpers;
+		this.plugin = plugin;
 		this.type = type;
 		this.background = background;
 		this.title = Component.translatable(titleKey);
@@ -60,9 +59,9 @@ public abstract class ModJEICategory<RECIPE> implements IRecipeCategory<RECIPE>
 
 	}
 
-	public IJeiHelpers getHelpers()
+	public ModJEI getPlugin()
 	{
-		return this.helpers;
+		return this.plugin;
 	}
 
 	@Override

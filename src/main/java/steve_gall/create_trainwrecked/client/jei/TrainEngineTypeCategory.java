@@ -8,7 +8,6 @@ import com.simibubi.create.AllBlocks;
 import mezz.jei.api.forge.ForgeTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
-import mezz.jei.api.helpers.IJeiHelpers;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
@@ -19,6 +18,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidType;
+import steve_gall.create_trainwrecked.common.config.CreateTrainwreckedConfig;
 import steve_gall.create_trainwrecked.common.crafting.TrainEngineTypeRecipe;
 import steve_gall.create_trainwrecked.common.fluid.FluidHelper;
 import steve_gall.create_trainwrecked.common.init.ModRecipeTypes;
@@ -36,14 +36,15 @@ public class TrainEngineTypeCategory extends ModJEIRecipeCategory<TrainEngineTyp
 	public static final String TEXT_MAX_SPEED = ModJEI.translationKey(RECIPE_TYPE, "max_speed");
 	public static final String TEXT_ACCELERATION = ModJEI.translationKey(RECIPE_TYPE, "acceleration");
 	public static final String TEXT_MAX_FUEL_USAGE = ModJEI.translationKey(RECIPE_TYPE, "max_fuel_usage");
+	public static final String TEXT_HEAT_LEVEL_FOR_MAX_SPEED = ModJEI.translationKey(RECIPE_TYPE, "need_heat_level");
 	public static final String TEXT_HEAT_CAPACITY = ModJEI.translationKey(RECIPE_TYPE, "heat_capacity");
 	public static final String TEXT_HEAT_PER_FUEL = ModJEI.translationKey(RECIPE_TYPE, "heat_per_fuel");
 	public static final String TEXT_AIR_COOLING_RATE = ModJEI.translationKey(RECIPE_TYPE, "air_cooling_rate");
 	public static final String TEXT_HEAT_DURABILITY = ModJEI.translationKey(RECIPE_TYPE, "heat_durability");
 
-	public TrainEngineTypeCategory(IJeiHelpers helpers)
+	public TrainEngineTypeCategory(ModJEI plugin)
 	{
-		super(helpers, RECIPE_TYPE, helpers.getGuiHelper().createDrawable(TEXTURE_BACKGROUND, 0, 0, 178, 120), TEXT_TITLE);
+		super(plugin, RECIPE_TYPE, plugin.getJeiHelpers().getGuiHelper().createDrawable(TEXTURE_BACKGROUND, 0, 0, 178, 120), TEXT_TITLE);
 	}
 
 	@Override
@@ -66,7 +67,24 @@ public class TrainEngineTypeCategory extends ModJEIRecipeCategory<TrainEngineTyp
 		Minecraft minecraft = Minecraft.getInstance();
 		Font font = minecraft.font;
 		float maxSpeed = recipe.getMaxSpeed();
-		double maxFuelUsage = recipe.getFuelUsage(0, maxSpeed);
+		int heatLevel = 0;
+
+		if (recipe.isLimitableByHeat())
+		{
+			List<? extends Number> speedLimits = CreateTrainwreckedConfig.COMMON.heatSourceSpeedLimits.get();
+
+			for (int i = 0; i < speedLimits.size(); i++)
+			{
+				if (speedLimits.get(i).floatValue() >= maxSpeed)
+				{
+					heatLevel = i + 1;
+				}
+
+			}
+
+		}
+
+		double maxFuelUsage = recipe.getFuelUsage(maxSpeed, heatLevel);
 
 		int textX = 2;
 		int textY = 22;
@@ -85,6 +103,12 @@ public class TrainEngineTypeCategory extends ModJEIRecipeCategory<TrainEngineTyp
 
 		font.draw(stack, Component.translatable(TEXT_MAX_FUEL_USAGE, NumberHelper.format(maxFuelUsage, 2) + " mB/s"), textX, textY, textColor);
 		textY += font.lineHeight;
+
+		if (recipe.isLimitableByHeat())
+		{
+			font.draw(stack, Component.translatable(TEXT_HEAT_LEVEL_FOR_MAX_SPEED, NumberHelper.format(heatLevel)), textX, textY, textColor);
+			textY += font.lineHeight;
+		}
 
 		if (recipe.getHeatPerFuel() > 0 && recipe.getHeatCapacity() > 0)
 		{

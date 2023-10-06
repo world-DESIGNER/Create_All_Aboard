@@ -10,5 +10,7 @@ public interface CarriageSyncDataExtension
 
 	List<Engine> getEngineCaches();
 
+	List<HeatSource> getHeatSourceCaches();
+
 	double getTrainSpeed();
 }

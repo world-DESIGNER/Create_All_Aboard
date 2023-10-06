@@ -20,6 +20,7 @@ import steve_gall.create_trainwrecked.common.content.contraption.MountedStorageM
 import steve_gall.create_trainwrecked.common.content.train.CarriageExtension;
 import steve_gall.create_trainwrecked.common.content.train.CarriageSyncDataExtension;
 import steve_gall.create_trainwrecked.common.content.train.Engine;
+import steve_gall.create_trainwrecked.common.content.train.HeatSource;
 import steve_gall.create_trainwrecked.common.fluid.FluidTankData;
 
 @Mixin(value = CarriageSyncData.class, remap = false)
@@ -30,6 +31,8 @@ public abstract class CarriageSyncDataMixin implements CarriageSyncDataExtension
 	@Unique
 	private List<Engine> engineCaches = new ArrayList<>();
 	@Unique
+	private List<HeatSource> heatSourceCaches = new ArrayList<>();
+	@Unique
 	private double trainSpeed = 0.0F;
 
 	@Inject(method = "copy", at = @At(value = "TAIL"), cancellable = true)
@@ -38,6 +41,7 @@ public abstract class CarriageSyncDataMixin implements CarriageSyncDataExtension
 		CarriageSyncDataMixin copy = (CarriageSyncDataMixin) (Object) cir.getReturnValue();
 		copy.syncedFluids.addAll(this.syncedFluids.stream().map(FluidTankData::copy).toList());
 		copy.engineCaches.addAll(this.engineCaches);
+		copy.heatSourceCaches.addAll(this.heatSourceCaches);
 		copy.trainSpeed = this.trainSpeed;
 	}
 
@@ -46,6 +50,7 @@ public abstract class CarriageSyncDataMixin implements CarriageSyncDataExtension
 	{
 		buffer.writeCollection(this.syncedFluids, FluidTankData::toNetwork);
 		buffer.writeCollection(this.engineCaches, Engine::toNetwork);
+		buffer.writeCollection(this.heatSourceCaches, HeatSource::toNetwork);
 		buffer.writeDouble(this.trainSpeed);
 	}
 
@@ -54,6 +59,7 @@ public abstract class CarriageSyncDataMixin implements CarriageSyncDataExtension
 	{
 		this.syncedFluids = buffer.readList(FluidTankData::fromNetwork);
 		this.engineCaches = buffer.readList(Engine::new);
+		this.heatSourceCaches = buffer.readList(HeatSource::new);
 		this.trainSpeed = buffer.readDouble();
 	}
 
@@ -72,6 +78,8 @@ public abstract class CarriageSyncDataMixin implements CarriageSyncDataExtension
 		CarriageExtension extension = (CarriageExtension) carriage;
 		this.engineCaches.clear();
 		this.engineCaches.addAll(extension.getEngines());
+		this.heatSourceCaches.clear();
+		this.heatSourceCaches.addAll(extension.getHeatSources());
 
 		this.trainSpeed = carriage.train.speed;
 	}
@@ -84,6 +92,8 @@ public abstract class CarriageSyncDataMixin implements CarriageSyncDataExtension
 		CarriageExtension extension = (CarriageExtension) carriage;
 		extension.getEngines().clear();
 		extension.getEngines().addAll(this.engineCaches);
+		extension.getHeatSources().clear();
+		extension.getHeatSources().addAll(this.heatSourceCaches);
 	}
 
 	@Override
@@ -98,6 +108,12 @@ public abstract class CarriageSyncDataMixin implements CarriageSyncDataExtension
 	public List<Engine> getEngineCaches()
 	{
 		return this.engineCaches;
+	}
+
+	@Override
+	public List<HeatSource> getHeatSourceCaches()
+	{
+		return this.heatSourceCaches;
 	}
 
 	@Override

@@ -3,10 +3,7 @@ package steve_gall.create_trainwrecked.common.crafting;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gson.JsonObject;
-
 import net.minecraft.data.recipes.FinishedRecipe;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 
@@ -19,10 +16,6 @@ public abstract class SimpleRecipeBuilder<BUILDER extends SimpleRecipeBuilder<? 
 	{
 		this.conditions = new ArrayList<>();
 	}
-
-	public abstract void fromJson(JsonObject pJson);
-
-	public abstract void fromNetwork(FriendlyByteBuf pBuffer);
 
 	public abstract RECIPE build(ResourceLocation id);
 

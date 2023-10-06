@@ -6,7 +6,9 @@ import net.minecraft.core.BlockPos;
 
 public interface CarriageContraptionExtension
 {
-	List<EnginPos> getAssembledEnginePos();
+	List<Engine> getAssembledEngines();
+
+	List<HeatSource> getAssembledHeatSources();
 
 	BlockPos toLocalPos(BlockPos globalPos);
 }

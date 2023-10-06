@@ -5,10 +5,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
 
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -105,57 +103,14 @@ public interface RegistryTagEntryType<VALUE, STACK, INGREDIENT, ENTRY extends Re
 		return collection.stream().anyMatch(i -> this.testIngredient(i, stack));
 	}
 
-	public default List<ENTRY> convertToTagEntryList(JsonElement json)
-	{
-		List<ENTRY> list = new ArrayList<>();
-
-		if (json instanceof JsonArray array)
-		{
-			for (JsonElement jelement : array)
-			{
-				list.addAll(this.convertToTagEntryList(jelement));
-			}
-
-		}
-		else
-		{
-			list.add(this.fromJson(json));
-		}
-
-		return list;
-	}
-
 	public default List<ENTRY> getAsTagEntryList(JsonObject json, String memberName)
 	{
-		if (json.has(memberName))
-		{
-			return this.convertToTagEntryList(json.get(memberName));
-		}
-		else
-		{
-			throw new JsonSyntaxException("Missing " + memberName);
-		}
-
+		return GsonHelper2.parseAsJsonArrayOrElement(json, memberName, this::fromJson);
 	}
 
 	public default JsonElement listToJson(List<ENTRY> list)
 	{
-		if (list.size() == 1)
-		{
-			return list.get(0).toJson();
-		}
-		else
-		{
-			JsonArray jarray = new JsonArray();
-
-			for (ENTRY entry : list)
-			{
-				jarray.add(entry.toJson());
-			}
-
-			return jarray;
-		}
-
+		return GsonHelper2.toJsonAarryOrElement(list, ENTRY::toJson);
 	}
 
 	public default List<ENTRY> listFromNetwork(FriendlyByteBuf buffer)

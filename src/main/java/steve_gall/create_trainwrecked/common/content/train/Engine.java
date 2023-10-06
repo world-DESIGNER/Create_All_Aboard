@@ -1,55 +1,33 @@
 package steve_gall.create_trainwrecked.common.content.train;
 
-import java.util.List;
-
 import com.simibubi.create.content.trains.entity.Train;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
-import steve_gall.create_trainwrecked.common.CreateTrainwrecked;
 import steve_gall.create_trainwrecked.common.crafting.TrainEngineTypeRecipe;
 import steve_gall.create_trainwrecked.common.init.ModRecipeTypes;
 import steve_gall.create_trainwrecked.common.util.ItemTagEntry;
 
-public class Engine
+public class Engine extends TrainPart<TrainEngineTypeRecipe>
 {
-	public static final ResourceLocation RECIPE_NOT_FOUND_ID = CreateTrainwrecked.asResource("recipe_not_found");
 	public static final TrainEngineTypeRecipe NOT_FOUND_RECIPE = new TrainEngineTypeRecipe.Builder<>().build(RECIPE_NOT_FOUND_ID);
 
-	private BlockPos localPos;
-	private BlockState blockState;
-	private ItemStack item;
-
-	private TrainEngineTypeRecipe recipe;
-	private double fuelUsedRatio;
 	private double heat;
 	private double speed;
 	private boolean overheated;
 
-	public Engine(EnginPos enginPos)
+	public Engine(Level level, CapturedPos capture)
 	{
-		this.localPos = enginPos.localPos();
-		this.blockState = enginPos.blockState();
-		this.item = enginPos.item();
-
-		this.recipe = enginPos.recipe();
+		super(level, capture);
 	}
 
 	public Engine(CompoundTag tag)
 	{
-		this.localPos = NbtUtils.readBlockPos(tag.getCompound("localPos"));
-		this.blockState = NbtUtils.readBlockState(tag.getCompound("blockState"));
-		this.item = ItemStack.of(tag.getCompound("item"));
+		super(tag);
 
-		this.recipe = null;
-		this.fuelUsedRatio = tag.getDouble("fuelUsedRatio");
 		this.heat = tag.getDouble("heat");
 		this.speed = tag.getDouble("speed");
 		this.overheated = tag.getBoolean("overheated");
@@ -57,43 +35,45 @@ public class Engine
 
 	public Engine(FriendlyByteBuf buffer)
 	{
-		this.localPos = buffer.readBlockPos();
-		this.blockState = NbtUtils.readBlockState(buffer.readNbt());
-		this.item = buffer.readItem();
+		super(buffer);
 
-		this.recipe = null;
-		this.fuelUsedRatio = buffer.readDouble();
 		this.heat = buffer.readDouble();
 		this.speed = buffer.readDouble();
 		this.overheated = buffer.readBoolean();
 	}
 
-	public void onFuelBurned(FuelBurning fuel, double allocatedSpeed)
+	@Override
+	public RecipeType<TrainEngineTypeRecipe> getRecipeType()
 	{
-		this.fuelUsedRatio = this.getFuelUsingRatio(fuel);
+		return ModRecipeTypes.TRAIN_ENGINE_TYPE.get();
+	}
 
+	@Override
+	protected TrainEngineTypeRecipe getFallbackRecipe()
+	{
+		return NOT_FOUND_RECIPE;
+	}
+
+	@Override
+	protected boolean testRecipe(TrainEngineTypeRecipe recipe)
+	{
+		return ItemTagEntry.TYPE.testIngredient(recipe.getBlocks(), this.item);
+	}
+
+	public void onFuelBurned(FuelBurning fuel, double allocatedSpeed, int heatLevel)
+	{
 		TrainEngineTypeRecipe recipe = this.getRecipe();
-		double speed = recipe.getPredictSpeed(fuel.toBurn(), fuel.burned(), allocatedSpeed);
+		double speed = recipe.getPredictSpeed(fuel.toBurn(), fuel.burned(), allocatedSpeed, heatLevel);
 		this.setSpeed(speed);
 
 		double heat = this.getHeat();
 		this.setHeat(heat + (fuel.burned() * recipe.getHeatPerFuel()));
 	}
 
-	public double getFuelUsingRatio(FuelBurning fuel)
-	{
-		return fuel.toBurn() > 0.0D ? (fuel.burned() / fuel.toBurn()) : 1.0D;
-	}
-
+	@Override
 	public void tick(Train train, Level level)
 	{
-		if (this.recipe == null)
-		{
-			List<TrainEngineTypeRecipe> recipes = level.getRecipeManager().getAllRecipesFor(ModRecipeTypes.TRAIN_ENGINE_TYPE.get());
-			this.recipe = recipes.stream().filter(r -> ItemTagEntry.TYPE.testIngredient(r.getBlocks(), this.item)).findFirst().orElse(null);
-		}
-
-		this.fuelUsedRatio = 0.0D;
+		super.tick(train, level);
 
 		TrainEngineTypeRecipe recipe = this.getRecipe();
 
@@ -111,7 +91,7 @@ public class Engine
 	{
 		TrainEngineTypeRecipe recipe = this.getRecipe();
 		double heat = this.getHeat();
-		this.setHeat(heat - recipe.getAirCoolingRate() / 20);
+		this.setHeat(heat - recipe.getAirCoolingRate() / 20.0D);
 	}
 
 	public void coolingCoolant(Train train)
@@ -131,63 +111,43 @@ public class Engine
 		{
 			this.setOverheat(true);
 		}
-		else if (recipe.overheatedResettingTemp() >= (heat / heatCapacity))
+		else if (recipe.getOverheatedResettingTemp() >= (heat / heatCapacity))
 		{
 			this.setOverheat(false);
 		}
 
 	}
 
+	@Override
+	public void serializeNbt(CompoundTag tag)
+	{
+		super.serializeNbt(tag);
+
+		tag.putDouble("heat", this.heat);
+		tag.putDouble("speed", this.speed);
+		tag.putBoolean("overheated", this.overheated);
+	}
+
+	@Override
+	public void serializeNetwork(FriendlyByteBuf buffer)
+	{
+		super.serializeNetwork(buffer);
+
+		buffer.writeDouble(this.heat);
+		buffer.writeDouble(this.speed);
+		buffer.writeBoolean(this.overheated);
+	}
+
 	public static CompoundTag toNbt(Engine engine)
 	{
 		CompoundTag tag = new CompoundTag();
-		tag.put("localPos", NbtUtils.writeBlockPos(engine.localPos));
-		tag.put("blockState", NbtUtils.writeBlockState(engine.blockState));
-		tag.put("item", engine.item.serializeNBT());
-
-		tag.putDouble("fuelUsedRatio", engine.fuelUsedRatio);
-		tag.putDouble("heat", engine.heat);
-		tag.putDouble("speed", engine.speed);
-		tag.putBoolean("overheated", engine.overheated);
-
+		engine.serializeNbt(tag);
 		return tag;
 	}
 
 	public static void toNetwork(FriendlyByteBuf buffer, Engine engine)
 	{
-		buffer.writeBlockPos(engine.localPos);
-		buffer.writeNbt(NbtUtils.writeBlockState(engine.blockState));
-		buffer.writeItem(engine.item);
-
-		buffer.writeDouble(engine.fuelUsedRatio);
-		buffer.writeDouble(engine.heat);
-		buffer.writeDouble(engine.speed);
-		buffer.writeBoolean(engine.overheated);
-	}
-
-	public BlockPos getBlockPos()
-	{
-		return this.localPos;
-	}
-
-	public BlockState getBlockState()
-	{
-		return this.blockState;
-	}
-
-	public ItemStack getItem()
-	{
-		return this.item.copy();
-	}
-
-	public TrainEngineTypeRecipe getRecipe()
-	{
-		return this.recipe != null ? this.recipe : NOT_FOUND_RECIPE;
-	}
-
-	public double getFuelUsedRatio()
-	{
-		return this.fuelUsedRatio;
+		engine.serializeNetwork(buffer);
 	}
 
 	public void setSpeed(double speed)

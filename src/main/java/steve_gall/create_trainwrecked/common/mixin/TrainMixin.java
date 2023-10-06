@@ -42,13 +42,19 @@ public abstract class TrainMixin implements TrainExtension
 	@Inject(method = "tickPassiveSlowdown", at = @At(value = "HEAD"), cancellable = true)
 	private void tickPassiveSlowdown(CallbackInfo ci)
 	{
-		TrainHelper.applyFuelSpeed((Train) (Object) this);
+		TrainHelper.controlSpeed((Train) (Object) this);
 	}
 
 	@Inject(method = "approachTargetSpeed", at = @At(value = "HEAD"), cancellable = true)
 	private void approachTargetSpeed(float accelerationMod, CallbackInfo ci)
 	{
 		this.setApproachAccelerationMod(accelerationMod);
+		ci.cancel();
+	}
+
+	@Inject(method = "burnFuel", at = @At(value = "HEAD"), cancellable = true)
+	private void burnFuel(CallbackInfo ci)
+	{
 		ci.cancel();
 	}
 

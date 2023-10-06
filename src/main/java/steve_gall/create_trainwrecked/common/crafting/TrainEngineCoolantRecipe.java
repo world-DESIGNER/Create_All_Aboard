@@ -18,8 +18,7 @@ import steve_gall.create_trainwrecked.common.init.ModRecipeTypes;
 
 public class TrainEngineCoolantRecipe implements SerializableRecipe<Container>, NonContainerRecipe
 {
-	protected final ResourceLocation id;
-
+	private final ResourceLocation id;
 	private final Ingredient itemIngredient;
 	private final FluidIngredient fluidIngredient;
 	private final int cooling;
@@ -119,6 +118,22 @@ public class TrainEngineCoolantRecipe implements SerializableRecipe<Container>, 
 		return this.cooling;
 	}
 
+	public static class Serializer extends SimpleRecipeSerializer<TrainEngineCoolantRecipe, Builder<?>>
+	{
+		@Override
+		protected Builder<?> fromJson(JsonObject pJson)
+		{
+			return new Builder<>(pJson);
+		}
+
+		@Override
+		protected Builder<?> fromNetwork(FriendlyByteBuf pBuffer)
+		{
+			return new Builder<>(pBuffer);
+		}
+
+	}
+
 	@SuppressWarnings("unchecked")
 	public static class Builder<T extends Builder<T>> extends SimpleRecipeBuilder<T, TrainEngineCoolantRecipe>
 	{
@@ -131,8 +146,7 @@ public class TrainEngineCoolantRecipe implements SerializableRecipe<Container>, 
 
 		}
 
-		@Override
-		public void fromJson(JsonObject pJson)
+		public Builder(JsonObject pJson)
 		{
 			JsonElement itemJson = pJson.get("item");
 			JsonElement fluidJson = pJson.get("fluid");
@@ -158,8 +172,7 @@ public class TrainEngineCoolantRecipe implements SerializableRecipe<Container>, 
 			this.cooling(GsonHelper.getAsInt(pJson, "cooling"));
 		}
 
-		@Override
-		public void fromNetwork(FriendlyByteBuf pBuffer)
+		public Builder(FriendlyByteBuf pBuffer)
 		{
 			int type = pBuffer.readInt();
 			this.itemIngredient(null);

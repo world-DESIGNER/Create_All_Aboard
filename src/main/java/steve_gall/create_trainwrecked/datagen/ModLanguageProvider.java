@@ -12,6 +12,7 @@ import net.minecraftforge.common.data.LanguageProvider;
 import steve_gall.create_trainwrecked.client.content.train.StationScreenHelper;
 import steve_gall.create_trainwrecked.client.jei.TrainEngineCoolantCategory;
 import steve_gall.create_trainwrecked.client.jei.TrainEngineTypeCategory;
+import steve_gall.create_trainwrecked.client.jei.TrainHeatSourceCategory;
 import steve_gall.create_trainwrecked.common.CreateTrainwrecked;
 import steve_gall.create_trainwrecked.common.content.train.TrainHelper;
 import steve_gall.create_trainwrecked.common.init.ModItems;
@@ -61,7 +62,8 @@ public class ModLanguageProvider extends LanguageProvider
 		this.add(TrainHelper.TRAIN_ASSEMBLEY_NO_ENGINES, "Engine Not Found");
 		this.add(TrainHelper.TRAIN_ASSEMBLEY_TOO_MANY_CARRIAGES, "Too Many Carriages, With the current engines, up to %s can be configured, Current carriages: %s");
 		this.add(TrainHelper.TRAIN_ASSEMBLEY_TOO_MANY_BLOCKS, "Too Many Contraption Blocks, With the current engines, up to %s can be placed, Current blocks: %s");
-		this.add(TrainHelper.TRAIN_ASSEMBLEY_CARRIAGE_NO_FLUID_INTERFACE, "%1$s Not Found, Carriage with fluid tanks requires at least one %1$s.");
+		this.add(TrainHelper.TRAIN_ASSEMBLEY_CARRIAGE_NO_FLUID_INTERFACES, "%1$s Not Found, Carriage with fluid tanks requires at least one %1$s.");
+		this.add(TrainHelper.TRAIN_ASSEMBLEY_NO_HEAT_SOURCES, "Heat Source Not Found, to boil water requires at least one heat source, Only heat sources below the fluid tanks are detected.");
 	}
 
 	private void addTrainStation()
@@ -84,6 +86,8 @@ public class ModLanguageProvider extends LanguageProvider
 		this.add(TrainHelper.TRAIN_GOGGLE_TRAIN_INFO, "Train Info:");
 		this.add(TrainHelper.TRAIN_GOGGLE_TRAIN_SPEED, "Speed: %1$s / %2$s");
 		this.add(TrainHelper.TRAIN_GOGGLE_TRAIN_BLOCKS, "Blocks: %1$s / %2$s");
+		this.add(TrainHelper.TRAIN_GOGGLE_HEAT_SOURCE_INFO, "Heat Source Info:");
+		this.add(TrainHelper.TRAIN_GOGGLE_HEAT_SOURCE_LEVEL, "Level: %1$s / %2$s");
 		this.add(TrainHelper.TRAIN_GOGGLE_ENGINE_INFO, "Engine Info:");
 		this.add(TrainHelper.TRAIN_GOGGLE_ENGINE_COUNT, "%1$s: %2$s");
 		this.add(TrainHelper.TRAIN_GOGGLE_ENGINE_TEMP, "Temp.: %s");
@@ -101,6 +105,7 @@ public class ModLanguageProvider extends LanguageProvider
 		this.add(TrainEngineTypeCategory.TEXT_MAX_SPEED, "Max. Speed: %s");
 		this.add(TrainEngineTypeCategory.TEXT_ACCELERATION, "Acceleration: %s");
 		this.add(TrainEngineTypeCategory.TEXT_MAX_FUEL_USAGE, "Max. Fuel Usage: %s");
+		this.add(TrainEngineTypeCategory.TEXT_HEAT_LEVEL_FOR_MAX_SPEED, "Heat Level For Max. Speed: %s");
 		this.add(TrainEngineTypeCategory.TEXT_HEAT_PER_FUEL, "Heat Per Fuel: %s");
 		this.add(TrainEngineTypeCategory.TEXT_AIR_COOLING_RATE, "Air Cooling Rate: %s");
 		this.add(TrainEngineTypeCategory.TEXT_HEAT_CAPACITY, "Heat Capacity: %s");
@@ -108,6 +113,8 @@ public class ModLanguageProvider extends LanguageProvider
 
 		this.add(TrainEngineCoolantCategory.TEXT_TITLE, "Train Engine Coolant");
 		this.add(TrainEngineCoolantCategory.TEXT_COOLING, "Cooling: %s");
+
+		this.add(TrainHeatSourceCategory.TEXT_TITLE, "Train Heat Source");
 	}
 
 }

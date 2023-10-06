@@ -5,4 +5,6 @@ import java.util.List;
 public interface CarriageExtension
 {
 	List<Engine> getEngines();
+
+	List<HeatSource> getHeatSources();
 }

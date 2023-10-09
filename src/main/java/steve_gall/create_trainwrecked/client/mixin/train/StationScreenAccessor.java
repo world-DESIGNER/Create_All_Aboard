@@ -1,4 +1,4 @@
-package steve_gall.create_trainwrecked.client.mixin;
+package steve_gall.create_trainwrecked.client.mixin.train;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;

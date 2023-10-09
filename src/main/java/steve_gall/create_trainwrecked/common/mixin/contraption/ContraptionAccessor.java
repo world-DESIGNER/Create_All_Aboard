@@ -1,4 +1,4 @@
-package steve_gall.create_trainwrecked.common.mixin;
+package steve_gall.create_trainwrecked.common.mixin.contraption;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;

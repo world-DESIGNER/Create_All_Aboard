@@ -1,4 +1,4 @@
-package steve_gall.create_trainwrecked.common.mixin;
+package steve_gall.create_trainwrecked.common.mixin.train;
 
 import java.util.Collection;
 

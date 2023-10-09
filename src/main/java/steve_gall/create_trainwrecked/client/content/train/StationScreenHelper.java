@@ -6,9 +6,9 @@ import com.simibubi.create.content.trains.station.StationBlockEntity;
 import com.simibubi.create.content.trains.station.StationScreen;
 import com.simibubi.create.content.trains.track.TrackTargetingBehaviour;
 
-import steve_gall.create_trainwrecked.client.mixin.StationScreenAccessor;
+import steve_gall.create_trainwrecked.client.mixin.train.StationScreenAccessor;
 import steve_gall.create_trainwrecked.common.content.train.TrainHelper;
-import steve_gall.create_trainwrecked.common.mixin.StationBlockEntityAccessor;
+import steve_gall.create_trainwrecked.common.mixin.train.StationBlockEntityAccessor;
 
 public class StationScreenHelper
 {

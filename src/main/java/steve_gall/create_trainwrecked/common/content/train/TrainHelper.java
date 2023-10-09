@@ -57,9 +57,9 @@ import steve_gall.create_trainwrecked.common.content.contraption.MountedStorageM
 import steve_gall.create_trainwrecked.common.crafting.HeatStage;
 import steve_gall.create_trainwrecked.common.crafting.TrainEngineTypeRecipe;
 import steve_gall.create_trainwrecked.common.fluid.FluidHelper;
-import steve_gall.create_trainwrecked.common.mixin.ContraptionAccessor;
-import steve_gall.create_trainwrecked.common.mixin.MountedStorageManagerAccessor;
-import steve_gall.create_trainwrecked.common.mixin.StationBlockEntityAccessor;
+import steve_gall.create_trainwrecked.common.mixin.contraption.ContraptionAccessor;
+import steve_gall.create_trainwrecked.common.mixin.contraption.MountedStorageManagerAccessor;
+import steve_gall.create_trainwrecked.common.mixin.train.StationBlockEntityAccessor;
 import steve_gall.create_trainwrecked.common.util.FluidTagEntry;
 import steve_gall.create_trainwrecked.common.util.NumberHelper;
 

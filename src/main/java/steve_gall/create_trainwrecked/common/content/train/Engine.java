@@ -19,6 +19,8 @@ public class Engine extends TrainPart<TrainEngineTypeRecipe>
 	private double speed;
 	private boolean overheated;
 
+	private float angle;
+
 	public Engine(Level level, CapturedPos capture)
 	{
 		super(level, capture);
@@ -31,6 +33,8 @@ public class Engine extends TrainPart<TrainEngineTypeRecipe>
 		this.heat = tag.getDouble("heat");
 		this.speed = tag.getDouble("speed");
 		this.overheated = tag.getBoolean("overheated");
+
+		this.angle = tag.getFloat("angle");
 	}
 
 	public Engine(FriendlyByteBuf buffer)
@@ -40,6 +44,8 @@ public class Engine extends TrainPart<TrainEngineTypeRecipe>
 		this.heat = buffer.readDouble();
 		this.speed = buffer.readDouble();
 		this.overheated = buffer.readBoolean();
+
+		this.angle = buffer.readFloat();
 	}
 
 	@Override
@@ -76,6 +82,7 @@ public class Engine extends TrainPart<TrainEngineTypeRecipe>
 		super.tick(train, level);
 
 		TrainEngineTypeRecipe recipe = this.getRecipe();
+		this.setAngle(this.getAngle() + (float) (this.getSpeed() / recipe.getMaxSpeed()) * 2.0F);
 
 		if (recipe.getHeatCapacity() <= 0)
 		{
@@ -126,6 +133,8 @@ public class Engine extends TrainPart<TrainEngineTypeRecipe>
 		tag.putDouble("heat", this.heat);
 		tag.putDouble("speed", this.speed);
 		tag.putBoolean("overheated", this.overheated);
+
+		tag.putFloat("angle", this.angle);
 	}
 
 	@Override
@@ -136,6 +145,8 @@ public class Engine extends TrainPart<TrainEngineTypeRecipe>
 		buffer.writeDouble(this.heat);
 		buffer.writeDouble(this.speed);
 		buffer.writeBoolean(this.overheated);
+
+		buffer.writeFloat(this.angle);
 	}
 
 	public static CompoundTag toNbt(Engine engine)
@@ -187,6 +198,16 @@ public class Engine extends TrainPart<TrainEngineTypeRecipe>
 	public boolean isOverheated()
 	{
 		return this.overheated;
+	}
+
+	public float getAngle()
+	{
+		return this.angle;
+	}
+
+	public void setAngle(float angle)
+	{
+		this.angle = angle;
 	}
 
 }

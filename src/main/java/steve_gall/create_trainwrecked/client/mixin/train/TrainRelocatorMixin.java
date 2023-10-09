@@ -1,4 +1,4 @@
-package steve_gall.create_trainwrecked.client.mixin;
+package steve_gall.create_trainwrecked.client.mixin.train;
 
 import java.lang.ref.WeakReference;
 import java.util.List;

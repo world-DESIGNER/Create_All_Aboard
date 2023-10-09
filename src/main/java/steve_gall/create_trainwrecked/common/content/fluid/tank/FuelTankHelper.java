@@ -3,7 +3,7 @@ package steve_gall.create_trainwrecked.common.content.fluid.tank;
 import com.simibubi.create.content.fluids.tank.BoilerData;
 import com.simibubi.create.content.fluids.tank.FluidTankBlockEntity;
 
-import steve_gall.create_trainwrecked.common.mixin.FluidTankBlockEntityAccessor;
+import steve_gall.create_trainwrecked.common.mixin.tank.FluidTankBlockEntityAccessor;
 
 public class FuelTankHelper
 {

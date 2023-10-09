@@ -11,6 +11,7 @@ import com.simibubi.create.foundation.config.ConfigBase.ConfigFloat;
 import com.simibubi.create.infrastructure.config.AllConfigs;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -71,6 +72,17 @@ public class CarriageContraptionHelper
 		if (config.get() != 1.0D)
 		{
 			config.set(1.0D);
+		}
+
+	}
+
+	public static void copyData(List<? extends TrainPart<?>> to, List<CompoundTag> from)
+	{
+		int size = Math.min(to.size(), from.size());
+
+		for (int i = 0; i < size; i++)
+		{
+			to.get(i).readSyncData(from.get(i));
 		}
 
 	}

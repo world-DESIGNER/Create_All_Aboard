@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -41,6 +42,8 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
@@ -426,19 +429,33 @@ public class TrainHelper
 
 	}
 
-	public static void tickTrain(Train train, Level level)
+	public static void tickTrainClient(Train train, Level level)
+	{
+		for (Engine engine : streamEngines(train).toList())
+		{
+			engine.tickClient(train, level);
+		}
+
+		for (HeatSource heatSource : streamHeatSources(train).toList())
+		{
+			heatSource.tickClient(train, level);
+		}
+
+	}
+
+	public static void tickTrainServer(Train train, Level level)
 	{
 		TrainExtension extension = (TrainExtension) train;
 		extension.getCoolingSystem().tick(train, level);
 
 		for (Engine engine : streamEngines(train).toList())
 		{
-			engine.tick(train, level);
+			engine.tickServer(train, level);
 		}
 
 		for (HeatSource heatSource : streamHeatSources(train).toList())
 		{
-			heatSource.tick(train, level);
+			heatSource.tickServer(train, level);
 		}
 
 	}
@@ -1005,6 +1022,40 @@ public class TrainHelper
 			return new HeatState(0, 0.0F, 0, 0, 0.0F);
 		}
 
+	}
+
+	public static <PART extends TrainPart<?>> List<PART> readTrainParts(FriendlyByteBuf buffer, Function<CompoundTag, PART> factory)
+	{
+		return buffer.readList(b -> factory.apply(b.readNbt()));
+	}
+
+	public static <PART extends TrainPart<?>> void writeTrainParts(FriendlyByteBuf buffer, Collection<PART> parts)
+	{
+		buffer.writeCollection(parts, (b, p) -> b.writeNbt(p.toNbt()));
+	}
+
+	public static <PART extends TrainPart<?>> PART getPart(Carriage carriage, Function<CarriageExtension, List<? extends PART>> func, BlockPos localPos)
+	{
+		for (PART part : func.apply(((CarriageExtension) carriage)))
+		{
+			if (part.getBlockPos().equals(localPos))
+			{
+				return part;
+			}
+
+		}
+
+		return null;
+	}
+
+	public static Engine getEngine(Carriage carriage, BlockPos localPos)
+	{
+		return getPart(carriage, CarriageExtension::getEngines, localPos);
+	}
+
+	public static HeatSource getHeatSource(Carriage carriage, BlockPos localPos)
+	{
+		return getPart(carriage, CarriageExtension::getHeatSources, localPos);
 	}
 
 	private TrainHelper()

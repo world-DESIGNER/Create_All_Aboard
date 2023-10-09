@@ -5,11 +5,11 @@ import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
 
+import com.simibubi.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import com.simibubi.create.content.trains.entity.Carriage;
 import com.simibubi.create.content.trains.entity.Train;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
@@ -40,47 +40,37 @@ public class HeatSource extends TrainPart<TrainHeatSourceRecipe>
 	public HeatSource(CompoundTag tag)
 	{
 		super(tag);
+	}
+
+	@Override
+	public void readSyncData(CompoundTag tag)
+	{
+		super.readSyncData(tag);
 
 		this.fuelLevel = tag.getInt("fuelLevel");
 		this.fuelTime = tag.getInt("fuelTime");
 	}
 
-	public HeatSource(FriendlyByteBuf buffer)
-	{
-		super(buffer);
-
-		this.fuelLevel = buffer.readInt();
-		this.fuelTime = buffer.readInt();
-	}
-
 	@Override
-	public void serializeNbt(CompoundTag tag)
+	public void writeSyncData(CompoundTag tag)
 	{
-		super.serializeNbt(tag);
+		super.writeSyncData(tag);
 
+		tag.put("fuel", this.item.serializeNBT());
 		tag.putInt("fuelLevel", this.fuelLevel);
 		tag.putInt("fuelTime", this.fuelTime);
 	}
 
 	@Override
-	public void serializeNetwork(FriendlyByteBuf buffer)
+	public void tickServer(Train train, Level level)
 	{
-		super.serializeNetwork(buffer);
-
-		buffer.writeInt(this.fuelLevel);
-		buffer.writeInt(this.fuelTime);
-	}
-
-	@Override
-	public void tick(Train train, Level level)
-	{
-		super.tick(train, level);
+		super.tickServer(train, level);
 
 		int fuelTime = this.getFuelTime();
 
 		if (fuelTime > 0)
 		{
-			this.setFuel(this.getFuelLevel(), fuelTime - 1);
+			this.setFuelTime(fuelTime - 1);
 		}
 
 	}
@@ -184,26 +174,46 @@ public class HeatSource extends TrainPart<TrainHeatSourceRecipe>
 		return recipe.getBlocks().stream().anyMatch(i -> i.test(this.item));
 	}
 
-	public static CompoundTag toNbt(HeatSource heatSource)
-	{
-		CompoundTag tag = new CompoundTag();
-		heatSource.serializeNbt(tag);
-		return tag;
-	}
-
-	public static void toNetwork(FriendlyByteBuf buffer, HeatSource HeatSource)
-	{
-		HeatSource.serializeNetwork(buffer);
-	}
-
 	public int getLevel()
 	{
-		return this.getFuelTime() > 0 ? this.fuelLevel : this.passive.getLevel();
+		int fuelLevel = this.getFuelLevel();
+		return fuelLevel > 0 ? fuelLevel : this.passive.getLevel();
+	}
+
+	public HeatLevel getLevelAsHeatLevel()
+	{
+		int level = this.getLevel();
+
+		if (level <= 1)
+		{
+			return HeatLevel.SMOULDERING;
+		}
+		else if (level == 2)
+		{
+			return HeatLevel.KINDLED;
+		}
+		else
+		{
+			return HeatLevel.SEETHING;
+		}
+
 	}
 
 	public double getSpeedLimit()
 	{
 		return HeatStage.getSpeedLimit(this.getLevel());
+	}
+
+	public void setFuel(int fuellevel, int fuelTime)
+	{
+		this.fuelLevel = Math.max(fuellevel, 0);
+		this.fuelTime = Math.max(fuelTime, 0);
+	}
+
+	public void resetFuel()
+	{
+		this.fuelLevel = 0;
+		this.fuelTime = 0;
 	}
 
 	public int getFuelLevel()
@@ -216,10 +226,17 @@ public class HeatSource extends TrainPart<TrainHeatSourceRecipe>
 		return this.fuelTime;
 	}
 
-	public void setFuel(int fuellevel, int fuelTime)
+	public void setFuelTime(int fuelTime)
 	{
-		this.fuelLevel = Math.max(fuellevel, 0);
-		this.fuelTime = Math.max(fuelTime, 0);
+		if (fuelTime > 0 && this.getFuelLevel() > 0)
+		{
+			this.fuelTime = fuelTime;
+		}
+		else
+		{
+			this.resetFuel();
+		}
+
 	}
 
 	public int getMaxLevel()

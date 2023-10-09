@@ -17,7 +17,8 @@
 		"train.NavigationMixin",
 		"train.StationBlockEntityAccessor",
 		"train.StationBlockEntityMixin",
-		"train.TrainMixin"
+		"train.TrainMixin",
+		"train.TrainPacketMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

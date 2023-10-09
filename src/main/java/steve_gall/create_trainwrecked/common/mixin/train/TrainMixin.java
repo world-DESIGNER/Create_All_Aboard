@@ -36,7 +36,7 @@ public abstract class TrainMixin implements TrainExtension
 	@Inject(method = "tick", at = @At(value = "HEAD"), cancellable = true)
 	private void tick(Level level, CallbackInfo ci)
 	{
-		TrainHelper.tickTrain((Train) (Object) this, level);
+		TrainHelper.tickTrainServer((Train) (Object) this, level);
 	}
 
 	@Inject(method = "tickPassiveSlowdown", at = @At(value = "HEAD"), cancellable = true)

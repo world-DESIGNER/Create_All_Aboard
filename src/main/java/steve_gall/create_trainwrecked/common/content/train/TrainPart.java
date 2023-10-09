@@ -9,7 +9,6 @@ import com.simibubi.create.content.trains.entity.Train;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
@@ -44,16 +43,16 @@ public abstract class TrainPart<RECIPE extends Recipe<Container>>
 		this.localPos = NbtUtils.readBlockPos(tag.getCompound("localPos"));
 		this.blockState = NbtUtils.readBlockState(tag.getCompound("blockState"));
 		this.item = ItemStack.of(tag.getCompound("item"));
+
+		this.readSyncData(tag);
 	}
 
-	public TrainPart(FriendlyByteBuf buffer)
+	public void tickClient(Train train, Level level)
 	{
-		this.localPos = buffer.readBlockPos();
-		this.blockState = NbtUtils.readBlockState(buffer.readNbt());
-		this.item = buffer.readItem();
+		this.cacheRecipe(level);
 	}
 
-	public void tick(Train train, Level level)
+	public void tickServer(Train train, Level level)
 	{
 		this.cacheRecipe(level);
 	}
@@ -93,18 +92,29 @@ public abstract class TrainPart<RECIPE extends Recipe<Container>>
 
 	protected abstract boolean testRecipe(RECIPE recipe);
 
-	public void serializeNbt(CompoundTag tag)
+	public CompoundTag toNbt()
+	{
+		CompoundTag tag = new CompoundTag();
+		this.writeNbt(tag);
+		return tag;
+	}
+
+	public void writeNbt(CompoundTag tag)
 	{
 		tag.put("localPos", NbtUtils.writeBlockPos(this.localPos));
 		tag.put("blockState", NbtUtils.writeBlockState(this.blockState));
 		tag.put("item", this.item.serializeNBT());
+		this.writeSyncData(tag);
 	}
 
-	public void serializeNetwork(FriendlyByteBuf buffer)
+	public void readSyncData(CompoundTag tag)
 	{
-		buffer.writeBlockPos(this.localPos);
-		buffer.writeNbt(NbtUtils.writeBlockState(this.blockState));
-		buffer.writeItem(this.item);
+
+	}
+
+	public void writeSyncData(CompoundTag tag)
+	{
+
 	}
 
 	public BlockPos getBlockPos()

@@ -6,9 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.simibubi.create.AllItems;
-import com.simibubi.create.AllTags.AllItemTags;
-
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.helpers.IJeiHelpers;
@@ -18,13 +15,13 @@ import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.registries.ForgeRegistries;
 import steve_gall.create_trainwrecked.common.CreateTrainwrecked;
+import steve_gall.create_trainwrecked.common.crafting.HeatStage;
 
 @JeiPlugin
 public class ModJEI implements IModPlugin
@@ -84,7 +81,7 @@ public class ModJEI implements IModPlugin
 			ItemStack stack = new ItemStack(item);
 			int burnTime = ForgeHooks.getBurnTime(stack, null);
 
-			if (burnTime > 0)
+			if (burnTime > 0 && HeatStage.getBlazeBurnerFuelBurnTime(stack) == 0)
 			{
 				this.burnableItems.add(stack);
 			}
@@ -96,23 +93,14 @@ public class ModJEI implements IModPlugin
 	private void cacheBlazeBurnerFuels()
 	{
 		this.blazeBunerFuels.clear();
-		this.blazeBunerFuels.add(AllItems.CREATIVE_BLAZE_CAKE.asStack());
 
-		List<TagKey<Item>> tags = new ArrayList<>();
-		tags.add(AllItemTags.BLAZE_BURNER_FUEL_REGULAR.tag);
-		tags.add(AllItemTags.BLAZE_BURNER_FUEL_SPECIAL.tag);
-
-		for (TagKey<Item> tag : tags)
+		for (Item item : ForgeRegistries.ITEMS.getValues())
 		{
-			for (Item item : ForgeRegistries.ITEMS.getValues())
+			ItemStack stack = new ItemStack(item);
+
+			if (HeatStage.getBlazeBurnerFuelBurnTime(stack) > 0)
 			{
-				ItemStack stack = new ItemStack(item);
-
-				if (stack.is(tag))
-				{
-					this.blazeBunerFuels.add(stack);
-				}
-
+				this.blazeBunerFuels.add(stack);
 			}
 
 		}

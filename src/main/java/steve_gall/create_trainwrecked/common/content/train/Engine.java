@@ -3,7 +3,6 @@ package steve_gall.create_trainwrecked.common.content.train;
 import com.simibubi.create.content.trains.entity.Train;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
@@ -29,23 +28,6 @@ public class Engine extends TrainPart<TrainEngineTypeRecipe>
 	public Engine(CompoundTag tag)
 	{
 		super(tag);
-
-		this.heat = tag.getDouble("heat");
-		this.speed = tag.getDouble("speed");
-		this.overheated = tag.getBoolean("overheated");
-
-		this.angle = tag.getFloat("angle");
-	}
-
-	public Engine(FriendlyByteBuf buffer)
-	{
-		super(buffer);
-
-		this.heat = buffer.readDouble();
-		this.speed = buffer.readDouble();
-		this.overheated = buffer.readBoolean();
-
-		this.angle = buffer.readFloat();
 	}
 
 	@Override
@@ -77,12 +59,19 @@ public class Engine extends TrainPart<TrainEngineTypeRecipe>
 	}
 
 	@Override
-	public void tick(Train train, Level level)
+	public void tickClient(Train train, Level level)
 	{
-		super.tick(train, level);
+		super.tickClient(train, level);
+
+		this.angle += this.getSpeed() / 20.0D;
+	}
+
+	@Override
+	public void tickServer(Train train, Level level)
+	{
+		super.tickServer(train, level);
 
 		TrainEngineTypeRecipe recipe = this.getRecipe();
-		this.setAngle(this.getAngle() + (float) (this.getSpeed() / recipe.getMaxSpeed()) * 2.0F);
 
 		if (recipe.getHeatCapacity() <= 0)
 		{
@@ -126,39 +115,23 @@ public class Engine extends TrainPart<TrainEngineTypeRecipe>
 	}
 
 	@Override
-	public void serializeNbt(CompoundTag tag)
+	public void readSyncData(CompoundTag tag)
 	{
-		super.serializeNbt(tag);
+		super.readSyncData(tag);
+
+		this.heat = tag.getDouble("heat");
+		this.speed = tag.getDouble("speed");
+		this.overheated = tag.getBoolean("overheated");
+	}
+
+	@Override
+	public void writeSyncData(CompoundTag tag)
+	{
+		super.writeSyncData(tag);
 
 		tag.putDouble("heat", this.heat);
 		tag.putDouble("speed", this.speed);
 		tag.putBoolean("overheated", this.overheated);
-
-		tag.putFloat("angle", this.angle);
-	}
-
-	@Override
-	public void serializeNetwork(FriendlyByteBuf buffer)
-	{
-		super.serializeNetwork(buffer);
-
-		buffer.writeDouble(this.heat);
-		buffer.writeDouble(this.speed);
-		buffer.writeBoolean(this.overheated);
-
-		buffer.writeFloat(this.angle);
-	}
-
-	public static CompoundTag toNbt(Engine engine)
-	{
-		CompoundTag tag = new CompoundTag();
-		engine.serializeNbt(tag);
-		return tag;
-	}
-
-	public static void toNetwork(FriendlyByteBuf buffer, Engine engine)
-	{
-		engine.serializeNetwork(buffer);
 	}
 
 	public void setSpeed(double speed)
@@ -203,11 +176,6 @@ public class Engine extends TrainPart<TrainEngineTypeRecipe>
 	public float getAngle()
 	{
 		return this.angle;
-	}
-
-	public void setAngle(float angle)
-	{
-		this.angle = angle;
 	}
 
 }

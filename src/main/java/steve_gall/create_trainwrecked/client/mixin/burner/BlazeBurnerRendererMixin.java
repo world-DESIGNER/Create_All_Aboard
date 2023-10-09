@@ -28,13 +28,13 @@ import steve_gall.create_trainwrecked.common.content.train.TrainHelper;
 @Mixin(value = BlazeBurnerRenderer.class)
 public class BlazeBurnerRendererMixin
 {
-	@Shadow
+	@Shadow(remap = false)
 	private static void renderShared(PoseStack ms, @Nullable PoseStack modelTransform, MultiBufferSource bufferSource, Level level, BlockState blockState, HeatLevel heatLevel, float animation, float horizontalAngle, boolean canDrawFlame, boolean drawGoggles, boolean drawHat, int hashCode)
 	{
 
 	}
 
-	@Inject(method = "renderInContraption", at = @At(value = "HEAD"), cancellable = true)
+	@Inject(method = "renderInContraption", at = @At(value = "HEAD"), cancellable = true, remap = false)
 	private static void renderInContraption(MovementContext context, VirtualRenderWorld renderWorld, ContraptionMatrices matrices, MultiBufferSource bufferSource, LerpedFloat headAngle, boolean conductor, CallbackInfo ci)
 	{
 		if (context.contraption.entity instanceof CarriageContraptionEntity cce)

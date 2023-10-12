@@ -29,9 +29,15 @@ public class ModLanguageProvider extends LanguageProvider
 	protected void addTranslations()
 	{
 		this.add(ModItems.JERRYCAN.get(), "Jerrycan");
+		this.add(ModItems.JERRYCAN.get().getDescriptionId() + ".tooltip", "Jerrycan");
 		this.add(ModItems.JERRYCAN.get().getDescriptionId() + ".tooltip.empty", "Empty");
 		this.add(ModItems.JERRYCAN.get().getDescriptionId() + ".tooltip.amount", "%1$s: %2$s");
 		this.add(ModItems.JERRYCAN.get().getDescriptionId() + ".tooltip.capacity", "Capacity: %s");
+		this.add(ModItems.JERRYCAN.get().getDescriptionId() + ".tooltip.summary", "BLA BLA");
+		this.add(ModItems.JERRYCAN.get().getDescriptionId() + ".tooltip.condition1", "When used on Blocks");
+		this.add(ModItems.JERRYCAN.get().getDescriptionId() + ".tooltip.behaviour1", "_Drain fluid_ from clicked block. _Sneak_ while interacting to _fill fluid_ to block.");
+		this.add(ModItems.JERRYCAN.get().getDescriptionId() + ".tooltip.condition2", "When used on Fluid Interface in Train Carraige");
+		this.add(ModItems.JERRYCAN.get().getDescriptionId() + ".tooltip.behaviour2", "_Drain fluid_ from clicked carriage's fluid tanks. _Sneak_ while interacting to _fill fluid_ fluid tanks.");
 
 		this.add(JerrycanItem.TOOLTIP_FILLED, "%1$s %2$s filled");
 		this.add(JerrycanItem.TOOLTIP_DRAINED, "%1$s %2$s drained");

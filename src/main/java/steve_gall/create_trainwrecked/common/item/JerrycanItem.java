@@ -61,6 +61,8 @@ public class JerrycanItem extends Item
 
 		if (jerrycan != null)
 		{
+			pTooltip.add(Component.empty());
+
 			for (int i = 0; i < jerrycan.getTanks(); i++)
 			{
 				pTooltip.add(Component.translatable(this.getDescriptionId() + ".tooltip.capacity", NumberHelper.format(jerrycan.getTankCapacity(i)) + " mB"));

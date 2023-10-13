@@ -273,6 +273,11 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 		return this.heatCapacity;
 	}
 
+	public boolean hasHeatCapacity()
+	{
+		return this.getHeatCapacity() > 0;
+	}
+
 	public double getHeatPerFuel()
 	{
 		return this.heatPerFuel;

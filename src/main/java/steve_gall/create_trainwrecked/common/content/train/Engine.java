@@ -66,42 +66,47 @@ public class Engine extends TrainPart<TrainEngineTypeRecipe>
 		this.angle += this.getSpeed() / 20.0D;
 	}
 
-	@Override
-	public void tickServer(Train train, Level level)
+	public void coolingAir(Train train)
 	{
-		super.tickServer(train, level);
-
 		TrainEngineTypeRecipe recipe = this.getRecipe();
 
-		if (recipe.getHeatCapacity() <= 0)
+		if (!recipe.hasHeatCapacity())
 		{
 			return;
 		}
 
-		this.coolingAir(train);
-		this.coolingCoolant(train);
-		this.updateOverheat(train);
-	}
-
-	public void coolingAir(Train train)
-	{
-		TrainEngineTypeRecipe recipe = this.getRecipe();
 		double heat = this.getHeat();
 		this.setHeat(heat - recipe.getAirCoolingRate() / 20.0D);
 	}
 
 	public void coolingCoolant(Train train)
 	{
+		this.coolingCoolant(train, this.getHeat());
+	}
+
+	public void coolingCoolant(Train train, double cooling)
+	{
+		if (!this.getRecipe().hasHeatCapacity())
+		{
+			return;
+		}
+
 		double heat = this.getHeat();
-		double cooled = ((TrainExtension) train).getCoolingSystem().useCoolant(train, heat);
+		double cooled = ((TrainExtension) train).getCoolingSystem().useCoolant(train, Math.min(heat, cooling));
 		this.setHeat(heat - cooled);
 	}
 
-	public void updateOverheat(Train train)
+	public void updateOverheat()
 	{
 		TrainEngineTypeRecipe recipe = this.getRecipe();
-		double heat = this.getHeat();
+
+		if (!recipe.hasHeatCapacity())
+		{
+			return;
+		}
+
 		int heatCapacity = recipe.getHeatCapacity();
+		double heat = this.getHeat();
 
 		if (heat > heatCapacity)
 		{
@@ -146,16 +151,38 @@ public class Engine extends TrainPart<TrainEngineTypeRecipe>
 
 	public double getHeat()
 	{
+		if (!this.getRecipe().hasHeatCapacity())
+		{
+			return 0.0D;
+		}
+
 		return this.heat;
+	}
+
+	public double getRemainHeatForAlive()
+	{
+		TrainEngineTypeRecipe recipe = this.getRecipe();
+		return Math.max(this.getHeat() - (recipe.getOverheatedResettingTemp() * recipe.getHeatCapacity()), 0.0D);
 	}
 
 	public void setHeat(double heat)
 	{
+		if (!this.getRecipe().hasHeatCapacity())
+		{
+			return;
+		}
+
 		this.heat = Math.max(heat, 0.0D);
+		this.updateOverheat();
 	}
 
 	public void setOverheat(boolean overheated)
 	{
+		if (!this.getRecipe().hasHeatCapacity())
+		{
+			return;
+		}
+
 		if (overheated)
 		{
 			this.overheated = true;
@@ -170,6 +197,11 @@ public class Engine extends TrainPart<TrainEngineTypeRecipe>
 
 	public boolean isOverheated()
 	{
+		if (!this.getRecipe().hasHeatCapacity())
+		{
+			return false;
+		}
+
 		return this.overheated;
 	}
 

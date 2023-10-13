@@ -8,9 +8,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.mojang.datafixers.util.Pair;
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllPackets;
 import com.simibubi.create.Create;
@@ -63,6 +65,7 @@ import steve_gall.create_trainwrecked.common.fluid.FluidHelper;
 import steve_gall.create_trainwrecked.common.mixin.contraption.ContraptionAccessor;
 import steve_gall.create_trainwrecked.common.mixin.contraption.MountedStorageManagerAccessor;
 import steve_gall.create_trainwrecked.common.mixin.train.StationBlockEntityAccessor;
+import steve_gall.create_trainwrecked.common.util.CompareUtil;
 import steve_gall.create_trainwrecked.common.util.FluidTagEntry;
 import steve_gall.create_trainwrecked.common.util.NumberHelper;
 
@@ -450,12 +453,143 @@ public class TrainHelper
 
 		for (Engine engine : streamEngines(train).toList())
 		{
+			engine.coolingAir(train);
+		}
+
+		coolingEngines(train);
+
+		for (Engine engine : streamEngines(train).toList())
+		{
 			engine.tickServer(train, level);
 		}
 
 		for (HeatSource heatSource : streamHeatSources(train).toList())
 		{
 			heatSource.tickServer(train, level);
+		}
+
+	}
+
+	public static void coolingEngines(Train train)
+	{
+		List<Engine> engines = streamEngines(train).filter(e -> e.getRecipe().hasHeatCapacity()).toList();
+
+		if (!coolEngines(train, engines, Engine::isOverheated, Engine::getRemainHeatForAlive) || !coolEngines(train, engines, e -> true, Engine::getHeat))
+		{
+			return;
+		}
+
+	}
+
+	/**
+	 *
+	 * @param train
+	 * @param engines
+	 * @param predicate
+	 * @param toCoolFunc
+	 * @return all cooled
+	 */
+	public static boolean coolEngines(Train train, List<Engine> engines, Predicate<Engine> predicate, Function<Engine, Double> toCoolFunc)
+	{
+		while (true)
+		{
+			List<Engine> toCoolEngines = engines.stream().filter(predicate).toList();
+
+			if (toCoolEngines.size() > 0)
+			{
+				EngineCooling cooling = coolEngines(train, toCoolEngines, toCoolFunc);
+
+				if (cooling.toCool() == 0.0D)
+				{
+					return true;
+				}
+				else if (cooling.cooled() == 0.0D)
+				{
+					return false;
+				}
+				else
+				{
+					continue;
+				}
+
+			}
+			else
+			{
+				return true;
+			}
+
+		}
+
+	}
+
+	public static EngineCooling coolEngines(Train train, List<Engine> engines, Function<Engine, Double> toCoolFunc)
+	{
+		Pair<Stream<Engine>, Double> pair = streamToCoolEngines(train, engines, toCoolFunc);
+		List<Engine> toCoolEngines = pair.getFirst().toList();
+		double coolingTemp = pair.getSecond();
+		int toCoolEngineCount = toCoolEngines.size();
+
+		if (toCoolEngineCount > 0 && coolingTemp > 0.0D)
+		{
+			double totalToCool = 0.0D;
+
+			for (Engine engine : toCoolEngines)
+			{
+				totalToCool += coolingTemp * engine.getRecipe().getHeatCapacity();
+			}
+
+			double totalCooled = ((TrainExtension) train).getCoolingSystem().useCoolant(train, totalToCool);
+
+			for (Engine engine : toCoolEngines)
+			{
+				double cooled = (toCoolFunc.apply(engine) / totalToCool) * totalCooled;
+				engine.setHeat(engine.getHeat() - cooled);
+			}
+
+			return new EngineCooling(totalToCool, totalCooled);
+		}
+
+		return new EngineCooling(0.0D, 0.0D);
+	}
+
+	public static Pair<Stream<Engine>, Double> streamToCoolEngines(Train train, List<Engine> engines, Function<Engine, Double> func)
+	{
+		List<Engine> descByCoolingTemps = engines.stream().sorted(CompareUtil.desc(e -> func.apply(e) / e.getRecipe().getHeatCapacity())).toList();
+		int size = descByCoolingTemps.size();
+
+		if (size == 0)
+		{
+			return Pair.of(Stream.empty(), 0.0D);
+		}
+		else if (size == 1)
+		{
+			Engine engine = descByCoolingTemps.get(0);
+			return Pair.of(Stream.of(engine), func.apply(engine) / engine.getRecipe().getHeatCapacity());
+		}
+		else
+		{
+			List<Engine> coolings = new ArrayList<>();
+			double mostCoolingTemp = 0.0D;
+
+			for (int i = 0; i < descByCoolingTemps.size(); i++)
+			{
+				Engine engine = descByCoolingTemps.get(i);
+				double toCoolingTemp = func.apply(engine) / engine.getRecipe().getHeatCapacity();
+
+				if (i == 0 || mostCoolingTemp == toCoolingTemp)
+				{
+					coolings.add(engine);
+					mostCoolingTemp = toCoolingTemp;
+				}
+				else
+				{
+					return Pair.of(coolings.stream(), mostCoolingTemp - toCoolingTemp);
+				}
+
+			}
+
+			Engine first = descByCoolingTemps.get(0);
+			return Pair.of(coolings.stream(), func.apply(first) / first.getRecipe().getHeatCapacity());
 		}
 
 	}

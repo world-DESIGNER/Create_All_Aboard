@@ -1,7 +1,7 @@
 {
   "create.station.has_heat": "Cannot disassemble.",
   "create.station.has_heat_1": "need to cool the engines",
-  "create_trainwrecked.ponder.mesh_frame.header": "Mesh Frame",
+  "create_trainwrecked.ponder.steam_engine.header": "Steam Engine",
   "create_trainwrecked.ponder.tag.train_engine": "Train Engine",
   "create_trainwrecked.ponder.tag.train_engine.description": "DESCRIPTION",
   "create_trainwrecked.train_assembly.carriage_no_fluid_interfaces": "%1$s Not Found, Carriage with fluid tanks requires at least one %1$s.",
@@ -33,7 +33,7 @@
   "item.create_trainwrecked.jerrycan.tooltip.condition1": "When used on Blocks",
   "item.create_trainwrecked.jerrycan.tooltip.condition2": "When used on Fluid Interface in Train Carraige",
   "item.create_trainwrecked.jerrycan.tooltip.empty": "Empty",
-  "item.create_trainwrecked.jerrycan.tooltip.summary": "BLA BLA",
+  "item.create_trainwrecked.jerrycan.tooltip.summary": "Portable fluid carriage for your fuel exhaustion emergency.",
   "text.create_trainwrecked.jei.train_engine_coolant.cooling": "Cooling: %s",
   "text.create_trainwrecked.jei.train_engine_coolant.title": "Train Engine Coolant",
   "text.create_trainwrecked.jei.train_engine_type.acceleration": "Acceleration: %s",

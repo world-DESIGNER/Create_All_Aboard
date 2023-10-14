@@ -33,7 +33,7 @@ public class ModLanguageProvider extends LanguageProvider
 		this.add(ModItems.JERRYCAN.get().getDescriptionId() + ".tooltip.empty", "Empty");
 		this.add(ModItems.JERRYCAN.get().getDescriptionId() + ".tooltip.amount", "%1$s: %2$s");
 		this.add(ModItems.JERRYCAN.get().getDescriptionId() + ".tooltip.capacity", "Capacity: %s");
-		this.add(ModItems.JERRYCAN.get().getDescriptionId() + ".tooltip.summary", "BLA BLA");
+		this.add(ModItems.JERRYCAN.get().getDescriptionId() + ".tooltip.summary", "Portable fluid carriage for your fuel exhaustion emergency.");
 		this.add(ModItems.JERRYCAN.get().getDescriptionId() + ".tooltip.condition1", "When used on Blocks");
 		this.add(ModItems.JERRYCAN.get().getDescriptionId() + ".tooltip.behaviour1", "_Drain fluid_ from clicked block. _Sneak_ while interacting to _fill fluid_ to block.");
 		this.add(ModItems.JERRYCAN.get().getDescriptionId() + ".tooltip.condition2", "When used on Fluid Interface in Train Carraige");

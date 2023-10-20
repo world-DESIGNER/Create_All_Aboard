@@ -29,7 +29,7 @@ public class CreateTrainwreckedClient
 	{
 		e.enqueueWork(() ->
 		{
-			ModPonders.register();
+			ModPonders.init();
 		});
 
 	}

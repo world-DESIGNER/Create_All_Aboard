@@ -2,8 +2,8 @@ package steve_gall.create_trainwrecked.common.init;
 
 import com.simibubi.create.AllCreativeModeTabs;
 import com.simibubi.create.foundation.item.ItemDescription;
-import com.simibubi.create.foundation.item.TooltipModifier;
 import com.simibubi.create.foundation.item.TooltipHelper.Palette;
+import com.simibubi.create.foundation.item.TooltipModifier;
 
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Item.Properties;

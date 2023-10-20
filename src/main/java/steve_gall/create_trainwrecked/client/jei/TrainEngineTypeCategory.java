@@ -110,7 +110,7 @@ public class TrainEngineTypeCategory extends ModJEIRecipeCategory<TrainEngineTyp
 			textY += font.lineHeight;
 		}
 
-		if (recipe.getHeatPerFuel() > 0 && recipe.getHeatCapacity() > 0)
+		if (recipe.getHeatPerFuel() > 0 && recipe.hasHeatCapacity())
 		{
 			textY += font.lineHeight;
 			font.draw(stack, Component.translatable(TEXT_HEAT_CAPACITY, NumberHelper.format(recipe.getHeatCapacity()) + " J"), textX, textY, textColor);

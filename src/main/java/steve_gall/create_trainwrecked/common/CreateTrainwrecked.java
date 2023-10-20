@@ -15,6 +15,8 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import steve_gall.create_trainwrecked.client.CreateTrainwreckedClient;
+import steve_gall.create_trainwrecked.client.compat.CompatibilityManager;
+import steve_gall.create_trainwrecked.client.compat.CompatibilityMod;
 import steve_gall.create_trainwrecked.common.config.CreateTrainwreckedConfig;
 import steve_gall.create_trainwrecked.common.init.ModItems;
 import steve_gall.create_trainwrecked.common.init.ModRecipeSerializers;
@@ -38,6 +40,8 @@ public class CreateTrainwrecked
 		ModRecipeSerializers.RECIPE_SERIALIZERS.register(fml_bus);
 
 		IEventBus forge_bus = MinecraftForge.EVENT_BUS;
+
+		CompatibilityManager.MODS.forEach(CompatibilityMod::load);
 	}
 
 	public static String translationKey(CharSequence path)

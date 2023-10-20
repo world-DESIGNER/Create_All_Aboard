@@ -5,6 +5,7 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import steve_gall.create_trainwrecked.client.compat.TFMGCompatPonders;
 import steve_gall.create_trainwrecked.client.init.ModPonders;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -13,7 +14,8 @@ public class ModDataGenerator
 	@SubscribeEvent
 	public static void gatherData(GatherDataEvent event)
 	{
-		ModPonders.register();
+		ModPonders.init();
+		TFMGCompatPonders.init();
 
 		DataGenerator generator = event.getGenerator();
 		ExistingFileHelper existingFileHelper = event.getExistingFileHelper();

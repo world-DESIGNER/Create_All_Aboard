@@ -52,15 +52,7 @@ public class ModLanguageProvider extends LanguageProvider
 		this.addTrainStation();
 		this.addTrainGoggle();
 
-		PonderLocalization.generateSceneLang();
-		JsonObject object = new JsonObject();
-		PonderLocalization.record(CreateTrainwrecked.MOD_ID, object);
-
-		for (Map.Entry<String, JsonElement> entry : object.entrySet())
-		{
-			this.add(entry.getKey(), entry.getValue().getAsString());
-		}
-
+		this.addPonder();
 	}
 
 	private void addTrainAssemble()
@@ -121,6 +113,19 @@ public class ModLanguageProvider extends LanguageProvider
 		this.add(TrainEngineCoolantCategory.TEXT_COOLING, "Cooling: %s");
 
 		this.add(TrainHeatSourceCategory.TEXT_TITLE, "Train Heat Source");
+	}
+
+	private void addPonder()
+	{
+		PonderLocalization.generateSceneLang();
+		JsonObject object = new JsonObject();
+		PonderLocalization.record(CreateTrainwrecked.MOD_ID, object);
+
+		for (Map.Entry<String, JsonElement> entry : object.entrySet())
+		{
+			this.add(entry.getKey(), entry.getValue().getAsString());
+		}
+
 	}
 
 }

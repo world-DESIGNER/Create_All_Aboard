@@ -10,7 +10,8 @@
 		"engine.DieselEngineInstanceMixin",
 		"flywheel.AbstractInstanceAccessor",
 		"flywheel.InstancingEngineAccessor",
-		"train.StationScreenMixin",
+		"train.AbstractStationScreenAcessor",
+		"train.StationScreenAcessor",
 		"train.TrainRelocatorMixin"
 	],
 	"mixins": [],

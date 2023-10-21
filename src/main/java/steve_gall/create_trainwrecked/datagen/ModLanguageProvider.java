@@ -60,7 +60,7 @@ public class ModLanguageProvider extends LanguageProvider
 		this.add(TrainHelper.TRAIN_ASSEMBLEY_NO_ENGINES, "Engine Not Found");
 		this.add(TrainHelper.TRAIN_ASSEMBLEY_TOO_MANY_CARRIAGES, "Too Many Carriages, With the current engines, up to %s can be configured, Current carriages: %s");
 		this.add(TrainHelper.TRAIN_ASSEMBLEY_TOO_MANY_BLOCKS, "Too Many Contraption Blocks, With the current engines, up to %s can be placed, Current blocks: %s");
-		this.add(TrainHelper.TRAIN_ASSEMBLEY_CARRIAGE_NO_FLUID_INTERFACES, "%1$s Not Found, Carriage with fluid tanks requires at least one %1$s.");
+		this.add(TrainHelper.TRAIN_ASSEMBLEY_NO_FLUID_INTERFACES, "Requires least one carriage have both %1$s and %2$s.");
 		this.add(TrainHelper.TRAIN_ASSEMBLEY_NO_HEAT_SOURCES, "Heat Source Not Found, to boil water requires at least one heat source, Only heat sources below the fluid tanks are detected.");
 	}
 

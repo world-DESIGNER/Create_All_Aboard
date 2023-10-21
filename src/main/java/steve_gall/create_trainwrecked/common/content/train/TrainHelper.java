@@ -74,7 +74,7 @@ public class TrainHelper
 	public static String TRAIN_ASSEMBLEY_NO_ENGINES = CreateTrainwrecked.translationKey("train_assembly.no_engines");
 	public static String TRAIN_ASSEMBLEY_TOO_MANY_CARRIAGES = CreateTrainwrecked.translationKey("train_assembly.too_many_carriages");
 	public static String TRAIN_ASSEMBLEY_TOO_MANY_BLOCKS = CreateTrainwrecked.translationKey("train_assembly.too_many_blocks");
-	public static String TRAIN_ASSEMBLEY_CARRIAGE_NO_FLUID_INTERFACES = CreateTrainwrecked.translationKey("train_assembly.carriage_no_fluid_interfaces");
+	public static String TRAIN_ASSEMBLEY_NO_FLUID_INTERFACES = CreateTrainwrecked.translationKey("train_assembly.no_fluid_interfaces");
 	public static String TRAIN_ASSEMBLEY_NO_HEAT_SOURCES = CreateTrainwrecked.translationKey("train_assembly.no_heat_sources");
 
 	public static String TRAIN_GOGGLE_OVERHEATED = CreateTrainwrecked.translationKey("train_google.overheated");
@@ -161,6 +161,7 @@ public class TrainHelper
 		Vec3 directionVec = Vec3.atLowerCornerOf(assemblyDirection.getNormal());
 		TrackGraph graph = null;
 		TrackNode secondNode = null;
+		int carriagesHavingTanksInterfaces = 0;
 
 		for (int j = 0; j < assemblyLength * 2 + 40; j++)
 		{
@@ -305,10 +306,9 @@ public class TrainHelper
 			{
 				boolean hasFluidInterface = contraption.getBlocks().values().stream().anyMatch(sbi -> sbi.state.getBlock() == AllBlocks.PORTABLE_FLUID_INTERFACE.get());
 
-				if (!hasFluidInterface)
+				if (hasFluidInterface)
 				{
-					accessor.invokeException(new AssemblyException(Component.translatable(TRAIN_ASSEMBLEY_CARRIAGE_NO_FLUID_INTERFACES, AllBlocks.PORTABLE_FLUID_INTERFACE.asStack().getHoverName())), contraptions.size() + 1);
-					return;
+					carriagesHavingTanksInterfaces++;
 				}
 
 			}
@@ -361,6 +361,12 @@ public class TrainHelper
 				accessor.invokeException(new AssemblyException(Component.translatable(TRAIN_ASSEMBLEY_NO_HEAT_SOURCES)), -1);
 				return;
 			}
+		}
+
+		if (carriagesHavingTanksInterfaces == 0)
+		{
+			accessor.invokeException(new AssemblyException(Component.translatable(TRAIN_ASSEMBLEY_NO_FLUID_INTERFACES, AllBlocks.FLUID_TANK.asStack().getHoverName(), AllBlocks.PORTABLE_FLUID_INTERFACE.asStack().getHoverName())), contraptions.size() + 1);
+			return;
 		}
 
 		for (CarriageContraption contraption : contraptions)

@@ -28,6 +28,8 @@ public class ModLanguageProvider extends LanguageProvider
 	@Override
 	protected void addTranslations()
 	{
+		this.add(ModItems.TRAIN_STEAM_ENGINE.get(), "Train Steam Engine");
+
 		this.add(ModItems.JERRYCAN.get(), "Jerrycan");
 		this.add(ModItems.JERRYCAN.get().getDescriptionId() + ".tooltip", "Jerrycan");
 		this.add(ModItems.JERRYCAN.get().getDescriptionId() + ".tooltip.empty", "Empty");

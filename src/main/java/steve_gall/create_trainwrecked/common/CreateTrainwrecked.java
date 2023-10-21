@@ -18,6 +18,8 @@ import steve_gall.create_trainwrecked.client.CreateTrainwreckedClient;
 import steve_gall.create_trainwrecked.client.compat.CompatibilityManager;
 import steve_gall.create_trainwrecked.client.compat.CompatibilityMod;
 import steve_gall.create_trainwrecked.common.config.CreateTrainwreckedConfig;
+import steve_gall.create_trainwrecked.common.init.ModBlockEntityTypes;
+import steve_gall.create_trainwrecked.common.init.ModBlocks;
 import steve_gall.create_trainwrecked.common.init.ModItems;
 import steve_gall.create_trainwrecked.common.init.ModRecipeSerializers;
 import steve_gall.create_trainwrecked.common.init.ModRecipeTypes;
@@ -35,6 +37,8 @@ public class CreateTrainwrecked
 		DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> CreateTrainwreckedClient::init);
 
 		IEventBus fml_bus = FMLJavaModLoadingContext.get().getModEventBus();
+		ModBlocks.BLOCKS.register(fml_bus);
+		ModBlockEntityTypes.BLOCK_ENTITY_TYPES.register(fml_bus);
 		ModItems.ITEMS.register(fml_bus);
 		ModRecipeTypes.RECIPE_TYPES.register(fml_bus);
 		ModRecipeSerializers.RECIPE_SERIALIZERS.register(fml_bus);

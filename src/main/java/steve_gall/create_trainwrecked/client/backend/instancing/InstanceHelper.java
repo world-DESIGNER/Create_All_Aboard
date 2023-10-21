@@ -53,7 +53,7 @@ public class InstanceHelper
 
 	public static Float getEngineTargetAngle(Engine engine, Float angle)
 	{
-		return engine != null ? (Float) (engine.getAngle() + 90.0F) : angle;
+		return engine != null ? (Float) engine.getAngle() : angle;
 	}
 
 	private InstanceHelper()

@@ -24,6 +24,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.registries.ForgeRegistries;
 import steve_gall.create_trainwrecked.common.CreateTrainwrecked;
+import steve_gall.create_trainwrecked.common.init.ModBlocks;
 
 public class ModPonders
 {
@@ -35,6 +36,7 @@ public class ModPonders
 	public static final PonderRegistrationHelper PONDERS = new PonderRegistrationHelper(CreateTrainwrecked.MOD_ID);
 	public static final PonderStoryBoardEntry ASSEMBLING_TRAIN_STORY = createAssemblingTrainStory(AllBlocks.TRACK_STATION.get(), "steam_train", ModPonders::assemblingTrain);
 	public static final PonderStoryBoardEntry STEAM_ENGINE_STORY = createAssemblingTrainStory(AllBlocks.STEAM_ENGINE.get(), "steam_train", ModPonders::steamEngine);
+	public static final PonderStoryBoardEntry TRAIN_STEAM_ENGINE_STORY = createAssemblingTrainStory(ModBlocks.TRAIN_STEAM_ENGINE.get(), "steam_train", ModPonders::steamEngine);
 
 	public static final int TEXT_SHOW_TIME = 20;
 	public static final int TEXT_FADING_TIME = 15;

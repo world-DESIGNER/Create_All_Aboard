@@ -1,5 +1,6 @@
 package steve_gall.create_trainwrecked.client;
 
+import com.jozufozu.flywheel.backend.instancing.InstancedRenderRegistry;
 import com.simibubi.create.CreateClient;
 import com.simibubi.create.content.trains.entity.Train;
 import com.simibubi.create.content.trains.station.GlobalStation;
@@ -18,8 +19,10 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import steve_gall.create_trainwrecked.client.content.train.StationScreenHelper;
 import steve_gall.create_trainwrecked.client.init.ModPonders;
+import steve_gall.create_trainwrecked.client.instancing.TrainSteamEngineInstance;
 import steve_gall.create_trainwrecked.client.mixin.train.StationScreenAcessor;
 import steve_gall.create_trainwrecked.common.content.train.TrainHelper;
+import steve_gall.create_trainwrecked.common.init.ModBlockEntityTypes;
 import steve_gall.create_trainwrecked.common.mixin.train.StationBlockEntityAccessor;
 
 public class CreateTrainwreckedClient
@@ -32,6 +35,7 @@ public class CreateTrainwreckedClient
 		IEventBus forge_bus = MinecraftForge.EVENT_BUS;
 		forge_bus.addListener(CreateTrainwreckedClient::clientTick);
 		forge_bus.addListener(CreateTrainwreckedClient::clientLevelTick);
+
 	}
 
 	public static void clientSetup(FMLClientSetupEvent e)
@@ -39,6 +43,8 @@ public class CreateTrainwreckedClient
 		e.enqueueWork(() ->
 		{
 			ModPonders.init();
+
+			InstancedRenderRegistry.configure(ModBlockEntityTypes.TRAIN_STEAM_ENGINE.get()).factory(TrainSteamEngineInstance::new).skipRender(be -> false).apply();
 		});
 
 	}

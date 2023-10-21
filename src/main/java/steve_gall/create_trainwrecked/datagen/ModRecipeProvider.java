@@ -29,6 +29,7 @@ import steve_gall.create_trainwrecked.common.crafting.HeatStage;
 import steve_gall.create_trainwrecked.common.crafting.TrainEngineCoolantRecipe;
 import steve_gall.create_trainwrecked.common.crafting.TrainEngineTypeRecipe;
 import steve_gall.create_trainwrecked.common.crafting.TrainHeatSourceRecipe;
+import steve_gall.create_trainwrecked.common.init.ModBlocks;
 import steve_gall.create_trainwrecked.common.util.FluidTagEntry;
 import steve_gall.create_trainwrecked.common.util.ItemTagEntry;
 
@@ -54,6 +55,7 @@ public class ModRecipeProvider extends RecipeProvider
 	{
 		TrainEngineTypeRecipe.Builder<?> steam = new TrainEngineTypeRecipe.Builder<>();
 		steam.blockType(ItemTagEntry.TYPE.of(AllBlocks.STEAM_ENGINE.get()));
+		steam.blockType(ItemTagEntry.TYPE.of(ModBlocks.TRAIN_STEAM_ENGINE.get()));
 		steam.maxSpeed(50.0F);
 		steam.acceleration(steam.maxSpeed() / 60.0F);
 		steam.carriageStressMultiplier(0.75D);

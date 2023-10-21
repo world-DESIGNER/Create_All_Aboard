@@ -41,7 +41,7 @@ public class TrainSteamEngineInstance extends BlockEntityInstance<TrainSteamEngi
 	@Override
 	public void beginFrame()
 	{
-		Float angle = InstanceHelper.getEngineTargetAngle(this.engineSupplier.get(), null);
+		Float angle = InstanceHelper.getEngineAnimatingAngle(this.engineSupplier.get(), null);
 
 		if (angle == null)
 		{

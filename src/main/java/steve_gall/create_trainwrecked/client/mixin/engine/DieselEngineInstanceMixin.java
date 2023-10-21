@@ -29,7 +29,7 @@ public abstract class DieselEngineInstanceMixin extends BlockEntityInstance<Dies
 	@ModifyVariable(method = "beginFrame", at = @At("STORE"), ordinal = 0)
 	private Float getEngineTargetAngle(Float angle)
 	{
-		return InstanceHelper.getEngineTargetAngle(this.engineSupplier.get(), angle);
+		return InstanceHelper.getEngineAnimatingAngle(this.engineSupplier.get(), angle);
 	}
 
 }

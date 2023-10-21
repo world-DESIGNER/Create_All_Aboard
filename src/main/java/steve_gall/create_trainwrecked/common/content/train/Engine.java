@@ -1,6 +1,7 @@
 package steve_gall.create_trainwrecked.common.content.train;
 
 import com.simibubi.create.content.trains.entity.Train;
+import com.simibubi.create.foundation.utility.AnimationTickHolder;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
@@ -18,6 +19,7 @@ public class Engine extends TrainPart<TrainEngineTypeRecipe>
 	private double speed;
 	private boolean overheated;
 
+	private float prevAngle;
 	private float angle;
 
 	public Engine(Level level, CapturedPos capture)
@@ -63,6 +65,7 @@ public class Engine extends TrainPart<TrainEngineTypeRecipe>
 	{
 		super.tickClient(train, level);
 
+		this.prevAngle = this.angle;
 		this.angle += this.getSpeed() / 20.0D;
 	}
 
@@ -205,9 +208,14 @@ public class Engine extends TrainPart<TrainEngineTypeRecipe>
 		return this.overheated;
 	}
 
-	public float getAngle()
+	public float getTargetAngle()
 	{
 		return this.angle;
+	}
+
+	public float getAnimatingAngle()
+	{
+        return Mth.lerp(AnimationTickHolder.getPartialTicks(), this.prevAngle, this.angle);
 	}
 
 }

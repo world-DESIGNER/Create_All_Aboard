@@ -1,6 +1,5 @@
 package steve_gall.create_trainwrecked.common.init;
 
-import com.simibubi.create.AllCreativeModeTabs;
 import com.simibubi.create.foundation.item.ItemDescription;
 import com.simibubi.create.foundation.item.TooltipHelper.Palette;
 import com.simibubi.create.foundation.item.TooltipModifier;
@@ -22,7 +21,7 @@ public class ModItems
 
 	public static Properties defaultProperties()
 	{
-		return new Properties().tab(AllCreativeModeTabs.BASE_CREATIVE_TAB);
+		return new Properties().tab(ModCreativeModTabs.TAB);
 	}
 
 	static

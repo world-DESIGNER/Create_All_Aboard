@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.content.contraptions.Contraption;
+import com.simibubi.create.content.fluids.tank.CreativeFluidTankBlockEntity.CreativeSmartFluidTank;
 import com.simibubi.create.content.trains.entity.CarriageContraptionEntity;
 
 import net.minecraft.core.BlockPos;
@@ -162,7 +163,12 @@ public class JerrycanItem extends Item
 			IFluidHandlerItem jerrycan = pContext.getItemInHand().getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).orElse(null);
 			IFluidHandler to = blockEntity.getCapability(ForgeCapabilities.FLUID_HANDLER).orElse(null);
 
-			if (jerrycan != null && to != null)
+			if (to instanceof CreativeSmartFluidTank inventory)
+			{
+				FluidStack drain = jerrycan.drain(1, FluidAction.SIMULATE);
+				inventory.setContainedFluid(drain);
+			}
+			else if (jerrycan != null && to != null)
 			{
 				this.move(pContext.getPlayer(), jerrycan, to);
 			}

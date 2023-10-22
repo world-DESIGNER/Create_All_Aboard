@@ -21,6 +21,12 @@ public class FluidTagEntryType implements RegistryTagEntryType<Fluid, FluidStack
 	}
 
 	@Override
+	public FluidIngredient getEmptyIngredient()
+	{
+		return FluidIngredient.EMPTY;
+	}
+
+	@Override
 	public FluidTagEntry of(TagEntry tagEntry)
 	{
 		return new FluidTagEntry(tagEntry);

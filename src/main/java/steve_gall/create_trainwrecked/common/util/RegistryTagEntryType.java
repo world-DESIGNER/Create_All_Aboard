@@ -19,6 +19,8 @@ public interface RegistryTagEntryType<VALUE, STACK, INGREDIENT, ENTRY extends Re
 {
 	VALUE getEmptyValue();
 
+	INGREDIENT getEmptyIngredient();
+
 	ENTRY of(TagEntry tagEntry);
 
 	IForgeRegistry<VALUE> getRegistry();

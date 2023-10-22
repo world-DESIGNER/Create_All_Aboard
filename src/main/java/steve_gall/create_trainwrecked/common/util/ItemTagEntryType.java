@@ -21,6 +21,12 @@ public class ItemTagEntryType implements RegistryTagEntryType<Item, ItemStack, I
 		return Items.AIR;
 	}
 
+	@Override
+	public Ingredient getEmptyIngredient()
+	{
+		return Ingredient.EMPTY;
+	}
+
 	public ItemTagEntry of(ItemLike item)
 	{
 		return this.of(item.asItem());

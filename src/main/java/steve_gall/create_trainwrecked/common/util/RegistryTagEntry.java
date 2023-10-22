@@ -33,7 +33,16 @@ public abstract class RegistryTagEntry<VALUE, STACK, INGREDIENT>
 		else
 		{
 			VALUE value = registry.getValue(tagEntry.getId());
-			return type.toIngredient(value);
+
+			if (value != null)
+			{
+				return type.toIngredient(value);
+			}
+			else
+			{
+				return type.getEmptyIngredient();
+			}
+
 		}
 
 	}

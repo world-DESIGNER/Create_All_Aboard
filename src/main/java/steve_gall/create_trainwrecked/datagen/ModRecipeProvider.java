@@ -72,12 +72,12 @@ public class ModRecipeProvider extends RecipeProvider
 
 		TrainEngineTypeRecipe.Builder<?> diesel = new TrainEngineTypeRecipe.Builder<>();
 		diesel.blockType(ItemTagEntry.TYPE.of(CIBlocks.DIESEL_ENGINE.get()));
-		diesel.maxSpeed(30.0F);
+		diesel.maxSpeed(40.0F);
 		diesel.acceleration(diesel.maxSpeed() / 5.0F);
 		diesel.fuelType(FluidTagEntry.TYPE.of(FluidTags.create(new ResourceLocation("forge", "diesel"))));
 		diesel.fuelType(FluidTagEntry.TYPE.of(FluidTags.create(new ResourceLocation("forge", "biodiesel"))));
-		diesel.fuelPerSpeed(1.0D);
-		diesel.heatPerFuel(10.0D);
+		diesel.fuelPerSpeed(8000.0D / 1800.0D / 40.0D / 2.0D);
+		diesel.heatPerFuel(27.0D);
 		diesel.overheatedResettingTemp(0.1D);
 		this.solveHeatVariables(diesel, 10 * 60, 5 * 60);
 		this.save(pFinishedRecipeConsumer, diesel, "diesel");
@@ -187,7 +187,7 @@ public class ModRecipeProvider extends RecipeProvider
 	private void addBlockExistConditions(List<ICondition> conditions, ItemTagEntry blockType)
 	{
 		TagEntry tagEntry = blockType.getTagEntry();
-		List<String> builtinNamespaces = Arrays.asList(ResourceLocation.DEFAULT_NAMESPACE, Create.ID);
+		List<String> builtinNamespaces = Arrays.asList(ResourceLocation.DEFAULT_NAMESPACE, Create.ID, CreateTrainwrecked.MOD_ID);
 
 		if (!tagEntry.isTag() && !builtinNamespaces.contains(tagEntry.getId().getNamespace()))
 		{

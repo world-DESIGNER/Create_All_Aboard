@@ -18,6 +18,7 @@ import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.TagEntry;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.Explosion.BlockInteraction;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.common.crafting.conditions.ICondition;
@@ -25,6 +26,7 @@ import net.minecraftforge.common.crafting.conditions.ItemExistsCondition;
 import net.minecraftforge.fluids.FluidType;
 import steve_gall.create_trainwrecked.common.CreateTrainwrecked;
 import steve_gall.create_trainwrecked.common.crafting.ConditionFinishedRecipe;
+import steve_gall.create_trainwrecked.common.crafting.CrashBehavior;
 import steve_gall.create_trainwrecked.common.crafting.HeatStage;
 import steve_gall.create_trainwrecked.common.crafting.TrainEngineCoolantRecipe;
 import steve_gall.create_trainwrecked.common.crafting.TrainEngineTypeRecipe;
@@ -65,6 +67,7 @@ public class ModRecipeProvider extends RecipeProvider
 		steam.fuelPerHeatLevel(FluidType.BUCKET_VOLUME / 267.6D);
 		steam.overheatedResettingTemp(0.0D);
 		steam.heatCapacity(0);
+		steam.crashBehavior(new CrashBehavior.Builder().explosionRadius(5.0F).causesFire(true).explosionMode(BlockInteraction.NONE).build());
 		this.save(pFinishedRecipeConsumer, steam, "steam");
 
 		TrainEngineTypeRecipe.Builder<?> diesel = new TrainEngineTypeRecipe.Builder<>();
@@ -147,19 +150,19 @@ public class ModRecipeProvider extends RecipeProvider
 		TrainHeatSourceRecipe.Builder<?> passive = new TrainHeatSourceRecipe.Builder<>();
 		passive.blockType(ItemTagEntry.TYPE.of(Items.CAMPFIRE));
 		passive.blockType(ItemTagEntry.TYPE.of(Items.MAGMA_BLOCK));
-		passive.stage(new HeatStage.Builder().level(1).passive());
+		passive.stage(new HeatStage.Builder().level(1).passive().build());
 		this.save(pFinishedRecipeConsumer, passive, "passive");
 
 		TrainHeatSourceRecipe.Builder<?> charcoal_burner = new TrainHeatSourceRecipe.Builder<>();
 		charcoal_burner.blockType(ItemTagEntry.TYPE.of(zeh.createlowheated.AllBlocks.CHARCOAL_BURNER.get()));
-		charcoal_burner.stage(new HeatStage.Builder().level(1).burnTime());
+		charcoal_burner.stage(new HeatStage.Builder().level(1).burnTime().build());
 		this.save(pFinishedRecipeConsumer, charcoal_burner, "charcoal_burner");
 
 		TrainHeatSourceRecipe.Builder<?> blaze_burner = new TrainHeatSourceRecipe.Builder<>();
 		blaze_burner.blockType(ItemTagEntry.TYPE.of(AllBlocks.BLAZE_BURNER.get()));
-		blaze_burner.stage(new HeatStage.Builder().level(1).passive());
-		blaze_burner.stage(new HeatStage.Builder().level(2).burnTime());
-		blaze_burner.stage(new HeatStage.Builder().level(3).blazeBurnerFuel());
+		blaze_burner.stage(new HeatStage.Builder().level(1).passive().build());
+		blaze_burner.stage(new HeatStage.Builder().level(2).burnTime().build());
+		blaze_burner.stage(new HeatStage.Builder().level(3).blazeBurnerFuel().build());
 		this.save(pFinishedRecipeConsumer, blaze_burner, "blaze_burner");
 	}
 

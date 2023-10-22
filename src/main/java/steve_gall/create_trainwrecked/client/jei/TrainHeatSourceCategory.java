@@ -19,6 +19,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import steve_gall.create_trainwrecked.common.content.train.HeatSource;
 import steve_gall.create_trainwrecked.common.crafting.HeatStage;
 import steve_gall.create_trainwrecked.common.crafting.TrainHeatSourceRecipe;
 import steve_gall.create_trainwrecked.common.init.ModRecipeTypes;
@@ -63,7 +64,7 @@ public class TrainHeatSourceCategory extends ModJEIRecipeCategory<TrainHeatSourc
 		int textColor = 0x404040;
 
 		List<HeatStage> stages = recipe.getStages();
-		HeatStage passiveStage = new HeatStage.Builder().passive().level(0).build();
+		HeatStage passiveStage = HeatSource.NOT_FOUND_PASSIVE;
 		List<HeatStage> ingredientStages = new ArrayList<>();
 
 		for (int i = 0; i < stages.size(); i++)

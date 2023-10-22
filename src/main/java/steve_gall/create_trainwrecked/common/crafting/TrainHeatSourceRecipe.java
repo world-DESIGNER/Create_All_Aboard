@@ -1,7 +1,6 @@
 package steve_gall.create_trainwrecked.common.crafting;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import com.google.gson.JsonObject;
@@ -28,8 +27,8 @@ public class TrainHeatSourceRecipe implements SerializableRecipe<Container>, Non
 	private TrainHeatSourceRecipe(ResourceLocation id, Builder<?> builder)
 	{
 		this.id = id;
-		this.blockType = Collections.unmodifiableList(builder.blockType());
-		this.stages = builder.stage().stream().map(HeatStage.Builder::build).toList();
+		this.blockType = new ArrayList<>(builder.blockType());
+		this.stages = new ArrayList<>(builder.stage());
 
 		this.blocks = this.blockType.stream().map(ItemTagEntry::toIngredient).toList();
 	}
@@ -101,7 +100,7 @@ public class TrainHeatSourceRecipe implements SerializableRecipe<Container>, Non
 	public static class Builder<T extends Builder<T>> extends SimpleRecipeBuilder<T, TrainHeatSourceRecipe>
 	{
 		private final List<ItemTagEntry> blockType = new ArrayList<>();
-		private final List<HeatStage.Builder> stage = new ArrayList<>();
+		private final List<HeatStage> stage = new ArrayList<>();
 
 		public Builder()
 		{
@@ -111,13 +110,13 @@ public class TrainHeatSourceRecipe implements SerializableRecipe<Container>, Non
 		public Builder(JsonObject pJson)
 		{
 			this.blockType().addAll(ItemTagEntry.TYPE.getAsTagEntryList(pJson, "blockType"));
-			this.stage().addAll(GsonHelper2.parseAsJsonArrayOrElement(pJson, "stage", HeatStage.Builder::new));
+			this.stage().addAll(GsonHelper2.parseAsJsonArrayOrElement(pJson, "stage", HeatStage::new));
 		}
 
 		public Builder(FriendlyByteBuf pBuffer)
 		{
 			this.blockType().addAll(ItemTagEntry.TYPE.listFromNetwork(pBuffer));
-			this.stage().addAll(pBuffer.readList(HeatStage.Builder::new));
+			this.stage().addAll(pBuffer.readList(HeatStage::new));
 		}
 
 		@Override
@@ -137,12 +136,12 @@ public class TrainHeatSourceRecipe implements SerializableRecipe<Container>, Non
 			return (T) this;
 		}
 
-		public List<HeatStage.Builder> stage()
+		public List<HeatStage> stage()
 		{
 			return this.stage;
 		}
 
-		public T stage(HeatStage.Builder stage)
+		public T stage(HeatStage stage)
 		{
 			this.stage.add(stage);
 			return (T) this;

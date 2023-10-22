@@ -13,6 +13,11 @@
       "item": "create_trainwrecked:train_steam_engine"
     }
   ],
+  "crashBehavior": {
+    "causesFire": true,
+    "explosionMode": "none",
+    "explosionRadius": 5.0
+  },
   "fuelPerHeatLevel": 3.736920777279521,
   "fuelPerSpeed": 1.0,
   "fuelType": "minecraft:water",

@@ -45,6 +45,18 @@ public abstract class TrainMixin implements TrainExtension
 		TrainHelper.controlSpeed((Train) (Object) this);
 	}
 
+	@Inject(method = "updateConductors", at = @At(value = "HEAD"), cancellable = true)
+	private void updateConductors(CallbackInfo ci)
+	{
+		Train self = (Train) (Object) this;
+
+		if (self.graph == null)
+		{
+			TrainHelper.streamEngines(self).forEach(e -> e.setSpeed(0.0D));
+		}
+
+	}
+
 	@Inject(method = "approachTargetSpeed", at = @At(value = "HEAD"), cancellable = true)
 	private void approachTargetSpeed(float accelerationMod, CallbackInfo ci)
 	{
@@ -104,8 +116,17 @@ public abstract class TrainMixin implements TrainExtension
 	@Inject(method = "canDisassemble", at = @At(value = "TAIL"), cancellable = true)
 	private void canDisassemble(CallbackInfoReturnable<Boolean> cir)
 	{
-		boolean canDisassemble = TrainHelper.canDisassemble((Train) (Object) this);
-		cir.setReturnValue(canDisassemble);
+		if (!TrainHelper.anyEngineHasHeat((Train) (Object) this))
+		{
+			cir.setReturnValue(false);
+		}
+
+	}
+
+	@Inject(method = "crash", at = @At(value = "TAIL"), cancellable = true)
+	private void crash(CallbackInfo ci)
+	{
+		TrainHelper.onCrash((Train) (Object) this);
 	}
 
 	@Override

@@ -20,6 +20,7 @@ public class ModCreativeModTabs
 			return new ItemStack(ModItems.TRAIN_STEAM_ENGINE.get());
 		}
 
+		@Override
 		public Component getDisplayName()
 		{
 			return DISPLAY_NAME;

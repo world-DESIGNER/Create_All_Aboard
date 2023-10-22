@@ -66,7 +66,12 @@ public class Engine extends TrainPart<TrainEngineTypeRecipe>
 		super.tickClient(train, level);
 
 		this.prevAngle = this.angle;
-		this.angle += this.getSpeed() / 20.0D;
+
+		if (train.graph != null)
+		{
+			this.angle += this.getSpeed() / 20.0D;
+		}
+
 	}
 
 	public void coolingAir(Train train)
@@ -215,7 +220,7 @@ public class Engine extends TrainPart<TrainEngineTypeRecipe>
 
 	public float getAnimatingAngle()
 	{
-        return Mth.lerp(AnimationTickHolder.getPartialTicks(), this.prevAngle, this.angle);
+		return Mth.lerp(AnimationTickHolder.getPartialTicks(), this.prevAngle, this.angle);
 	}
 
 }

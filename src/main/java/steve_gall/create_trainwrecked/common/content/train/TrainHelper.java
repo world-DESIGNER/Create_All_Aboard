@@ -59,6 +59,7 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.network.PacketDistributor;
 import steve_gall.create_trainwrecked.common.CreateTrainwrecked;
 import steve_gall.create_trainwrecked.common.content.contraption.MountedStorageManagerExtension;
+import steve_gall.create_trainwrecked.common.crafting.CrashBehavior;
 import steve_gall.create_trainwrecked.common.crafting.HeatStage;
 import steve_gall.create_trainwrecked.common.crafting.TrainEngineTypeRecipe;
 import steve_gall.create_trainwrecked.common.fluid.FluidHelper;
@@ -456,33 +457,28 @@ public class TrainHelper
 	{
 		TrainExtension extension = (TrainExtension) train;
 		extension.getCoolingSystem().tick(train, level);
-
-		for (Engine engine : streamEngines(train).toList())
-		{
-			engine.coolingAir(train);
-		}
-
+		streamEngines(train).forEach(e -> e.coolingAir(train));
 		coolingEngines(train);
 
-		for (Engine engine : streamEngines(train).toList())
-		{
-			engine.tickServer(train, level);
-		}
-
-		for (HeatSource heatSource : streamHeatSources(train).toList())
-		{
-			heatSource.tickServer(train, level);
-		}
-
+		streamEngines(train).forEach(e -> e.tickServer(train, level));
+		streamHeatSources(train).forEach(h -> h.tickServer(train, level));
 	}
 
-	public static void coolingEngines(Train train)
+	public static boolean coolingEngines(Train train)
 	{
 		List<Engine> engines = streamEngines(train).filter(e -> e.getRecipe().hasHeatCapacity()).toList();
 
-		if (!coolEngines(train, engines, Engine::isOverheated, Engine::getRemainHeatForAlive) || !coolEngines(train, engines, e -> true, Engine::getHeat))
+		if (!coolingEngines(train, engines, Engine::isOverheated, Engine::getRemainHeatForAlive))
 		{
-			return;
+			return true;
+		}
+		else if (!coolingEngines(train, engines, e -> true, Engine::getHeat))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
 		}
 
 	}
@@ -495,7 +491,7 @@ public class TrainHelper
 	 * @param toCoolFunc
 	 * @return all cooled
 	 */
-	public static boolean coolEngines(Train train, List<Engine> engines, Predicate<Engine> predicate, Function<Engine, Double> toCoolFunc)
+	public static boolean coolingEngines(Train train, List<Engine> engines, Predicate<Engine> predicate, Function<Engine, Double> toCoolFunc)
 	{
 		while (true)
 		{
@@ -794,12 +790,7 @@ public class TrainHelper
 		else
 		{
 			train.speed = 0.0D;
-
-			for (Engine engine : streamEngines(train).toList())
-			{
-				engine.setSpeed(0.0D);
-			}
-
+			streamEngines(train).forEach(e -> e.setSpeed(0.0D));
 		}
 
 		// when fuel not enough during test
@@ -1113,27 +1104,35 @@ public class TrainHelper
 		return Component.literal(NumberHelper.format(temp * 100.0D, 1) + "%").setStyle(Style.EMPTY.withColor(Mth.hsvToRgb((float) ((1.0D - temp) / 3.0F), (float) (temp), 1.0F)));
 	}
 
-	public static boolean canDisassemble(Train train)
+	public static void onCrash(Train train)
 	{
-		return !anyEngineHasHeat(train);
-	}
-
-	public static boolean anyEngineHasHeat(Train train)
-	{
-		for (Carriage carriage : train.carriages)
+		streamEngines(train).forEach(e ->
 		{
-			for (Engine engine : ((CarriageExtension) carriage).getEngines())
+			CrashBehavior crashBehavior = e.getRecipe().getCrashBehavior();
+
+			if (crashBehavior.getExplosionRadius() > 0.0F)
 			{
-				if (engine.getHeat() > 0.0D)
+				for (Carriage carriage : train.carriages)
 				{
-					return true;
+					CarriageContraptionEntity contraptionEntity = carriage.anyAvailableEntity();
+
+					if (contraptionEntity != null)
+					{
+						Vec3 pos = contraptionEntity.position();
+						contraptionEntity.getLevel().explode(contraptionEntity, pos.x(), pos.y(), pos.z(), crashBehavior.getExplosionRadius(), crashBehavior.isCausesFire(), crashBehavior.getExplosionMode());
+					}
+
 				}
 
 			}
 
-		}
+		});
 
-		return false;
+	}
+
+	public static boolean anyEngineHasHeat(Train train)
+	{
+		return streamEngines(train).anyMatch(e -> e.getHeat() > 0.0D);
 	}
 
 	public static HeatState getHeatState(Train train)

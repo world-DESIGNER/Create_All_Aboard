@@ -35,6 +35,7 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 	private final double heatPerFuel;
 	private final double airCoolingRate;
 	private final double overheatedResettingTemp;
+	private final CrashBehavior crashBehavior;
 
 	private final List<Ingredient> blocks;
 	private final List<FluidIngredient> fuels;
@@ -54,6 +55,7 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 		this.heatPerFuel = builder.heatPerFuel();
 		this.airCoolingRate = builder.airCoolingRate();
 		this.overheatedResettingTemp = builder.overheatedResettingTemp();
+		this.crashBehavior = builder.crashBehavior();
 
 		this.blocks = this.blockTypes.stream().map(ItemTagEntry::toIngredient).toList();
 		this.fuels = this.fuelTypes.stream().map(FluidTagEntry::toIngredient).toList();
@@ -193,6 +195,13 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 		pJson.addProperty("heatPerFuel", this.getHeatPerFuel());
 		pJson.addProperty("airCoolingRate", this.getAirCoolingRate());
 		pJson.addProperty("overheatedResettingTemp", this.getOverheatedResettingTemp());
+		CrashBehavior crashBehavior = this.getCrashBehavior();
+
+		if (crashBehavior.getExplosionRadius() > 0.0F)
+		{
+			pJson.add("crashBehavior", crashBehavior.toJson());
+		}
+
 	}
 
 	@Override
@@ -210,6 +219,7 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 		pBuffer.writeDouble(this.getHeatPerFuel());
 		pBuffer.writeDouble(this.getAirCoolingRate());
 		pBuffer.writeDouble(this.getOverheatedResettingTemp());
+		this.getCrashBehavior().toNetwork(pBuffer);
 	}
 
 	@Override
@@ -293,6 +303,11 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 		return this.overheatedResettingTemp;
 	}
 
+	public CrashBehavior getCrashBehavior()
+	{
+		return this.crashBehavior;
+	}
+
 	public static class Serializer extends SimpleRecipeSerializer<TrainEngineTypeRecipe, Builder<?>>
 	{
 		@Override
@@ -324,6 +339,7 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 		private double heatPerFuel = 0.0D;
 		private double airCoolingRate = 0.0D;
 		private double overheatedResettingTemp = 0.0D;
+		private CrashBehavior crashBehavior = new CrashBehavior.Builder().build();
 
 		public Builder()
 		{
@@ -344,6 +360,14 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 			this.heatPerFuel(GsonHelper.getAsDouble(pJson, "heatPerFuel"));
 			this.airCoolingRate(GsonHelper.getAsDouble(pJson, "airCoolingRate"));
 			this.overheatedResettingTemp(GsonHelper.getAsDouble(pJson, "overheatedResettingTemp"));
+
+			JsonObject jcrashBehavior = GsonHelper.getAsJsonObject(pJson, "crashBehavior", null);
+
+			if (jcrashBehavior != null)
+			{
+				this.crashBehavior(new CrashBehavior(jcrashBehavior));
+			}
+
 		}
 
 		public Builder(FriendlyByteBuf pBuffer)
@@ -360,6 +384,7 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 			this.heatPerFuel(pBuffer.readDouble());
 			this.airCoolingRate(pBuffer.readDouble());
 			this.overheatedResettingTemp(pBuffer.readDouble());
+			this.crashBehavior(new CrashBehavior(pBuffer));
 		}
 
 		@Override
@@ -497,6 +522,17 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 		public T overheatedResettingTemp(double overheatedResettingTemp)
 		{
 			this.overheatedResettingTemp = Math.max(overheatedResettingTemp, 0.0D);
+			return (T) this;
+		}
+
+		public CrashBehavior crashBehavior()
+		{
+			return this.crashBehavior;
+		}
+
+		public T crashBehavior(CrashBehavior crashBehavior)
+		{
+			this.crashBehavior = crashBehavior;
 			return (T) this;
 		}
 

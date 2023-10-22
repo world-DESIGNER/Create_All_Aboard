@@ -31,6 +31,16 @@ public class HeatStage
 		this.level = builder.level();
 	}
 
+	public HeatStage(JsonElement json)
+	{
+		this(new Builder(json));
+	}
+
+	public HeatStage(FriendlyByteBuf buffer)
+	{
+		this(new Builder(buffer));
+	}
+
 	public static int getBlazeBurnerFuelBurnTime(ItemStack item)
 	{
 		if (item.getItem() == AllItems.CREATIVE_BLAZE_CAKE.get())

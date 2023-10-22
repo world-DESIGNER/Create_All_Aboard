@@ -1,5 +1,7 @@
 package steve_gall.create_trainwrecked.common.init;
 
+import java.util.function.Function;
+
 import com.simibubi.create.foundation.item.ItemDescription;
 import com.simibubi.create.foundation.item.TooltipHelper.Palette;
 import com.simibubi.create.foundation.item.TooltipModifier;
@@ -16,6 +18,7 @@ import steve_gall.create_trainwrecked.common.item.JerrycanItem;
 public class ModItems
 {
 	public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(Keys.ITEMS, CreateTrainwrecked.MOD_ID);
+	public static final Function<Item, TooltipModifier> STANDARD_TOOLTIP_MODIFIER = item -> new ItemDescription.Modifier(item, Palette.STANDARD_CREATE);
 	public static final RegistryObject<BlockItem> TRAIN_STEAM_ENGINE = ITEMS.register("train_steam_engine", () -> new BlockItem(ModBlocks.TRAIN_STEAM_ENGINE.get(), defaultProperties()));
 	public static final RegistryObject<JerrycanItem> JERRYCAN = ITEMS.register("jerrycan", () -> new JerrycanItem(defaultProperties()));
 
@@ -26,7 +29,11 @@ public class ModItems
 
 	static
 	{
-		TooltipModifier.REGISTRY.registerDeferred(JERRYCAN.getId(), item -> new ItemDescription.Modifier(item, Palette.STANDARD_CREATE));
+		for (RegistryObject<Item> entry : ITEMS.getEntries())
+		{
+			TooltipModifier.REGISTRY.registerDeferred(entry.getId(), STANDARD_TOOLTIP_MODIFIER);
+		}
+
 	}
 
 	private ModItems()

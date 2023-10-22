@@ -1,5 +1,7 @@
 {
-  "block.create_trainwrecked.train_steam_engine": "Train Steam Engine",
+  "block.create_trainwrecked.train_steam_engine": "Weathered Steam Engine",
+  "block.create_trainwrecked.train_steam_engine.tooltip": "Weathered Steam Engine",
+  "block.create_trainwrecked.train_steam_engine.tooltip.summary": "It's so weathered that it can only be used on trains",
   "create.station.has_heat": "Cannot disassemble.",
   "create.station.has_heat_1": "need to cool the engines",
   "create_trainwrecked.ponder.assembly_train.header": "Assembling Train - New!",

@@ -116,7 +116,7 @@ public abstract class TrainMixin implements TrainExtension
 	@Inject(method = "canDisassemble", at = @At(value = "TAIL"), cancellable = true)
 	private void canDisassemble(CallbackInfoReturnable<Boolean> cir)
 	{
-		if (!TrainHelper.anyEngineHasHeat((Train) (Object) this))
+		if (TrainHelper.anyEngineHasHeat((Train) (Object) this))
 		{
 			cir.setReturnValue(false);
 		}

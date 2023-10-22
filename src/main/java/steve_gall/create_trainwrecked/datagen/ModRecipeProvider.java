@@ -102,39 +102,41 @@ public class ModRecipeProvider extends RecipeProvider
 
 	public void engineCoolants(Consumer<FinishedRecipe> pFinishedRecipeConsumer)
 	{
+		int heatPerSec = 40;
+
 		TrainEngineCoolantRecipe.Builder<?> water = new TrainEngineCoolantRecipe.Builder<>();
 		water.fluidIngredient(FluidIngredient.fromFluid(Fluids.WATER, 1));
-		water.cooling(1);
+		water.cooling((int) (heatPerSec * 0.1D));
 		this.save(pFinishedRecipeConsumer, water, "fluid_water");
-
-		TrainEngineCoolantRecipe.Builder<?> snow_block = new TrainEngineCoolantRecipe.Builder<>();
-		snow_block.itemIngredient(Ingredient.of(Blocks.SNOW_BLOCK));
-		snow_block.cooling(water.cooling() * FluidType.BUCKET_VOLUME / water.fluidIngredient().getRequiredAmount());
-		this.save(pFinishedRecipeConsumer, snow_block, "item_snow_block");
 
 		TrainEngineCoolantRecipe.Builder<?> snowball = new TrainEngineCoolantRecipe.Builder<>();
 		snowball.itemIngredient(Ingredient.of(Items.SNOWBALL));
-		snowball.cooling(snow_block.cooling() / 4);
+		snowball.cooling((int) (heatPerSec * 1.0D));
 		this.save(pFinishedRecipeConsumer, snowball, "item_snowball");
 
 		TrainEngineCoolantRecipe.Builder<?> snow = new TrainEngineCoolantRecipe.Builder<>();
 		snow.itemIngredient(Ingredient.of(Blocks.SNOW));
-		snow.cooling(snow_block.cooling() / 2);
+		snow.cooling((int) (heatPerSec * 2.0D));
 		this.save(pFinishedRecipeConsumer, snow, "item_snow");
+
+		TrainEngineCoolantRecipe.Builder<?> snow_block = new TrainEngineCoolantRecipe.Builder<>();
+		snow_block.itemIngredient(Ingredient.of(Blocks.SNOW_BLOCK));
+		snow_block.cooling((int) (heatPerSec * 4.0));
+		this.save(pFinishedRecipeConsumer, snow_block, "item_snow_block");
 
 		TrainEngineCoolantRecipe.Builder<?> ice = new TrainEngineCoolantRecipe.Builder<>();
 		ice.itemIngredient(Ingredient.of(Items.ICE));
-		ice.cooling(water.cooling() * FluidType.BUCKET_VOLUME / water.fluidIngredient().getRequiredAmount());
+		ice.cooling((int) (heatPerSec * 10.0D));
 		this.save(pFinishedRecipeConsumer, ice, "item_ice");
 
 		TrainEngineCoolantRecipe.Builder<?> packed_ice = new TrainEngineCoolantRecipe.Builder<>();
 		packed_ice.itemIngredient(Ingredient.of(Items.PACKED_ICE));
-		packed_ice.cooling(ice.cooling() * 10);
+		packed_ice.cooling((int) (heatPerSec * 30.0D));
 		this.save(pFinishedRecipeConsumer, packed_ice, "item_packed_ice");
 
 		TrainEngineCoolantRecipe.Builder<?> blue_ice = new TrainEngineCoolantRecipe.Builder<>();
 		blue_ice.itemIngredient(Ingredient.of(Items.BLUE_ICE));
-		blue_ice.cooling(packed_ice.cooling() * 10);
+		blue_ice.cooling((int) (heatPerSec * 60.0D));
 		this.save(pFinishedRecipeConsumer, blue_ice, "item_blue_ice");
 	}
 

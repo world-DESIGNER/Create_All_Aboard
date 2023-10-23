@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import com.drmangotea.createindustry.registry.CIBlocks;
+import com.jesz.createdieselgenerators.blocks.BlockRegistry;
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.Create;
 import com.simibubi.create.foundation.fluid.FluidIngredient;
@@ -72,6 +73,8 @@ public class ModRecipeProvider extends RecipeProvider
 
 		TrainEngineTypeRecipe.Builder<?> diesel = new TrainEngineTypeRecipe.Builder<>();
 		diesel.blockType(ItemTagEntry.TYPE.of(CIBlocks.DIESEL_ENGINE.get()));
+		diesel.blockType(ItemTagEntry.TYPE.of(BlockRegistry.DIESEL_ENGINE.get()));
+		diesel.blockType(ItemTagEntry.TYPE.of(BlockRegistry.MODULAR_DIESEL_ENGINE.get()));
 		diesel.maxSpeed(40.0F);
 		diesel.acceleration(diesel.maxSpeed() / 5.0F);
 		diesel.fuelType(FluidTagEntry.TYPE.of(FluidTags.create(new ResourceLocation("forge", "diesel"))));

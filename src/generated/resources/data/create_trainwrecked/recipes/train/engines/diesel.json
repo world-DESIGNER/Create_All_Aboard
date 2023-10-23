@@ -2,7 +2,11 @@
   "type": "create_trainwrecked:train_engine_type",
   "acceleration": 8.0,
   "airCoolingRate": 20.0,
-  "blockType": "createindustry:diesel_engine",
+  "blockType": [
+    "createindustry:diesel_engine",
+    "createdieselgenerators:diesel_engine",
+    "createdieselgenerators:large_diesel_engine"
+  ],
   "carriageStressMultiplier": 1.0,
   "fuelPerHeatLevel": 0.0,
   "fuelPerSpeed": 0.05555555555555556,

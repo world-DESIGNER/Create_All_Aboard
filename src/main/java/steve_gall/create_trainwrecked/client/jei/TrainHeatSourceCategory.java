@@ -149,4 +149,15 @@ public class TrainHeatSourceCategory extends ModJEIRecipeCategory<TrainHeatSourc
 
 	}
 
+	@Override
+	public boolean test(TrainHeatSourceRecipe recipe)
+	{
+		if (!ItemTagEntry.TYPE.getIngredientMatchingStacks(recipe.getBlocks()).findAny().isPresent())
+		{
+			return false;
+		}
+
+		return super.test(recipe);
+	}
+
 }

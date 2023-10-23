@@ -1,4 +1,4 @@
-// 1.19.2	2023-10-22T23:24:36.0755127	Recipes
+// 1.19.2	2023-10-23T00:10:14.6030289	Recipes
 22058c8e64c7682a91b68b1a9ba0567c851dfbac data/create_trainwrecked/recipes/train/coolants/fluid_water.json
 a37feb211bb587e6a350ccbaa3db17424ee15743 data/create_trainwrecked/recipes/train/coolants/item_blue_ice.json
 19decda087d34771d6d9eb212e29e0b7108c224c data/create_trainwrecked/recipes/train/coolants/item_ice.json
@@ -6,8 +6,8 @@ a37feb211bb587e6a350ccbaa3db17424ee15743 data/create_trainwrecked/recipes/train/
 3f1fcb417d194d0cb137d827b4f09356e0c9d8c2 data/create_trainwrecked/recipes/train/coolants/item_snow.json
 0bf9d050a267b47ee9781ed315b50791b0a31813 data/create_trainwrecked/recipes/train/coolants/item_snowball.json
 18fef9b146b7c4512360983c8e8e750302fbc501 data/create_trainwrecked/recipes/train/coolants/item_snow_block.json
-ed66dad0e06cb22f54847165834f11f67a3a6164 data/create_trainwrecked/recipes/train/engines/diesel.json
+22d26111f95ea0c5f851abb143ab8b47d38392da data/create_trainwrecked/recipes/train/engines/diesel.json
 8edfa83af94b677e7cdc3409c30a8a6cffb400c9 data/create_trainwrecked/recipes/train/engines/steam.json
 4527bdff510981c792bc574935b27811e71d3389 data/create_trainwrecked/recipes/train/heat_sources/blaze_burner.json
-e49330545b6fa11752e4243c919012c82cc75141 data/create_trainwrecked/recipes/train/heat_sources/charcoal_burner.json
+b948814714e7ffa31bc58dbc0004ab8036496202 data/create_trainwrecked/recipes/train/heat_sources/charcoal_burner.json
 43ca1d808360dd8887e8460a6b51303f5f851639 data/create_trainwrecked/recipes/train/heat_sources/passive.json

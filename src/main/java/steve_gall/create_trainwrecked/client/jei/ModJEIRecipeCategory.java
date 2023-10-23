@@ -22,7 +22,13 @@ public abstract class ModJEIRecipeCategory<RECIPE extends Recipe<?>> extends Mod
 	public List<RECIPE> getRecipes(RecipeManager recipeManager)
 	{
 		net.minecraft.world.item.crafting.RecipeType<Recipe<Container>> recipeType = (net.minecraft.world.item.crafting.RecipeType<Recipe<Container>>) this.getCraftingRecipeType();
-		return (List<RECIPE>) recipeManager.getAllRecipesFor(recipeType);
+		List<RECIPE> allRecipesFor = (List<RECIPE>) recipeManager.getAllRecipesFor(recipeType);
+		return allRecipesFor.stream().filter(this::test).toList();
+	}
+
+	public boolean test(RECIPE recipe)
+	{
+		return true;
 	}
 
 }

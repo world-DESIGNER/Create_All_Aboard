@@ -138,4 +138,15 @@ public class TrainEngineTypeCategory extends ModJEIRecipeCategory<TrainEngineTyp
 		layout.addSlot(RecipeIngredientRole.INPUT, 26, 2).addIngredients(ForgeTypes.FLUID_STACK, fluids);
 	}
 
+	@Override
+	public boolean test(TrainEngineTypeRecipe recipe)
+	{
+		if (!ItemTagEntry.TYPE.getIngredientMatchingStacks(recipe.getBlocks()).findAny().isPresent())
+		{
+			return false;
+		}
+
+		return super.test(recipe);
+	}
+
 }

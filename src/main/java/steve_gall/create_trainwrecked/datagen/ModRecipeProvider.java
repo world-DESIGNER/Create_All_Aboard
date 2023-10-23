@@ -95,7 +95,8 @@ public class ModRecipeProvider extends RecipeProvider
 	{
 		FinishedRecipe finish = builder.finish(new ResourceLocation(this.modId, "train/engines/" + name));
 		List<ICondition> conditions = new ArrayList<>();
-		this.addBlockExistConditions(builder.blockType(), conditions);
+		// no need, because safe if not item found
+		// this.addBlockExistConditions(builder.blockType(), conditions);
 
 		consumer.accept(new ConditionFinishedRecipe(finish, conditions));
 	}
@@ -172,7 +173,8 @@ public class ModRecipeProvider extends RecipeProvider
 	{
 		FinishedRecipe finish = builder.finish(new ResourceLocation(this.modId, "train/heat_sources/" + name));
 		List<ICondition> conditions = new ArrayList<>();
-		this.addBlockExistConditions(builder.blockType(), conditions);
+		// no need, because safe if not item found
+		// this.addBlockExistConditions(builder.blockType(), conditions);
 
 		consumer.accept(new ConditionFinishedRecipe(finish, conditions));
 	}

@@ -1,12 +1,6 @@
 {
   "type": "create_trainwrecked:train_heat_source",
   "blockType": "createlowheated:charcoal_burner",
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "createlowheated:charcoal_burner"
-    }
-  ],
   "stage": {
     "ingredientType": "burn_time",
     "level": 1

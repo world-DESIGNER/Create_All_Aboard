@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.content.contraptions.Contraption;
+import com.simibubi.create.content.contraptions.actors.psi.PortableFluidInterfaceBlockEntity;
 import com.simibubi.create.content.fluids.tank.CreativeFluidTankBlockEntity.CreativeSmartFluidTank;
 import com.simibubi.create.content.trains.entity.CarriageContraptionEntity;
 
@@ -21,7 +22,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.api.distmarker.Dist;
@@ -37,6 +37,7 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 import steve_gall.create_trainwrecked.common.CreateTrainwrecked;
 import steve_gall.create_trainwrecked.common.config.CreateTrainwreckedConfig;
 import steve_gall.create_trainwrecked.common.fluid.FluidHelper;
+import steve_gall.create_trainwrecked.common.mixin.contraption.PortableStorageInterfaceBlockEntityAccessor;
 import steve_gall.create_trainwrecked.common.util.NumberHelper;
 
 public class JerrycanItem extends Item
@@ -156,21 +157,24 @@ public class JerrycanItem extends Item
 	public InteractionResult useOn(UseOnContext pContext)
 	{
 		Level level = pContext.getLevel();
-		BlockEntity blockEntity = level.getBlockEntity(pContext.getClickedPos());
 
-		if (!level.isClientSide() && blockEntity != null)
+		if (!level.isClientSide() && level.getBlockEntity(pContext.getClickedPos()) instanceof PortableFluidInterfaceBlockEntity pfi)
 		{
-			IFluidHandlerItem jerrycan = pContext.getItemInHand().getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).orElse(null);
-			IFluidHandler to = blockEntity.getCapability(ForgeCapabilities.FLUID_HANDLER).orElse(null);
+			if (((PortableStorageInterfaceBlockEntityAccessor) pfi).getConnectedEntity() instanceof CarriageContraptionEntity)
+			{
+				IFluidHandlerItem jerrycan = pContext.getItemInHand().getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).orElse(null);
+				IFluidHandler to = pfi.getCapability(ForgeCapabilities.FLUID_HANDLER).orElse(null);
 
-			if (to instanceof CreativeSmartFluidTank inventory)
-			{
-				FluidStack drain = jerrycan.drain(1, FluidAction.SIMULATE);
-				inventory.setContainedFluid(drain);
-			}
-			else if (jerrycan != null && to != null)
-			{
-				this.move(pContext.getPlayer(), jerrycan, to);
+				if (to instanceof CreativeSmartFluidTank inventory)
+				{
+					FluidStack drain = jerrycan.drain(1, FluidAction.SIMULATE);
+					inventory.setContainedFluid(drain);
+				}
+				else if (jerrycan != null && to != null)
+				{
+					this.move(pContext.getPlayer(), jerrycan, to);
+				}
+
 			}
 
 		}

@@ -38,7 +38,7 @@ public class ModPonders
 	public static final PonderStoryBoardEntry STEAM_ENGINE_STORY = createAssemblingTrainStory(AllBlocks.STEAM_ENGINE.get(), "steam_train", ModPonders::steamEngine);
 	public static final PonderStoryBoardEntry TRAIN_STEAM_ENGINE_STORY = createAssemblingTrainStory(ModBlocks.TRAIN_STEAM_ENGINE.get(), "steam_train", ModPonders::steamEngine);
 
-	public static final int TEXT_SHOW_TIME = 20;
+	public static final int TEXT_SHOW_TIME = 100;
 	public static final int TEXT_FADING_TIME = 15;
 	public static final int TEXT_IDLE_TIME = TEXT_SHOW_TIME + TEXT_FADING_TIME;
 	public static final int OUT_LINE_FADING_TIME = 10;

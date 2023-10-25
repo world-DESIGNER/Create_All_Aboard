@@ -1,24 +1,40 @@
 package steve_gall.create_trainwrecked.common.util;
 
 import java.text.NumberFormat;
+import java.util.HashMap;
+import java.util.Map;
+
+import net.minecraft.client.Minecraft;
 
 public class NumberHelper
 {
-	private static final NumberFormat INT_FORMAT = NumberFormat.getIntegerInstance();
+	private static Map<Integer, NumberFormat> FORMATS = new HashMap<>();
+
+	public static void update()
+	{
+		FORMATS.clear();
+	}
+
+	public static NumberFormat getFormat(int decimals)
+	{
+		return FORMATS.computeIfAbsent(decimals, d ->
+		{
+			NumberFormat format = NumberFormat.getInstance(Minecraft.getInstance().getLanguageManager().getSelected().getJavaLocale());
+			format.setMaximumFractionDigits(d);
+			format.setMinimumFractionDigits(d);
+			format.setGroupingUsed(true);
+			return format;
+		});
+	}
 
 	public static String format(long number)
 	{
-		return INT_FORMAT.format(number);
-	}
-
-	public static String format(double number)
-	{
-		return String.format("%,f", number);
+		return getFormat(0).format(number);
 	}
 
 	public static String format(double number, int decimals)
 	{
-		return String.format("%,." + decimals + "f", number);
+		return getFormat(decimals).format(number);
 	}
 
 }

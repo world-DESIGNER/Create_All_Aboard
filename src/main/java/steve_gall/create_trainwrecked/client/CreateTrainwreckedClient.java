@@ -9,6 +9,7 @@ import com.simibubi.create.content.trains.track.TrackTargetingBehaviour;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.LevelTickEvent;
@@ -31,6 +32,7 @@ public class CreateTrainwreckedClient
 	{
 		IEventBus fml_bus = FMLJavaModLoadingContext.get().getModEventBus();
 		fml_bus.addListener(CreateTrainwreckedClient::clientSetup);
+		fml_bus.addListener(CreateTrainwreckedClient::registerClientReloadListeners);
 
 		IEventBus forge_bus = MinecraftForge.EVENT_BUS;
 		forge_bus.addListener(CreateTrainwreckedClient::clientTick);
@@ -47,6 +49,11 @@ public class CreateTrainwreckedClient
 			InstancedRenderRegistry.configure(ModBlockEntityTypes.TRAIN_STEAM_ENGINE.get()).factory(TrainSteamEngineInstance::new).skipRender(be -> false).apply();
 		});
 
+	}
+
+	public static void registerClientReloadListeners(RegisterClientReloadListenersEvent event)
+	{
+		event.registerReloadListener(new ClientResourceReloadListener());
 	}
 
 	public static void clientTick(ClientTickEvent e)

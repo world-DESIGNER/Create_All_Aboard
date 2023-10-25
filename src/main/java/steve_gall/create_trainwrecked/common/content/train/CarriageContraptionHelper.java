@@ -34,7 +34,19 @@ public class CarriageContraptionHelper
 	{
 		BlockPos localPos = contraption.toLocalPos(pos);
 		BlockState blockState = level.getBlockState(pos);
+
+		if (blockState.isAir())
+		{
+			return;
+		}
+
 		ItemStack item = new ItemStack(blockState.getBlock());
+
+		if (item.isEmpty())
+		{
+			return;
+		}
+
 		CapturedPos capturedPos = new CapturedPos(localPos, blockState, item);
 
 		captureParts(contraption, level, pos, capturedPos);

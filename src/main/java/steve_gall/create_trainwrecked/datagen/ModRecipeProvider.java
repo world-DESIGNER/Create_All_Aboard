@@ -13,10 +13,14 @@ import com.simibubi.create.foundation.fluid.FluidIngredient;
 
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagEntry;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Explosion.BlockInteraction;
@@ -33,6 +37,7 @@ import steve_gall.create_trainwrecked.common.crafting.TrainEngineCoolantRecipe;
 import steve_gall.create_trainwrecked.common.crafting.TrainEngineTypeRecipe;
 import steve_gall.create_trainwrecked.common.crafting.TrainHeatSourceRecipe;
 import steve_gall.create_trainwrecked.common.init.ModBlocks;
+import steve_gall.create_trainwrecked.common.init.ModItems;
 import steve_gall.create_trainwrecked.common.util.FluidTagEntry;
 import steve_gall.create_trainwrecked.common.util.ItemTagEntry;
 
@@ -49,9 +54,29 @@ public class ModRecipeProvider extends RecipeProvider
 	@Override
 	protected void buildCraftingRecipes(Consumer<FinishedRecipe> pFinishedRecipeConsumer)
 	{
+		this.crafting(pFinishedRecipeConsumer);
+
 		this.engineTypes(pFinishedRecipeConsumer);
 		this.engineCoolants(pFinishedRecipeConsumer);
 		this.heatSources(pFinishedRecipeConsumer);
+	}
+
+	private void crafting(Consumer<FinishedRecipe> pFinishedRecipeConsumer)
+	{
+		this.save(ShapedRecipeBuilder.shaped(ModItems.JERRYCAN.get()).//
+				pattern("pii").//
+				pattern("ibb").//
+				pattern("ibb").//
+				define('p', AllBlocks.FLUID_PIPE.get()).//
+				define('i', ItemTags.create(new ResourceLocation("forge", "ingots/iron"))).//
+				define('b', Items.BUCKET), pFinishedRecipeConsumer);
+	}
+
+	private void save(ShapedRecipeBuilder builder, Consumer<FinishedRecipe> pFinishedRecipeConsumer)
+	{
+		Item result = builder.getResult();
+		ResourceLocation path = RecipeBuilder.getDefaultRecipeId(result);
+		builder.unlockedBy(getHasName(result), has(result)).save(pFinishedRecipeConsumer, new ResourceLocation(path.getNamespace(), "crafting/" + path.getPath()));
 	}
 
 	public void engineTypes(Consumer<FinishedRecipe> pFinishedRecipeConsumer)

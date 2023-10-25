@@ -1,4 +1,6 @@
-// 1.19.2	2023-10-23T12:09:28.6920535	Recipes
+// 1.19.2	2023-10-25T16:57:15.1297119	Recipes
+be0583cba95b1c84aa7cc499ab292e84bd41c61c data/create_trainwrecked/advancements/recipes/create_trainwrecked_tab/crafting/jerrycan.json
+7f6740ec35bd692bbc5e7d71fe557928d3998497 data/create_trainwrecked/recipes/crafting/jerrycan.json
 22058c8e64c7682a91b68b1a9ba0567c851dfbac data/create_trainwrecked/recipes/train/coolants/fluid_water.json
 a37feb211bb587e6a350ccbaa3db17424ee15743 data/create_trainwrecked/recipes/train/coolants/item_blue_ice.json
 19decda087d34771d6d9eb212e29e0b7108c224c data/create_trainwrecked/recipes/train/coolants/item_ice.json

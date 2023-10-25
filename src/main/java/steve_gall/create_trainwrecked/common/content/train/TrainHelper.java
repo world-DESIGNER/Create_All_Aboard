@@ -816,7 +816,7 @@ public class TrainHelper
 			TrainEngineTypeRecipe recipe = entry.getKey();
 			List<Engine> engines = entry.getValue();
 			speedPlans.put(recipe, speedRatio * recipe.getMaxSpeed());
-			speedPredict.put(recipe, new EngineSpeedPlan(engines, new FuelBurning(0.0D, 0.0D), 0.0D));
+			speedPredict.put(recipe, new EngineSpeedPlan(engines, new FuelBurning(false, 0.0D, 0.0D), 0.0D));
 		}
 
 		double heatSpeedLimit = heatState.speedLimit();
@@ -890,12 +890,21 @@ public class TrainHelper
 
 	public static FuelBurning burnFuel(Train train, TrainEngineTypeRecipe recipe, int engineCount, double speed, int heatLevel, boolean simulate)
 	{
-		List<FluidTagEntry> fuelType = recipe.getFuelTypes();
 		double totalToBurn = recipe.getFuelUsage(speed, heatLevel) / 20.0D * engineCount;
-		double totalBurned = ((TrainExtension) train).getFuelBurner().burn(train, fuelType, totalToBurn, simulate);
 		double eachToBurn = totalToBurn / engineCount;
-		double eachBurned = totalBurned / engineCount;
-		return new FuelBurning(eachToBurn, eachBurned);
+
+		if (speed > 0.0D)
+		{
+			List<FluidTagEntry> fuelType = recipe.getFuelTypes();
+			double totalBurned = ((TrainExtension) train).getFuelBurner().burn(train, fuelType, totalToBurn, simulate);
+			double eachBurned = totalBurned / engineCount;
+			return new FuelBurning(true, eachToBurn, eachBurned);
+		}
+		else
+		{
+			return new FuelBurning(false, eachToBurn, 0.0D);
+		}
+
 	}
 
 	public static double getCarriagesSpeedReductionRatio(Train train)

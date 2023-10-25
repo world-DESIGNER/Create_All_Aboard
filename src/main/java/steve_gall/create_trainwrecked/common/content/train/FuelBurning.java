@@ -1,15 +1,31 @@
 package steve_gall.create_trainwrecked.common.content.train;
 
-public record FuelBurning(double toBurn, double burned)
+public record FuelBurning(boolean tried, double toBurn, double burned)
 {
 	public boolean isUsed()
 	{
-		return this.toBurn() > 0.0D ? (this.burned() > 0.0D) : true;
+		if (this.tried())
+		{
+			return this.toBurn() > 0.0D && this.burned() > 0.0D;
+		}
+		else
+		{
+			return false;
+		}
+
 	}
 
 	public double getUsedRatio()
 	{
-		return this.toBurn() > 0.0D ? (this.burned() / this.toBurn()) : 1.0D;
+		if (this.tried())
+		{
+			return this.toBurn() > 0.0D ? this.burned() / this.toBurn() : 0.0D;
+		}
+		else
+		{
+			return 0.0D;
+		}
+
 	}
 
 }

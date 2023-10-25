@@ -72,7 +72,15 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 
 			if (fuelPerHeatLevel > 0.0D)
 			{
-				burnedBySpeed = burnedBySpeed / (heatLevel * fuelPerHeatLevel);
+				if (heatLevel <= 0)
+				{
+					burnedBySpeed = 0.0D;
+				}
+				else
+				{
+					burnedBySpeed = burnedBySpeed / (heatLevel * fuelPerHeatLevel);
+				}
+
 			}
 
 			return burnedBySpeed * 20.0D / fuelPerSpeed;

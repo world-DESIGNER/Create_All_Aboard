@@ -1,8 +1,0 @@
-{
-  "type": "create_trainwrecked:train_heat_source",
-  "blockType": "createlowheated:charcoal_burner",
-  "stage": {
-    "ingredientType": "burn_time",
-    "level": 1
-  }
-}

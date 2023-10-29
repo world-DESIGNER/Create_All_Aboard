@@ -1,0 +1,7 @@
+{
+  "type": "create_all_aboard:train_engine_coolant",
+  "cooling": 80,
+  "item": {
+    "item": "minecraft:snow"
+  }
+}

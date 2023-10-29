@@ -1,0 +1,18 @@
+{
+  "type": "create:filling",
+  "ingredients": [
+    {
+      "item": "create:steam_engine"
+    },
+    {
+      "amount": 1000,
+      "fluid": "minecraft:water",
+      "nbt": {}
+    }
+  ],
+  "results": [
+    {
+      "item": "create_all_aboard:train_steam_engine"
+    }
+  ]
+}

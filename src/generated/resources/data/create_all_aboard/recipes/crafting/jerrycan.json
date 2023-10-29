@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "b": {
+      "item": "minecraft:bucket"
+    },
+    "i": {
+      "tag": "forge:ingots/iron"
+    },
+    "p": {
+      "item": "create:fluid_pipe"
+    }
+  },
+  "pattern": [
+    "pii",
+    "ibb",
+    "ibb"
+  ],
+  "result": {
+    "item": "create_all_aboard:jerrycan"
+  }
+}

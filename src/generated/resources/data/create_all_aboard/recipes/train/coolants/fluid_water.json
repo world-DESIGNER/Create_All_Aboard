@@ -1,0 +1,9 @@
+{
+  "type": "create_all_aboard:train_engine_coolant",
+  "cooling": 4,
+  "fluid": {
+    "amount": 1,
+    "fluid": "minecraft:water",
+    "nbt": {}
+  }
+}

@@ -150,7 +150,7 @@ public class JerrycanItem extends Item
 	@Override
 	public ICapabilityProvider initCapabilities(ItemStack stack, CompoundTag nbt)
 	{
-		return new FluidHandlerItemStack(stack, CreateTrainwreckedConfig.COMMON.oilGunCapacity.get());
+		return new FluidHandlerItemStack(stack, CreateTrainwreckedConfig.COMMON.jerryCanCapacity.get());
 	}
 
 	@Override
@@ -204,7 +204,7 @@ public class JerrycanItem extends Item
 
 	private FluidStack move(Player pPlayer, IFluidHandlerItem jerrycan, IFluidHandler fluidStorage)
 	{
-		int transfer = CreateTrainwreckedConfig.COMMON.oilGunTransfer.get();
+		int transfer = CreateTrainwreckedConfig.COMMON.jerryCanTransfer.get();
 		boolean shiftKeyDown = pPlayer.isShiftKeyDown();
 		IFluidHandler from = shiftKeyDown ? jerrycan : fluidStorage;
 		IFluidHandler to = shiftKeyDown ? fluidStorage : jerrycan;

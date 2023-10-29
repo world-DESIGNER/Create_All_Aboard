@@ -20,8 +20,8 @@ public class CommonConfig
 	public final ConfigValue<Float> carriageSpeedStress;
 	public final ConfigValue<Integer> carriageBlocksLimit;
 
-	public final ConfigValue<Integer> oilGunCapacity;
-	public final ConfigValue<Integer> oilGunTransfer;
+	public final ConfigValue<Integer> jerryCanCapacity;
+	public final ConfigValue<Integer> jerryCanTransfer;
 
 	public CommonConfig()
 	{
@@ -38,9 +38,9 @@ public class CommonConfig
 		this.carriageBlocksLimit = builder.define("blocks_limit", 50);
 		builder.pop();
 
-		builder.push("oil_gun");
-		this.oilGunCapacity = builder.define("capacity", FluidType.BUCKET_VOLUME * 4);
-		this.oilGunTransfer = builder.define("transfer", FluidType.BUCKET_VOLUME);
+		builder.push("jerry_can");
+		this.jerryCanCapacity = builder.define("capacity", FluidType.BUCKET_VOLUME * 4);
+		this.jerryCanTransfer = builder.define("transfer", FluidType.BUCKET_VOLUME);
 		builder.pop();
 
 		this.configSpec = builder.build();

@@ -12,8 +12,8 @@
     "explosionMode": "none",
     "explosionRadius": 5.0
   },
+  "fuelPerDistance": 1.0,
   "fuelPerHeatLevel": 3.736920777279521,
-  "fuelPerSpeed": 1.0,
   "fuelType": "minecraft:water",
   "heatCapacity": 0,
   "heatPerFuel": 0.0,

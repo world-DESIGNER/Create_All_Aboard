@@ -29,7 +29,7 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 	private final double carriageStressMultiplier;
 	private final List<FluidTagEntry> fuelTypes;
 	private final boolean limitableByHeat;
-	private final double fuelPerSpeed;
+	private final double fuelPerDistance;
 	private final double fuelPerHeatLevel;
 	private final int heatCapacity;
 	private final double heatPerFuel;
@@ -49,7 +49,7 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 		this.carriageStressMultiplier = builder.carriageStressMultiplier();
 		this.fuelTypes = Collections.unmodifiableList(builder.fuelType());
 		this.limitableByHeat = builder.limitableByHeat();
-		this.fuelPerSpeed = builder.fuelPerSpeed();
+		this.fuelPerDistance = builder.fuelPerDistance();
 		this.fuelPerHeatLevel = builder.fuelPerHeatLevel();
 		this.heatCapacity = builder.heatCapacity();
 		this.heatPerFuel = builder.heatPerFuel();
@@ -63,9 +63,9 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 
 	public double getPredictSpeed(double toBurn, double burned, double allocatedSpeed, int heatLevel)
 	{
-		double fuelPerSpeed = this.getFuelPerSpeed();
+		double fuelPerDistance = this.getFuelPerDistance();
 
-		if (fuelPerSpeed > 0.0D)
+		if (fuelPerDistance > 0.0D)
 		{
 			double fuelPerHeatLevel = this.getFuelPerHeatLevel();
 			double burnedBySpeed = burned;
@@ -83,7 +83,7 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 
 			}
 
-			return burnedBySpeed * 20.0D / fuelPerSpeed;
+			return burnedBySpeed * 20.0D / fuelPerDistance;
 		}
 		else if (burned > 0)
 		{
@@ -98,12 +98,12 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 
 	public double getFuelUsage(double speed, int heatLevel)
 	{
-		return getFuelUsage(this.getFuelPerSpeed(), this.getFuelPerHeatLevel(), speed, heatLevel);
+		return getFuelUsage(this.getFuelPerDistance(), this.getFuelPerHeatLevel(), speed, heatLevel);
 	}
 
-	public static double getFuelUsage(double fuelPerSpeed, double fuelPerHeatLevel, double speed, int heatLevel)
+	public static double getFuelUsage(double fuelPerDistance, double fuelPerHeatLevel, double speed, int heatLevel)
 	{
-		double fuelUsage = speed * fuelPerSpeed;
+		double fuelUsage = speed * fuelPerDistance;
 
 		if (fuelPerHeatLevel > 0.0D)
 		{
@@ -197,7 +197,7 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 		pJson.addProperty("carriageStressMultiplier", this.getCarriageStressMultiplier());
 		pJson.add("fuelType", FluidTagEntry.TYPE.listToJson(this.getFuelTypes()));
 		pJson.addProperty("limitableByHeat", this.isLimitableByHeat());
-		pJson.addProperty("fuelPerSpeed", this.getFuelPerSpeed());
+		pJson.addProperty("fuelPerDistance", this.getFuelPerDistance());
 		pJson.addProperty("fuelPerHeatLevel", this.getFuelPerHeatLevel());
 		pJson.addProperty("heatCapacity", this.getHeatCapacity());
 		pJson.addProperty("heatPerFuel", this.getHeatPerFuel());
@@ -221,7 +221,7 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 		pBuffer.writeDouble(this.getCarriageStressMultiplier());
 		FluidTagEntry.TYPE.listToNetowrk(pBuffer, this.getFuelTypes());
 		pBuffer.writeBoolean(this.isLimitableByHeat());
-		pBuffer.writeDouble(this.getFuelPerSpeed());
+		pBuffer.writeDouble(this.getFuelPerDistance());
 		pBuffer.writeDouble(this.getFuelPerHeatLevel());
 		pBuffer.writeInt(this.getHeatCapacity());
 		pBuffer.writeDouble(this.getHeatPerFuel());
@@ -276,9 +276,9 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 		return this.limitableByHeat;
 	}
 
-	public double getFuelPerSpeed()
+	public double getFuelPerDistance()
 	{
-		return this.fuelPerSpeed;
+		return this.fuelPerDistance;
 	}
 
 	public double getFuelPerHeatLevel()
@@ -341,7 +341,7 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 		private double carriageStressMultiplier = 1.0D;
 		private List<FluidTagEntry> fuelType = new ArrayList<>();
 		private boolean limitableByHeat = false;
-		private double fuelPerSpeed = 0.0D;
+		private double fuelPerDistance = 0.0D;
 		private double fuelPerHeatLevel = 0.0D;
 		private int heatCapacity = 0;
 		private double heatPerFuel = 0.0D;
@@ -362,7 +362,7 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 			this.carriageStressMultiplier(GsonHelper.getAsFloat(pJson, "carriageStressMultiplier"));
 			this.fuelType().addAll(FluidTagEntry.TYPE.getAsTagEntryList(pJson, "fuelType"));
 			this.limitableByHeat(GsonHelper.getAsBoolean(pJson, "limitableByHeat"));
-			this.fuelPerSpeed(GsonHelper.getAsDouble(pJson, "fuelPerSpeed"));
+			this.fuelPerDistance(GsonHelper.getAsDouble(pJson, "fuelPerDistance"));
 			this.fuelPerHeatLevel(GsonHelper.getAsDouble(pJson, "fuelPerHeatLevel"));
 			this.heatCapacity(GsonHelper.getAsInt(pJson, "heatCapacity"));
 			this.heatPerFuel(GsonHelper.getAsDouble(pJson, "heatPerFuel"));
@@ -386,7 +386,7 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 			this.carriageStressMultiplier(pBuffer.readDouble());
 			this.fuelType().addAll(FluidTagEntry.TYPE.listFromNetwork(pBuffer));
 			this.limitableByHeat(pBuffer.readBoolean());
-			this.fuelPerSpeed(pBuffer.readDouble());
+			this.fuelPerDistance(pBuffer.readDouble());
 			this.fuelPerHeatLevel(pBuffer.readDouble());
 			this.heatCapacity(pBuffer.readInt());
 			this.heatPerFuel(pBuffer.readDouble());
@@ -467,14 +467,14 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 			return (T) this;
 		}
 
-		public double fuelPerSpeed()
+		public double fuelPerDistance()
 		{
-			return this.fuelPerSpeed;
+			return this.fuelPerDistance;
 		}
 
-		public T fuelPerSpeed(double fuelPerSpeed)
+		public T fuelPerDistance(double fuelPerDistance)
 		{
-			this.fuelPerSpeed = Math.max(fuelPerSpeed, 0.0D);
+			this.fuelPerDistance = Math.max(fuelPerDistance, 0.0D);
 			return (T) this;
 		}
 

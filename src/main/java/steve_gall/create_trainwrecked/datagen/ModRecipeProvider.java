@@ -89,7 +89,7 @@ public class ModRecipeProvider extends RecipeProvider
 		steam.carriageStressMultiplier(0.75D);
 		steam.fuelType(FluidTagEntry.TYPE.of(Fluids.WATER));
 		steam.limitableByHeat(true);
-		steam.fuelPerSpeed(1.0D);
+		steam.fuelPerDistance(1.0D);
 		steam.fuelPerHeatLevel(FluidType.BUCKET_VOLUME / 267.6D);
 		steam.overheatedResettingTemp(0.0D);
 		steam.heatCapacity(0);
@@ -104,7 +104,7 @@ public class ModRecipeProvider extends RecipeProvider
 		diesel.acceleration(diesel.maxSpeed() / 5.0F);
 		diesel.fuelType(FluidTagEntry.TYPE.of(FluidTags.create(new ResourceLocation("forge", "diesel"))));
 		diesel.fuelType(FluidTagEntry.TYPE.of(FluidTags.create(new ResourceLocation("forge", "biodiesel"))));
-		diesel.fuelPerSpeed(8000.0D / 1800.0D / 40.0D / 2.0D);
+		diesel.fuelPerDistance(8000.0D / 1800.0D / 40.0D / 2.0D);
 		diesel.heatPerFuel(27.0D);
 		diesel.overheatedResettingTemp(0.1D);
 		this.solveHeatVariables(diesel, 10 * 60, 5 * 60);
@@ -113,7 +113,7 @@ public class ModRecipeProvider extends RecipeProvider
 
 	public void solveHeatVariables(TrainEngineTypeRecipe.Builder<?> engineType, double airCoolingDurationToZero, double heatDurability)
 	{
-		double fuelUsage = engineType.maxSpeed() * engineType.fuelPerSpeed() * engineType.heatPerFuel();
+		double fuelUsage = engineType.maxSpeed() * engineType.fuelPerDistance() * engineType.heatPerFuel();
 		double denominator = 1.0D + (airCoolingDurationToZero / heatDurability);
 		engineType.airCoolingRate(fuelUsage / denominator);
 		engineType.heatCapacity((int) (heatDurability * (fuelUsage - engineType.airCoolingRate())));

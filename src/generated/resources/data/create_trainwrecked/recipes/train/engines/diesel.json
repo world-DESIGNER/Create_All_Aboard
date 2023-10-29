@@ -8,8 +8,8 @@
     "createdieselgenerators:large_diesel_engine"
   ],
   "carriageStressMultiplier": 1.0,
+  "fuelPerDistance": 0.05555555555555556,
   "fuelPerHeatLevel": 0.0,
-  "fuelPerSpeed": 0.05555555555555556,
   "fuelType": [
     "#forge:diesel",
     "#forge:biodiesel"

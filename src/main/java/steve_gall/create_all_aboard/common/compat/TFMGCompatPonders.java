@@ -1,4 +1,4 @@
-package steve_gall.create_all_aboard.client.compat;
+package steve_gall.create_all_aboard.common.compat;
 
 import static steve_gall.create_all_aboard.client.init.ModPonders.OUT_LINE_SHOW_TIME;
 import static steve_gall.create_all_aboard.client.init.ModPonders.SECTION_FADING_TIME;

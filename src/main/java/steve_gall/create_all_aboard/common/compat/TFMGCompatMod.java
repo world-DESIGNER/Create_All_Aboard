@@ -1,4 +1,4 @@
-package steve_gall.create_all_aboard.client.compat;
+package steve_gall.create_all_aboard.common.compat;
 
 public class TFMGCompatMod extends CompatibilityMod
 {
@@ -19,7 +19,15 @@ public class TFMGCompatMod extends CompatibilityMod
 	@Override
 	protected Runnable getClientInitializer()
 	{
-		return TFMGCompatModClient::init;
+		return null;
+	}
+
+	@Override
+	public void initPonders()
+	{
+		super.initPonders();
+
+		TFMGCompatPonders.init();
 	}
 
 }

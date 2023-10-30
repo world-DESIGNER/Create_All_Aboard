@@ -1,4 +1,4 @@
-package steve_gall.create_all_aboard.client.compat;
+package steve_gall.create_all_aboard.common.compat;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
@@ -51,6 +51,11 @@ public abstract class CompatibilityMod
 	public ResourceLocation asResource(String path)
 	{
 		return new ResourceLocation(this.getModId(), path);
+	}
+
+	public void initPonders()
+	{
+
 	}
 
 }

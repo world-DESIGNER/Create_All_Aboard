@@ -30,5 +30,6 @@
     "recipes": [
       "create_all_aboard:crafting/jerrycan"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

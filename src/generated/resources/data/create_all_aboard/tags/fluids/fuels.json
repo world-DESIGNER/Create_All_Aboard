@@ -1,0 +1,6 @@
+{
+  "values": [
+    "#create_all_aboard:fuels/steam",
+    "#create_all_aboard:fuels/diesel"
+  ]
+}

@@ -2,18 +2,11 @@
   "type": "create_all_aboard:train_engine_type",
   "acceleration": 8.0,
   "airCoolingRate": 20.0,
-  "blockType": [
-    "createindustry:diesel_engine",
-    "createdieselgenerators:diesel_engine",
-    "createdieselgenerators:large_diesel_engine"
-  ],
+  "blockType": "#create_all_aboard:engines/diesel",
   "carriageStressMultiplier": 1.0,
   "fuelPerDistance": 0.05555555555555556,
   "fuelPerHeatLevel": 0.0,
-  "fuelType": [
-    "#forge:diesel",
-    "#forge:biodiesel"
-  ],
+  "fuelType": "#create_all_aboard:fuels/diesel",
   "heatCapacity": 12000,
   "heatPerFuel": 27.0,
   "limitableByHeat": false,

@@ -16,7 +16,6 @@ import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagEntry;
 import net.minecraft.world.item.Item;
@@ -35,8 +34,8 @@ import steve_gall.create_all_aboard.common.crafting.HeatStage;
 import steve_gall.create_all_aboard.common.crafting.TrainEngineCoolantRecipe;
 import steve_gall.create_all_aboard.common.crafting.TrainEngineTypeRecipe;
 import steve_gall.create_all_aboard.common.crafting.TrainHeatSourceRecipe;
-import steve_gall.create_all_aboard.common.init.ModBlocks;
 import steve_gall.create_all_aboard.common.init.ModItems;
+import steve_gall.create_all_aboard.common.init.ModTags;
 import steve_gall.create_all_aboard.common.util.FluidTagEntry;
 import steve_gall.create_all_aboard.common.util.ItemTagEntry;
 
@@ -81,12 +80,11 @@ public class ModRecipeProvider extends RecipeProvider
 	public void engineTypes(Consumer<FinishedRecipe> pWriter)
 	{
 		TrainEngineTypeRecipe.Builder<?> steam = new TrainEngineTypeRecipe.Builder<>();
-		steam.blockType(ItemTagEntry.TYPE.of(AllBlocks.STEAM_ENGINE.get()));
-		steam.blockType(ItemTagEntry.TYPE.of(ModBlocks.TRAIN_STEAM_ENGINE.get()));
+		steam.blockType(ItemTagEntry.TYPE.of(ModTags.Items.ENGINES_STEAM));
 		steam.maxSpeed(50.0F);
 		steam.acceleration(steam.maxSpeed() / 60.0F);
 		steam.carriageStressMultiplier(0.75D);
-		steam.fuelType(FluidTagEntry.TYPE.of(Fluids.WATER));
+		steam.fuelType(FluidTagEntry.TYPE.of(ModTags.Fluids.FUELS_STEAM));
 		steam.limitableByHeat(true);
 		steam.fuelPerDistance(1.0D);
 		steam.fuelPerHeatLevel(FluidType.BUCKET_VOLUME / 267.6D);
@@ -96,14 +94,10 @@ public class ModRecipeProvider extends RecipeProvider
 		this.save(pWriter, steam, "steam");
 
 		TrainEngineTypeRecipe.Builder<?> diesel = new TrainEngineTypeRecipe.Builder<>();
-		diesel.blockType(ItemTagEntry.TYPE.of(TagEntry.element(new ResourceLocation("createindustry", "diesel_engine"))));
-		diesel.blockType(ItemTagEntry.TYPE.of(TagEntry.element(new ResourceLocation("createdieselgenerators", "diesel_engine"))));
-		diesel.blockType(ItemTagEntry.TYPE.of(TagEntry.element(new ResourceLocation("createdieselgenerators", "large_diesel_engine"))));
-
+		diesel.blockType(ItemTagEntry.TYPE.of(ModTags.Items.ENGINES_DIESEL));
 		diesel.maxSpeed(40.0F);
 		diesel.acceleration(diesel.maxSpeed() / 5.0F);
-		diesel.fuelType(FluidTagEntry.TYPE.of(FluidTags.create(new ResourceLocation("forge", "diesel"))));
-		diesel.fuelType(FluidTagEntry.TYPE.of(FluidTags.create(new ResourceLocation("forge", "biodiesel"))));
+		diesel.fuelType(FluidTagEntry.TYPE.of(ModTags.Fluids.FUELS_DIESEL));
 		diesel.fuelPerDistance(8000.0D / 1800.0D / 40.0D / 2.0D);
 		diesel.heatPerFuel(27.0D);
 		diesel.overheatedResettingTemp(0.1D);

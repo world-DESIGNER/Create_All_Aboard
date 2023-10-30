@@ -1,13 +1,9 @@
 package steve_gall.create_all_aboard.datagen;
 
-import java.util.Map;
-
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.simibubi.create.Create;
 import com.simibubi.create.foundation.ponder.PonderLocalization;
 
-import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraftforge.common.data.LanguageProvider;
 import steve_gall.create_all_aboard.client.content.train.StationScreenHelper;
 import steve_gall.create_all_aboard.client.jei.TrainEngineCoolantCategory;
@@ -20,9 +16,9 @@ import steve_gall.create_all_aboard.common.item.JerrycanItem;
 
 public class ModLanguageProvider extends LanguageProvider
 {
-	public ModLanguageProvider(DataGenerator gen)
+	public ModLanguageProvider(PackOutput output)
 	{
-		super(gen, CreateAllAboard.MOD_ID, "en_us");
+		super(output, CreateAllAboard.MOD_ID, "en_us");
 	}
 
 	@Override
@@ -120,14 +116,25 @@ public class ModLanguageProvider extends LanguageProvider
 	private void addPonder()
 	{
 		PonderLocalization.generateSceneLang();
-		JsonObject object = new JsonObject();
-		PonderLocalization.record(CreateAllAboard.MOD_ID, object);
+		PonderLocalization.provideLang(CreateAllAboard.MOD_ID, this::add);
 
-		for (Map.Entry<String, JsonElement> entry : object.entrySet())
-		{
-			this.add(entry.getKey(), entry.getValue().getAsString());
-		}
-
+		this.add("create_all_aboard.ponder.diesel_engine.header", "Diesel Engine");
+		this.add("create_all_aboard.ponder.diesel_engine.text_1", "Diesel engine is an advanced form of engine.");
+		this.add("create_all_aboard.ponder.diesel_engine.text_2", "When installed on a train with a diesel-filled tank...");
+		this.add("create_all_aboard.ponder.diesel_engine.text_3", "The train automatically consumes the diesel in the tank.");
+		this.add("create_all_aboard.ponder.diesel_engine.text_4", "The train automatically consumes the diesel in the tank.");
+		this.add("create_all_aboard.ponder.diesel_engine.text_5", "Diesel engines do not require a heat source!");
+		this.add("create_all_aboard.ponder.diesel_engine.text_6", "Diesel engines perform better than steam engines in terms of efficiency.");
+		this.add("create_all_aboard.ponder.overheat.header", "Overheat");
+		this.add("create_all_aboard.ponder.overheat.text_1", "If the engine is left running for a long time...");
+		this.add("create_all_aboard.ponder.overheat.text_2", "The engine overheats and stops working.");
+		this.add("create_all_aboard.ponder.overheat.text_3", "To prevent this, ice can be used.");
+		this.add("create_all_aboard.ponder.overheat.text_4", "Not only ice, but all ice-related items can be used.");
+		this.add("create_all_aboard.ponder.overheat.text_5", "The degree to which the engine cools varies depending on the coldness of the item.");
+		this.add("create_all_aboard.ponder.overheat.text_6", "Ice inside the train's chest or barrel is automatically consumed by the train.");
+		this.add("create_all_aboard.ponder.overheat.text_7", "Ice in the item vault is not consumed.");
+		this.add("create_all_aboard.ponder.overheat.text_8", "If the engine is left alone for a sufficient amount of time while overheated...");
+		this.add("create_all_aboard.ponder.overheat.text_9", "The engine cools down, allowing it to operate again.");
 	}
 
 }

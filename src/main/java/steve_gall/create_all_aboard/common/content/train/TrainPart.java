@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import com.simibubi.create.content.trains.entity.Train;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.resources.ResourceLocation;
@@ -41,7 +42,7 @@ public abstract class TrainPart<RECIPE extends Recipe<Container>>
 	public TrainPart(CompoundTag tag)
 	{
 		this.localPos = NbtUtils.readBlockPos(tag.getCompound("localPos"));
-		this.blockState = NbtUtils.readBlockState(tag.getCompound("blockState"));
+		this.blockState = NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), tag.getCompound("blockState"));
 		this.item = ItemStack.of(tag.getCompound("item"));
 
 		this.readSyncData(tag);

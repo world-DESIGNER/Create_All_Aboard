@@ -24,6 +24,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.registries.ForgeRegistries;
 import steve_gall.create_all_aboard.common.CreateAllAboard;
+import steve_gall.create_all_aboard.common.compat.CompatibilityManager;
 import steve_gall.create_all_aboard.common.init.ModBlocks;
 
 public class ModPonders
@@ -53,6 +54,14 @@ public class ModPonders
 
 	public static void init()
 	{
+		CompatibilityManager.MODS.forEach(m ->
+		{
+			if (m.isLoaded())
+			{
+				m.initPonders();
+			}
+
+		});
 
 	}
 

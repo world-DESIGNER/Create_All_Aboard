@@ -1,13 +1,13 @@
 package steve_gall.create_all_aboard.datagen;
 
-import net.minecraft.data.loot.BlockLoot;
+import net.minecraft.data.loot.packs.VanillaBlockLoot;
 import net.minecraft.world.level.block.Block;
 import steve_gall.create_all_aboard.common.init.ModBlocks;
 
-public class ModBlockLoot extends BlockLoot
+public class ModBlockLoot extends VanillaBlockLoot
 {
 	@Override
-	protected void addTables()
+	protected void generate()
 	{
 		this.dropSelf(ModBlocks.TRAIN_STEAM_ENGINE.get());
 	}

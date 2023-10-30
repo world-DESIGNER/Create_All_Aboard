@@ -3,7 +3,6 @@ package steve_gall.create_all_aboard.client.jei;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.AllBlocks;
 
 import mezz.jei.api.constants.VanillaTypes;
@@ -16,6 +15,7 @@ import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -54,8 +54,10 @@ public class TrainHeatSourceCategory extends ModJEIRecipeCategory<TrainHeatSourc
 	}
 
 	@Override
-	public void draw(TrainHeatSourceRecipe recipe, IRecipeSlotsView slotsView, PoseStack stack, double mouseX, double mouseY)
+	public void draw(TrainHeatSourceRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY)
 	{
+		super.draw(recipe, recipeSlotsView, guiGraphics, mouseX, mouseY);
+
 		Minecraft minecraft = Minecraft.getInstance();
 		Font font = minecraft.font;
 
@@ -83,27 +85,27 @@ public class TrainHeatSourceCategory extends ModJEIRecipeCategory<TrainHeatSourc
 
 		}
 
-		textY = this.drawHeatSource(stack, font, textX, textY, textColor, passiveStage);
+		textY = this.drawHeatSource(guiGraphics, font, textX, textY, textColor, passiveStage);
 
 		for (HeatStage stage : ingredientStages)
 		{
-			textY = this.drawHeatSource(stack, font, textX, textY, textColor, stage);
+			textY = this.drawHeatSource(guiGraphics, font, textX, textY, textColor, stage);
 		}
 
 	}
 
-	private int drawHeatSource(PoseStack stack, Font font, int textX, int textY, int textColor, HeatStage stage)
+	private int drawHeatSource(GuiGraphics guiGraphics, Font font, int textX, int textY, int textColor, HeatStage stage)
 	{
 		HeatStage.IngredientType ingredientType = stage.getIngredientType();
 
-		font.draw(stack, Component.translatable(ingredientType == HeatStage.IngredientType.PASSIVE ? "Passive" : "On item burned"), textX + 18, textY, textColor);
+		guiGraphics.drawString(font, Component.translatable(ingredientType == HeatStage.IngredientType.PASSIVE ? "Passive" : "On item burned"), textX + 18, textY, textColor, false);
 		textY += font.lineHeight;
-		font.draw(stack, Component.translatable("Heat Level: " + stage.getLevel()), textX + 18, textY, textColor);
+		guiGraphics.drawString(font, Component.translatable("Heat Level: " + stage.getLevel()), textX + 18, textY, textColor, false);
 		textY += font.lineHeight;
 
 		if (stage.getLevel() > 0)
 		{
-			font.draw(stack, Component.translatable("Speed Limit: %s m/s", NumberHelper.format(stage.getSpeedLimit(), 2)), textX + 18, textY, textColor);
+			guiGraphics.drawString(font, Component.translatable("Speed Limit: %s m/s", NumberHelper.format(stage.getSpeedLimit(), 2)), textX + 18, textY, textColor, false);
 		}
 
 		textY += font.lineHeight;

@@ -7,13 +7,13 @@ import com.google.gson.JsonObject;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.GsonHelper;
-import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.Level;
 
 public class CrashBehavior
 {
 	private final float explosionRadius;
 	private final boolean causesFire;
-	private final Explosion.BlockInteraction explosionMode;
+	private final Level.ExplosionInteraction explosionMode;
 
 	public CrashBehavior(Builder builder)
 	{
@@ -58,7 +58,7 @@ public class CrashBehavior
 		return this.causesFire;
 	}
 
-	public Explosion.BlockInteraction getExplosionMode()
+	public Level.ExplosionInteraction getExplosionMode()
 	{
 		return this.explosionMode;
 	}
@@ -67,7 +67,7 @@ public class CrashBehavior
 	{
 		private float explosionRadius = 0.0F;
 		private boolean causesFire = false;
-		private Explosion.BlockInteraction explosionMode = Explosion.BlockInteraction.NONE;
+		private Level.ExplosionInteraction explosionMode = Level.ExplosionInteraction.NONE;
 
 		public Builder()
 		{
@@ -79,14 +79,14 @@ public class CrashBehavior
 			JsonObject jobject = json.getAsJsonObject();
 			this.explosionRadius(GsonHelper.getAsFloat(jobject, "explosionRadius", 0.0F));
 			this.causesFire(GsonHelper.getAsBoolean(jobject, "causesFire"));
-			this.explosionMode(EnumUtils.getEnumIgnoreCase(Explosion.BlockInteraction.class, GsonHelper.getAsString(jobject, "explosionMode"), Explosion.BlockInteraction.NONE));
+			this.explosionMode(EnumUtils.getEnumIgnoreCase(Level.ExplosionInteraction.class, GsonHelper.getAsString(jobject, "explosionMode"), Level.ExplosionInteraction.NONE));
 		}
 
 		public Builder(FriendlyByteBuf buffer)
 		{
 			this.explosionRadius(buffer.readFloat());
 			this.causesFire(buffer.readBoolean());
-			this.explosionMode(buffer.readEnum(Explosion.BlockInteraction.class));
+			this.explosionMode(buffer.readEnum(Level.ExplosionInteraction.class));
 		}
 
 		public CrashBehavior build()
@@ -116,12 +116,12 @@ public class CrashBehavior
 			return this;
 		}
 
-		public Explosion.BlockInteraction explosionMode()
+		public Level.ExplosionInteraction explosionMode()
 		{
 			return this.explosionMode;
 		}
 
-		public Builder explosionMode(Explosion.BlockInteraction explosionMode)
+		public Builder explosionMode(Level.ExplosionInteraction explosionMode)
 		{
 			this.explosionMode = explosionMode;
 			return this;

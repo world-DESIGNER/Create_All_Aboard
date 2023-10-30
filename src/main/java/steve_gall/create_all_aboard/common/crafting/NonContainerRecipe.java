@@ -1,5 +1,6 @@
 package steve_gall.create_all_aboard.common.crafting;
 
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
@@ -14,9 +15,9 @@ public interface NonContainerRecipe extends Recipe<Container>
 	}
 
 	@Override
-	public default ItemStack assemble(Container pContainer)
+	public default ItemStack assemble(Container pContainer, RegistryAccess pRegistryAccess)
 	{
-		return this.getResultItem();
+		return this.getResultItem(pRegistryAccess);
 	}
 
 	@Override
@@ -26,7 +27,7 @@ public interface NonContainerRecipe extends Recipe<Container>
 	}
 
 	@Override
-	public default ItemStack getResultItem()
+	default ItemStack getResultItem(RegistryAccess pRegistryAccess)
 	{
 		return ItemStack.EMPTY;
 	}

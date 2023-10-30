@@ -5,15 +5,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.drmangotea.createindustry.registry.CIBlocks;
-import com.jesz.createdieselgenerators.blocks.BlockRegistry;
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.Create;
 import com.simibubi.create.foundation.fluid.FluidIngredient;
 
-import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeBuilder;
+import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
@@ -23,7 +22,7 @@ import net.minecraft.tags.TagEntry;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.level.Explosion.BlockInteraction;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.common.crafting.conditions.ICondition;
@@ -45,41 +44,41 @@ public class ModRecipeProvider extends RecipeProvider
 {
 	private final String modId;
 
-	public ModRecipeProvider(DataGenerator pGenerator)
+	public ModRecipeProvider(PackOutput pOutput)
 	{
-		super(pGenerator);
+		super(pOutput);
 		this.modId = CreateAllAboard.MOD_ID;
 	}
 
 	@Override
-	protected void buildCraftingRecipes(Consumer<FinishedRecipe> pFinishedRecipeConsumer)
+	protected void buildRecipes(Consumer<FinishedRecipe> pWriter)
 	{
-		this.crafting(pFinishedRecipeConsumer);
+		this.crafting(pWriter);
 
-		this.engineTypes(pFinishedRecipeConsumer);
-		this.engineCoolants(pFinishedRecipeConsumer);
-		this.heatSources(pFinishedRecipeConsumer);
+		this.engineTypes(pWriter);
+		this.engineCoolants(pWriter);
+		this.heatSources(pWriter);
 	}
 
-	private void crafting(Consumer<FinishedRecipe> pFinishedRecipeConsumer)
+	private void crafting(Consumer<FinishedRecipe> pWriter)
 	{
-		this.save(ShapedRecipeBuilder.shaped(ModItems.JERRYCAN.get()).//
+		this.save(ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.JERRYCAN.get()).//
 				pattern("pii").//
 				pattern("ibb").//
 				pattern("ibb").//
 				define('p', AllBlocks.FLUID_PIPE.get()).//
 				define('i', ItemTags.create(new ResourceLocation("forge", "ingots/iron"))).//
-				define('b', Items.BUCKET), pFinishedRecipeConsumer);
+				define('b', Items.BUCKET), pWriter);
 	}
 
-	private void save(ShapedRecipeBuilder builder, Consumer<FinishedRecipe> pFinishedRecipeConsumer)
+	private void save(ShapedRecipeBuilder builder, Consumer<FinishedRecipe> pWriter)
 	{
 		Item result = builder.getResult();
 		ResourceLocation path = RecipeBuilder.getDefaultRecipeId(result);
-		builder.unlockedBy(getHasName(result), has(result)).save(pFinishedRecipeConsumer, new ResourceLocation(path.getNamespace(), "crafting/" + path.getPath()));
+		builder.unlockedBy(getHasName(result), has(result)).save(pWriter, new ResourceLocation(path.getNamespace(), "crafting/" + path.getPath()));
 	}
 
-	public void engineTypes(Consumer<FinishedRecipe> pFinishedRecipeConsumer)
+	public void engineTypes(Consumer<FinishedRecipe> pWriter)
 	{
 		TrainEngineTypeRecipe.Builder<?> steam = new TrainEngineTypeRecipe.Builder<>();
 		steam.blockType(ItemTagEntry.TYPE.of(AllBlocks.STEAM_ENGINE.get()));
@@ -93,13 +92,14 @@ public class ModRecipeProvider extends RecipeProvider
 		steam.fuelPerHeatLevel(FluidType.BUCKET_VOLUME / 267.6D);
 		steam.overheatedResettingTemp(0.0D);
 		steam.heatCapacity(0);
-		steam.crashBehavior(new CrashBehavior.Builder().explosionRadius(5.0F).causesFire(true).explosionMode(BlockInteraction.NONE).build());
-		this.save(pFinishedRecipeConsumer, steam, "steam");
+		steam.crashBehavior(new CrashBehavior.Builder().explosionRadius(5.0F).causesFire(true).explosionMode(Level.ExplosionInteraction.NONE).build());
+		this.save(pWriter, steam, "steam");
 
 		TrainEngineTypeRecipe.Builder<?> diesel = new TrainEngineTypeRecipe.Builder<>();
-		diesel.blockType(ItemTagEntry.TYPE.of(CIBlocks.DIESEL_ENGINE.get()));
-		diesel.blockType(ItemTagEntry.TYPE.of(BlockRegistry.DIESEL_ENGINE.get()));
-		diesel.blockType(ItemTagEntry.TYPE.of(BlockRegistry.MODULAR_DIESEL_ENGINE.get()));
+		diesel.blockType(ItemTagEntry.TYPE.of(TagEntry.element(new ResourceLocation("createindustry", "diesel_engine"))));
+		diesel.blockType(ItemTagEntry.TYPE.of(TagEntry.element(new ResourceLocation("createdieselgenerators", "diesel_engine"))));
+		diesel.blockType(ItemTagEntry.TYPE.of(TagEntry.element(new ResourceLocation("createdieselgenerators", "large_diesel_engine"))));
+
 		diesel.maxSpeed(40.0F);
 		diesel.acceleration(diesel.maxSpeed() / 5.0F);
 		diesel.fuelType(FluidTagEntry.TYPE.of(FluidTags.create(new ResourceLocation("forge", "diesel"))));
@@ -108,7 +108,7 @@ public class ModRecipeProvider extends RecipeProvider
 		diesel.heatPerFuel(27.0D);
 		diesel.overheatedResettingTemp(0.1D);
 		this.solveHeatVariables(diesel, 10 * 60, 5 * 60);
-		this.save(pFinishedRecipeConsumer, diesel, "diesel");
+		this.save(pWriter, diesel, "diesel");
 	}
 
 	public void solveHeatVariables(TrainEngineTypeRecipe.Builder<?> engineType, double airCoolingDurationToZero, double heatDurability)
@@ -129,82 +129,82 @@ public class ModRecipeProvider extends RecipeProvider
 		consumer.accept(new ConditionFinishedRecipe(finish, conditions));
 	}
 
-	public void engineCoolants(Consumer<FinishedRecipe> pFinishedRecipeConsumer)
+	public void engineCoolants(Consumer<FinishedRecipe> pWriter)
 	{
 		int heatPerSec = 40;
 
 		TrainEngineCoolantRecipe.Builder<?> water = new TrainEngineCoolantRecipe.Builder<>();
 		water.fluidIngredient(FluidIngredient.fromFluid(Fluids.WATER, 1));
 		water.cooling((int) (heatPerSec * 0.1D));
-		this.save(pFinishedRecipeConsumer, water, "fluid_water");
+		this.save(pWriter, water, "fluid_water");
 
 		TrainEngineCoolantRecipe.Builder<?> snowball = new TrainEngineCoolantRecipe.Builder<>();
 		snowball.itemIngredient(Ingredient.of(Items.SNOWBALL));
 		snowball.cooling((int) (heatPerSec * 1.0D));
-		this.save(pFinishedRecipeConsumer, snowball, "item_snowball");
+		this.save(pWriter, snowball, "item_snowball");
 
 		TrainEngineCoolantRecipe.Builder<?> snow = new TrainEngineCoolantRecipe.Builder<>();
 		snow.itemIngredient(Ingredient.of(Blocks.SNOW));
 		snow.cooling((int) (heatPerSec * 2.0D));
-		this.save(pFinishedRecipeConsumer, snow, "item_snow");
+		this.save(pWriter, snow, "item_snow");
 
 		TrainEngineCoolantRecipe.Builder<?> snow_block = new TrainEngineCoolantRecipe.Builder<>();
 		snow_block.itemIngredient(Ingredient.of(Blocks.SNOW_BLOCK));
 		snow_block.cooling((int) (heatPerSec * 4.0));
-		this.save(pFinishedRecipeConsumer, snow_block, "item_snow_block");
+		this.save(pWriter, snow_block, "item_snow_block");
 
 		TrainEngineCoolantRecipe.Builder<?> ice = new TrainEngineCoolantRecipe.Builder<>();
 		ice.itemIngredient(Ingredient.of(Items.ICE));
 		ice.cooling((int) (heatPerSec * 10.0D));
-		this.save(pFinishedRecipeConsumer, ice, "item_ice");
+		this.save(pWriter, ice, "item_ice");
 
 		TrainEngineCoolantRecipe.Builder<?> packed_ice = new TrainEngineCoolantRecipe.Builder<>();
 		packed_ice.itemIngredient(Ingredient.of(Items.PACKED_ICE));
 		packed_ice.cooling((int) (heatPerSec * 30.0D));
-		this.save(pFinishedRecipeConsumer, packed_ice, "item_packed_ice");
+		this.save(pWriter, packed_ice, "item_packed_ice");
 
 		TrainEngineCoolantRecipe.Builder<?> blue_ice = new TrainEngineCoolantRecipe.Builder<>();
 		blue_ice.itemIngredient(Ingredient.of(Items.BLUE_ICE));
 		blue_ice.cooling((int) (heatPerSec * 60.0D));
-		this.save(pFinishedRecipeConsumer, blue_ice, "item_blue_ice");
+		this.save(pWriter, blue_ice, "item_blue_ice");
 	}
 
-	public void save(Consumer<FinishedRecipe> consumer, TrainEngineCoolantRecipe.Builder<?> builder, String name)
+	public void save(Consumer<FinishedRecipe> pWriter, TrainEngineCoolantRecipe.Builder<?> builder, String name)
 	{
 		FinishedRecipe finish = builder.finish(new ResourceLocation(this.modId, "train/coolants/" + name));
 		List<ICondition> conditions = new ArrayList<>();
-		consumer.accept(new ConditionFinishedRecipe(finish, conditions));
+		pWriter.accept(new ConditionFinishedRecipe(finish, conditions));
 	}
 
-	public void heatSources(Consumer<FinishedRecipe> pFinishedRecipeConsumer)
+	public void heatSources(Consumer<FinishedRecipe> pWriter)
 	{
 		TrainHeatSourceRecipe.Builder<?> passive = new TrainHeatSourceRecipe.Builder<>();
 		passive.blockType(ItemTagEntry.TYPE.of(Items.CAMPFIRE));
 		passive.blockType(ItemTagEntry.TYPE.of(Items.MAGMA_BLOCK));
 		passive.stage(new HeatStage.Builder().level(1).passive().build());
-		this.save(pFinishedRecipeConsumer, passive, "passive");
+		this.save(pWriter, passive, "passive");
 
 		TrainHeatSourceRecipe.Builder<?> charcoal_burner = new TrainHeatSourceRecipe.Builder<>();
 		charcoal_burner.blockType(ItemTagEntry.TYPE.of(zeh.createlowheated.AllBlocks.CHARCOAL_BURNER.get()));
 		charcoal_burner.stage(new HeatStage.Builder().level(1).burnTime().build());
-		this.save(pFinishedRecipeConsumer, charcoal_burner, "charcoal_burner");
+		this.save(pWriter, charcoal_burner, "charcoal_burner");
 
 		TrainHeatSourceRecipe.Builder<?> blaze_burner = new TrainHeatSourceRecipe.Builder<>();
 		blaze_burner.blockType(ItemTagEntry.TYPE.of(AllBlocks.BLAZE_BURNER.get()));
 		blaze_burner.stage(new HeatStage.Builder().level(1).passive().build());
 		blaze_burner.stage(new HeatStage.Builder().level(2).burnTime().build());
 		blaze_burner.stage(new HeatStage.Builder().level(3).blazeBurnerFuel().build());
-		this.save(pFinishedRecipeConsumer, blaze_burner, "blaze_burner");
+		this.save(pWriter, blaze_burner, "blaze_burner");
 	}
 
-	public void save(Consumer<FinishedRecipe> consumer, TrainHeatSourceRecipe.Builder<?> builder, String name)
+	public void save(Consumer<FinishedRecipe> pWriter, TrainHeatSourceRecipe.Builder<?> builder, String name)
 	{
 		FinishedRecipe finish = builder.finish(new ResourceLocation(this.modId, "train/heat_sources/" + name));
 		List<ICondition> conditions = new ArrayList<>();
 		// no need, because safe if not item found
 		// this.addBlockExistConditions(builder.blockType(), conditions);
 
-		consumer.accept(new ConditionFinishedRecipe(finish, conditions));
+		pWriter.accept(new ConditionFinishedRecipe(finish, conditions));
 	}
 
 	private void addBlockExistConditions(List<ItemTagEntry> list, List<ICondition> conditions)

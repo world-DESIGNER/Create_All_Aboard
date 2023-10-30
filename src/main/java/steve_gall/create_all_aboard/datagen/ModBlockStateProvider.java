@@ -1,6 +1,6 @@
 package steve_gall.create_all_aboard.datagen;
 
-import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import steve_gall.create_all_aboard.common.CreateAllAboard;
@@ -8,9 +8,9 @@ import steve_gall.create_all_aboard.common.init.ModBlocks;
 
 public class ModBlockStateProvider extends BlockStateProvider
 {
-	public ModBlockStateProvider(DataGenerator gen, ExistingFileHelper exFileHelper)
+	public ModBlockStateProvider(PackOutput output, ExistingFileHelper exFileHelper)
 	{
-		super(gen, CreateAllAboard.MOD_ID, exFileHelper);
+		super(output, CreateAllAboard.MOD_ID, exFileHelper);
 	}
 
 	@Override

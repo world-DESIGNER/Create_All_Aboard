@@ -126,7 +126,7 @@ public class TrainHelper
 		BlockPos trackPosition = edgePoint.getGlobalPosition();
 		BlockState trackState = edgePoint.getTrackBlockState();
 		ITrackBlock track = edgePoint.getTrack();
-		BlockPos bogeyOffset = new BlockPos(track.getUpNormal(level, trackPosition, trackState));
+		BlockPos bogeyOffset = BlockPos.containing(track.getUpNormal(level, trackPosition, trackState));
 
 		TrackNodeLocation location = null;
 		Vec3 centre = Vec3.atBottomCenterOf(trackPosition).add(0, track.getElevationAtCenter(level, trackPosition, trackState), 0);
@@ -305,7 +305,7 @@ public class TrainHelper
 
 			if (fluids.size() > 0)
 			{
-				boolean hasFluidInterface = contraption.getBlocks().values().stream().anyMatch(sbi -> sbi.state.getBlock() == AllBlocks.PORTABLE_FLUID_INTERFACE.get());
+				boolean hasFluidInterface = contraption.getBlocks().values().stream().anyMatch(sbi -> sbi.state().getBlock() == AllBlocks.PORTABLE_FLUID_INTERFACE.get());
 
 				if (hasFluidInterface)
 				{
@@ -1128,7 +1128,7 @@ public class TrainHelper
 					if (contraptionEntity != null)
 					{
 						Vec3 pos = contraptionEntity.position();
-						contraptionEntity.getLevel().explode(contraptionEntity, pos.x(), pos.y(), pos.z(), crashBehavior.getExplosionRadius(), crashBehavior.isCausesFire(), crashBehavior.getExplosionMode());
+						contraptionEntity.level().explode(contraptionEntity, pos.x(), pos.y(), pos.z(), crashBehavior.getExplosionRadius(), crashBehavior.isCausesFire(), crashBehavior.getExplosionMode());
 					}
 
 				}

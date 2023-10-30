@@ -1,27 +1,24 @@
 package steve_gall.create_all_aboard.datagen;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+import java.util.Set;
 
-import com.mojang.datafixers.util.Pair;
+import com.google.common.collect.ImmutableList;
 
-import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.LootTableProvider;
+import net.minecraft.data.loot.packs.VanillaLootTableProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.ValidationContext;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 
 public class ModLootTableProvider extends LootTableProvider
 {
-	public ModLootTableProvider(DataGenerator pGenerator)
+	public ModLootTableProvider(PackOutput pOutput)
 	{
-		super(pGenerator);
+		super(pOutput, Set.of(), VanillaLootTableProvider.create(pOutput).getTables());
 	}
 
 	@Override
@@ -31,9 +28,11 @@ public class ModLootTableProvider extends LootTableProvider
 	}
 
 	@Override
-	protected List<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, LootTable.Builder>>>, LootContextParamSet>> getTables()
+	public List<LootTableProvider.SubProviderEntry> getTables()
 	{
-		return Arrays.asList(Pair.of(ModBlockLoot::new, LootContextParamSets.BLOCK));
+		ImmutableList.Builder<LootTableProvider.SubProviderEntry> builder = ImmutableList.builder();
+		builder.add(new SubProviderEntry(ModBlockLoot::new, LootContextParamSets.BLOCK));
+		return builder.build();
 	}
 
 }

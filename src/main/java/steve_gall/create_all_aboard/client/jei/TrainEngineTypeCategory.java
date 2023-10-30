@@ -2,7 +2,6 @@ package steve_gall.create_all_aboard.client.jei;
 
 import java.util.List;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.AllBlocks;
 
 import mezz.jei.api.forge.ForgeTypes;
@@ -13,6 +12,7 @@ import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -62,8 +62,10 @@ public class TrainEngineTypeCategory extends ModJEIRecipeCategory<TrainEngineTyp
 	}
 
 	@Override
-	public void draw(TrainEngineTypeRecipe recipe, IRecipeSlotsView slotsView, PoseStack stack, double mouseX, double mouseY)
+	public void draw(TrainEngineTypeRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY)
 	{
+		super.draw(recipe, recipeSlotsView, guiGraphics, mouseX, mouseY);
+
 		Minecraft minecraft = Minecraft.getInstance();
 		Font font = minecraft.font;
 		float maxSpeed = recipe.getMaxSpeed();
@@ -89,41 +91,41 @@ public class TrainEngineTypeCategory extends ModJEIRecipeCategory<TrainEngineTyp
 		int textX = 2;
 		int textY = 22;
 		int textColor = 0x404040;
-		font.draw(stack, Component.translatable(TEXT_MAX_CARRIAGES, NumberHelper.format(recipe.getMaxCarriageCount(), 2)), textX, textY, textColor);
+		guiGraphics.drawString(font, Component.translatable(TEXT_MAX_CARRIAGES, NumberHelper.format(recipe.getMaxCarriageCount(), 2)), textX, textY, textColor, false);
 		textY += font.lineHeight;
 
-		font.draw(stack, Component.translatable(TEXT_MAX_BLOCKS_PER_CARRIAGE, NumberHelper.format(recipe.getMaxBlockCountPerCarriage(), 2)), textX, textY, textColor);
+		guiGraphics.drawString(font, Component.translatable(TEXT_MAX_BLOCKS_PER_CARRIAGE, NumberHelper.format(recipe.getMaxBlockCountPerCarriage(), 2)), textX, textY, textColor, false);
 		textY += font.lineHeight;
 
-		font.draw(stack, Component.translatable(TEXT_MAX_SPEED, NumberHelper.format(recipe.getMaxSpeed(), 2) + " m/s"), textX, textY, textColor);
+		guiGraphics.drawString(font, Component.translatable(TEXT_MAX_SPEED, NumberHelper.format(recipe.getMaxSpeed(), 2) + " m/s"), textX, textY, textColor, false);
 		textY += font.lineHeight;
 
-		font.draw(stack, Component.translatable(TEXT_ACCELERATION, NumberHelper.format(recipe.getAcceleration(), 2) + " m/s²"), textX, textY, textColor);
+		guiGraphics.drawString(font, Component.translatable(TEXT_ACCELERATION, NumberHelper.format(recipe.getAcceleration(), 2) + " m/s²"), textX, textY, textColor, false);
 		textY += font.lineHeight;
 
-		font.draw(stack, Component.translatable(TEXT_MAX_FUEL_USAGE, NumberHelper.format(maxFuelUsage, 2) + " mB/s"), textX, textY, textColor);
+		guiGraphics.drawString(font, Component.translatable(TEXT_MAX_FUEL_USAGE, NumberHelper.format(maxFuelUsage, 2) + " mB/s"), textX, textY, textColor, false);
 		textY += font.lineHeight;
 
 		if (recipe.isLimitableByHeat())
 		{
-			font.draw(stack, Component.translatable(TEXT_HEAT_LEVEL_FOR_MAX_SPEED, NumberHelper.format(heatLevel)), textX, textY, textColor);
+			guiGraphics.drawString(font, Component.translatable(TEXT_HEAT_LEVEL_FOR_MAX_SPEED, NumberHelper.format(heatLevel)), textX, textY, textColor, false);
 			textY += font.lineHeight;
 		}
 
 		if (recipe.getHeatPerFuel() > 0 && recipe.hasHeatCapacity())
 		{
 			textY += font.lineHeight;
-			font.draw(stack, Component.translatable(TEXT_HEAT_CAPACITY, NumberHelper.format(recipe.getHeatCapacity()) + " J"), textX, textY, textColor);
+			guiGraphics.drawString(font, Component.translatable(TEXT_HEAT_CAPACITY, NumberHelper.format(recipe.getHeatCapacity()) + " J"), textX, textY, textColor, false);
 			textY += font.lineHeight;
 
-			font.draw(stack, Component.translatable(TEXT_HEAT_PER_FUEL, NumberHelper.format(recipe.getHeatPerFuel(), 2) + " J/mB"), textX, textY, textColor);
+			guiGraphics.drawString(font, Component.translatable(TEXT_HEAT_PER_FUEL, NumberHelper.format(recipe.getHeatPerFuel(), 2) + " J/mB"), textX, textY, textColor, false);
 			textY += font.lineHeight;
 
-			font.draw(stack, Component.translatable(TEXT_AIR_COOLING_RATE, NumberHelper.format(recipe.getAirCoolingRate(), 2) + " J/s"), textX, textY, textColor);
+			guiGraphics.drawString(font, Component.translatable(TEXT_AIR_COOLING_RATE, NumberHelper.format(recipe.getAirCoolingRate(), 2) + " J/s"), textX, textY, textColor, false);
 			textY += font.lineHeight;
 
 			double heatDuration = recipe.getHeatDuration(maxFuelUsage);
-			font.draw(stack, Component.translatable(TEXT_HEAT_DURABILITY, NumberHelper.format(heatDuration, 2) + " s"), textX, textY, textColor);
+			guiGraphics.drawString(font, Component.translatable(TEXT_HEAT_DURABILITY, NumberHelper.format(heatDuration, 2) + " s"), textX, textY, textColor, false);
 			textY += font.lineHeight;
 		}
 

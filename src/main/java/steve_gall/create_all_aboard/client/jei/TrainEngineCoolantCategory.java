@@ -1,6 +1,5 @@
 package steve_gall.create_all_aboard.client.jei;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.foundation.fluid.FluidIngredient;
 
 import mezz.jei.api.constants.VanillaTypes;
@@ -14,6 +13,7 @@ import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -52,13 +52,15 @@ public class TrainEngineCoolantCategory extends ModJEIRecipeCategory<TrainEngine
 	}
 
 	@Override
-	public void draw(TrainEngineCoolantRecipe recipe, IRecipeSlotsView slotsView, PoseStack stack, double mouseX, double mouseY)
+	public void draw(TrainEngineCoolantRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY)
 	{
+		super.draw(recipe, recipeSlotsView, guiGraphics, mouseX, mouseY);
+
 		Minecraft minecraft = Minecraft.getInstance();
 		Font font = minecraft.font;
 
 		int textColor = 0x404040;
-		font.draw(stack, Component.translatable(TEXT_COOLING, NumberHelper.format(recipe.getCooling()) + " J"), 22, 6, textColor);
+		guiGraphics.drawString(font, Component.translatable(TEXT_COOLING, NumberHelper.format(recipe.getCooling()) + " J"), 22, 6, textColor, false);
 	}
 
 	@Override

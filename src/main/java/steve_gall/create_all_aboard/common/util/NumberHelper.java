@@ -19,7 +19,7 @@ public class NumberHelper
 	{
 		return FORMATS.computeIfAbsent(decimals, d ->
 		{
-			NumberFormat format = NumberFormat.getInstance(Minecraft.getInstance().getLanguageManager().getSelected().getJavaLocale());
+			NumberFormat format = NumberFormat.getInstance(Minecraft.getInstance().getLanguageManager().getJavaLocale());
 			format.setMaximumFractionDigits(d);
 			format.setMinimumFractionDigits(d);
 			format.setGroupingUsed(true);

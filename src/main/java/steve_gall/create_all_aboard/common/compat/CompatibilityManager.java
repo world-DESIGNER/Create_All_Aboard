@@ -1,4 +1,4 @@
-package steve_gall.create_all_aboard.client.compat;
+package steve_gall.create_all_aboard.common.compat;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,6 +11,7 @@ public class CompatibilityManager
 	public static final List<CompatibilityMod> MODS = Collections.unmodifiableList(_MODS);
 
 	public static final TFMGCompatMod THE_FACTORY_MUST_GROW = register(TFMGCompatMod::new);
+	public static final CompatibilityMod DIESEL_GENERATORS = register(SimpleCompatibilityMod.of("createdieselgenerators"));
 
 	public static <MOD extends CompatibilityMod> MOD register(Supplier<MOD> supplier)
 	{

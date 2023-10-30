@@ -186,9 +186,9 @@ public class JerrycanItem extends Item
 	{
 		StructureBlockInfo sbi = contraption.getBlocks().get(localPos);
 
-		if (contraption.entity instanceof CarriageContraptionEntity cce && sbi != null && sbi.state.getBlock() == AllBlocks.PORTABLE_FLUID_INTERFACE.get())
+		if (contraption.entity instanceof CarriageContraptionEntity cce && sbi != null && sbi.state().getBlock() == AllBlocks.PORTABLE_FLUID_INTERFACE.get())
 		{
-			if (!pPlayer.getLevel().isClientSide())
+			if (!pPlayer.level().isClientSide())
 			{
 				ItemStack item = pPlayer.getItemInHand(pHand);
 				IFluidHandlerItem jerrycan = item.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).orElseGet(null);

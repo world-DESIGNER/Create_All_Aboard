@@ -1,6 +1,6 @@
 package steve_gall.create_all_aboard.datagen;
 
-import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.client.model.generators.ItemModelBuilder;
@@ -12,9 +12,9 @@ import steve_gall.create_all_aboard.common.init.ModItems;
 
 public class ModItemModelProvider extends ItemModelProvider
 {
-	public ModItemModelProvider(DataGenerator generator, ExistingFileHelper existingFileHelper)
+	public ModItemModelProvider(PackOutput output, ExistingFileHelper existingFileHelper)
 	{
-		super(generator, CreateAllAboard.MOD_ID, existingFileHelper);
+		super(output, CreateAllAboard.MOD_ID, existingFileHelper);
 	}
 
 	@Override

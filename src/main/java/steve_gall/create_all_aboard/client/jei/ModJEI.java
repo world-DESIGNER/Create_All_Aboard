@@ -60,7 +60,7 @@ public class ModJEI implements IModPlugin
 	public void registerRecipes(IRecipeRegistration registration)
 	{
 		Minecraft minecraft = Minecraft.getInstance();
-		RecipeManager recipeManager = minecraft.player.level.getRecipeManager();
+		RecipeManager recipeManager = minecraft.player.level().getRecipeManager();
 
 		this.cacheBurnTimes();
 		this.cacheBlazeBurnerFuels();

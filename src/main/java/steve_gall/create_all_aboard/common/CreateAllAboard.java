@@ -15,11 +15,12 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import steve_gall.create_all_aboard.client.CreateTrainwreckedClient;
-import steve_gall.create_all_aboard.client.compat.CompatibilityManager;
-import steve_gall.create_all_aboard.client.compat.CompatibilityMod;
+import steve_gall.create_all_aboard.common.compat.CompatibilityManager;
+import steve_gall.create_all_aboard.common.compat.CompatibilityMod;
 import steve_gall.create_all_aboard.common.config.CreateTrainwreckedConfig;
 import steve_gall.create_all_aboard.common.init.ModBlockEntityTypes;
 import steve_gall.create_all_aboard.common.init.ModBlocks;
+import steve_gall.create_all_aboard.common.init.ModCreativeModTabs;
 import steve_gall.create_all_aboard.common.init.ModItems;
 import steve_gall.create_all_aboard.common.init.ModRecipeSerializers;
 import steve_gall.create_all_aboard.common.init.ModRecipeTypes;
@@ -42,6 +43,7 @@ public class CreateAllAboard
 		ModItems.ITEMS.register(fml_bus);
 		ModRecipeTypes.RECIPE_TYPES.register(fml_bus);
 		ModRecipeSerializers.RECIPE_SERIALIZERS.register(fml_bus);
+		ModCreativeModTabs.TABS.register(fml_bus);
 
 		IEventBus forge_bus = MinecraftForge.EVENT_BUS;
 

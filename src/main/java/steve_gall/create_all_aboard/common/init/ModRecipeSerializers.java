@@ -3,11 +3,11 @@ package steve_gall.create_all_aboard.common.init;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries.Keys;
+import net.minecraftforge.registries.RegistryObject;
 import steve_gall.create_all_aboard.common.CreateAllAboard;
 import steve_gall.create_all_aboard.common.crafting.TrainEngineCoolantRecipe;
 import steve_gall.create_all_aboard.common.crafting.TrainEngineTypeRecipe;
 import steve_gall.create_all_aboard.common.crafting.TrainHeatSourceRecipe;
-import net.minecraftforge.registries.RegistryObject;
 
 public class ModRecipeSerializers
 {

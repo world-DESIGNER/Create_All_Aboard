@@ -1,4 +1,4 @@
-// 1.19.2	2023-10-29T11:00:52.7688933	Recipes
+// 1.19.2	2023-10-30T23:09:15.7343945	Recipes
 324c6be332a01ebe74c465afaccf3191a6425016 data/create_all_aboard/advancements/recipes/create_all_aboard_tab/crafting/jerrycan.json
 82a70caf822fec0213a4b53ee2b7bb9c7344ec83 data/create_all_aboard/recipes/crafting/jerrycan.json
 1991807ba716747abdc370b4ea8ac3ef7908918d data/create_all_aboard/recipes/train/coolants/fluid_water.json
@@ -8,8 +8,8 @@
 75d7124b9f44c199f0894adc07d60988f61acf89 data/create_all_aboard/recipes/train/coolants/item_snow.json
 3de4c6ed3747ce2b3bb8fd43d32dc091075bce45 data/create_all_aboard/recipes/train/coolants/item_snowball.json
 2c2da81f8eaf0d788d797a83c00fb4d7ab4ba5c0 data/create_all_aboard/recipes/train/coolants/item_snow_block.json
-19c68b1ee34de0184a3865a0eaa396fe9015d3aa data/create_all_aboard/recipes/train/engines/diesel.json
-ce7d7ee30318b8b61769aca9d7a1c972de050528 data/create_all_aboard/recipes/train/engines/steam.json
+d5a3f81a5478a789e469511c4a4904c46c6df287 data/create_all_aboard/recipes/train/engines/diesel.json
+01d9e291b3a65c2a541f00d7c54967b6abf2e3d4 data/create_all_aboard/recipes/train/engines/steam.json
 4a9d1aba73ca18e23b82694230bac1bb6df6e6aa data/create_all_aboard/recipes/train/heat_sources/blaze_burner.json
 9236a21680c3dcd34b3a212a5b0bb6f736a1897a data/create_all_aboard/recipes/train/heat_sources/charcoal_burner.json
 b7324b15ee3476bef7e2aa84245468b40788443e data/create_all_aboard/recipes/train/heat_sources/passive.json

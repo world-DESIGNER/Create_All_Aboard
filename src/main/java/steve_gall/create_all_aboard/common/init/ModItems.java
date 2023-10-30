@@ -11,9 +11,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Item.Properties;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries.Keys;
+import net.minecraftforge.registries.RegistryObject;
 import steve_gall.create_all_aboard.common.CreateAllAboard;
 import steve_gall.create_all_aboard.common.item.JerrycanItem;
-import net.minecraftforge.registries.RegistryObject;
 
 public class ModItems
 {

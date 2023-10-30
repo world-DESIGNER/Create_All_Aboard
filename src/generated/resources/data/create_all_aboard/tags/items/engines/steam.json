@@ -1,0 +1,12 @@
+{
+  "values": [
+    {
+      "id": "create:steam_engine",
+      "required": false
+    },
+    {
+      "id": "create_all_aboard:train_steam_engine",
+      "required": false
+    }
+  ]
+}

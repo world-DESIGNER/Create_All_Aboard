@@ -2,10 +2,7 @@
   "type": "create_all_aboard:train_engine_type",
   "acceleration": 0.8333333,
   "airCoolingRate": 0.0,
-  "blockType": [
-    "create:steam_engine",
-    "create_all_aboard:train_steam_engine"
-  ],
+  "blockType": "#create_all_aboard:engines/steam",
   "carriageStressMultiplier": 0.75,
   "crashBehavior": {
     "causesFire": true,
@@ -14,7 +11,7 @@
   },
   "fuelPerDistance": 1.0,
   "fuelPerHeatLevel": 3.736920777279521,
-  "fuelType": "minecraft:water",
+  "fuelType": "#create_all_aboard:fuels/steam",
   "heatCapacity": 0,
   "heatPerFuel": 0.0,
   "limitableByHeat": true,

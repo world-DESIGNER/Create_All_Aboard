@@ -9,6 +9,7 @@
 		"contraption.MountedStorageManagerAccessor",
 		"contraption.MountedStorageManagerMixin",
 		"contraption.PortableStorageInterfaceBlockEntityAccessor",
+		"engine.PoweredShaftBlockMixin",
 		"engine.SteamEngineBlockMixin",
 		"tank.FluidTankBlockEntityAccessor",
 		"train.CarriageContraptionEntityMixin",

@@ -8,6 +8,8 @@ import com.jozufozu.flywheel.backend.instancing.blockentity.BlockEntityInstance;
 import com.jozufozu.flywheel.core.Materials;
 import com.jozufozu.flywheel.core.materials.model.ModelData;
 import com.simibubi.create.AllPartialModels;
+import com.simibubi.create.content.kinetics.base.KineticBlockEntityRenderer;
+import com.simibubi.create.content.kinetics.steamEngine.PoweredShaftBlockEntity;
 import com.simibubi.create.content.kinetics.steamEngine.SteamEngineBlock;
 import com.simibubi.create.foundation.utility.AngleHelper;
 
@@ -20,7 +22,6 @@ import steve_gall.create_all_aboard.common.content.train.Engine;
 
 public class TrainSteamEngineInstance extends BlockEntityInstance<TrainSteamEngineBlockEntity> implements DynamicInstance
 {
-
 	protected final ModelData piston;
 	protected final ModelData linkage;
 	protected final ModelData connector;
@@ -41,7 +42,7 @@ public class TrainSteamEngineInstance extends BlockEntityInstance<TrainSteamEngi
 	@Override
 	public void beginFrame()
 	{
-		Float angle = InstanceHelper.getEngineAnimatingAngle(this.engineSupplier.get(), null);
+		Float angle = InstanceHelper.getEngineAnimatingAngle(this.engineSupplier.get(), blockEntity.getTargetAngle());
 
 		if (angle == null)
 		{
@@ -54,6 +55,10 @@ public class TrainSteamEngineInstance extends BlockEntityInstance<TrainSteamEngi
 		Direction facing = SteamEngineBlock.getFacing(blockState);
 		Axis facingAxis = facing.getAxis();
 		Axis axis = Axis.Y;
+
+		PoweredShaftBlockEntity shaft = blockEntity.getShaft();
+		if (shaft != null)
+			axis = KineticBlockEntityRenderer.getRotationAxisOf(shaft);
 
 		boolean roll90 = facingAxis.isHorizontal() && axis == Axis.Y || facingAxis.isVertical() && axis == Axis.Z;
 		float sine = Mth.sin(angle);

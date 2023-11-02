@@ -8,7 +8,7 @@ import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllShapes;
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.content.fluids.tank.FluidTankBlock;
-import com.simibubi.create.content.kinetics.simpleRelays.ShaftBlock;
+import com.simibubi.create.content.kinetics.base.RotatedPillarKineticBlock;
 import com.simibubi.create.content.kinetics.steamEngine.PoweredShaftBlock;
 import com.simibubi.create.content.kinetics.steamEngine.SteamEngineBlock;
 import com.simibubi.create.foundation.advancement.AdvancementBehaviour;
@@ -185,7 +185,7 @@ public class TrainSteamEngineBlock extends FaceAttachedHorizontalDirectionalBloc
 			BlockState shaft = AllBlocks.SHAFT.getDefaultState();
 			for (Direction direction : Direction.orderedByNearest(player))
 			{
-				shaft = shaft.setValue(ShaftBlock.AXIS, direction.getAxis());
+				shaft = shaft.setValue(RotatedPillarKineticBlock.AXIS, direction.getAxis());
 				if (SteamEngineBlock.isShaftValid(state, shaft))
 					break;
 			}
@@ -194,8 +194,8 @@ public class TrainSteamEngineBlock extends FaceAttachedHorizontalDirectionalBloc
 			if (!newState.getMaterial().isReplaceable())
 				return PlacementOffset.fail();
 
-			Axis axis = shaft.getValue(ShaftBlock.AXIS);
-			return PlacementOffset.success(shaftPos, s -> BlockHelper.copyProperties(s, AllBlocks.POWERED_SHAFT.getDefaultState()).setValue(PoweredShaftBlock.AXIS, axis));
+			Axis axis = shaft.getValue(RotatedPillarKineticBlock.AXIS);
+			return PlacementOffset.success(shaftPos, s -> BlockHelper.copyProperties(s, AllBlocks.POWERED_SHAFT.getDefaultState()).setValue(RotatedPillarKineticBlock.AXIS, axis));
 		}
 	}
 

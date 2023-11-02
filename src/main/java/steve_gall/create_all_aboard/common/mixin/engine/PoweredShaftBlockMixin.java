@@ -5,6 +5,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import com.simibubi.create.content.kinetics.base.RotatedPillarKineticBlock;
 import com.simibubi.create.content.kinetics.steamEngine.PoweredShaftBlock;
 import com.simibubi.create.content.kinetics.steamEngine.SteamEngineBlock;
 import com.simibubi.create.foundation.utility.Iterate;
@@ -23,13 +24,11 @@ public abstract class PoweredShaftBlockMixin
 	{
 		for (Direction d : Iterate.directions)
 		{
-			if (d.getAxis() == pState.getValue(PoweredShaftBlock.AXIS))
+			if (d.getAxis() == pState.getValue(RotatedPillarKineticBlock.AXIS))
 				continue;
 			BlockPos enginePos = pPos.relative(d, 2);
 			BlockState engineState = pLevel.getBlockState(enginePos);
-			if (!(engineState.getBlock() instanceof TrainSteamEngineBlock engine))
-				continue;
-			if (!SteamEngineBlock.getShaftPos(engineState, enginePos).equals(pPos))
+			if (!(engineState.getBlock() instanceof TrainSteamEngineBlock engine) || !SteamEngineBlock.getShaftPos(engineState, enginePos).equals(pPos))
 				continue;
 			if (SteamEngineBlock.isShaftValid(engineState, pState))
 				cir.setReturnValue(true);

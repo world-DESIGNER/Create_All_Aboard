@@ -10,6 +10,7 @@ import com.simibubi.create.content.trains.entity.Carriage;
 import com.simibubi.create.content.trains.entity.Train;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
@@ -40,25 +41,36 @@ public class HeatSource extends TrainPart<TrainHeatSourceRecipe>
 	public HeatSource(CompoundTag tag)
 	{
 		super(tag);
-	}
-
-	@Override
-	public void readSyncData(CompoundTag tag)
-	{
-		super.readSyncData(tag);
 
 		this.fuelLevel = tag.getInt("fuelLevel");
 		this.fuelTime = tag.getInt("fuelTime");
 	}
 
 	@Override
-	public void writeSyncData(CompoundTag tag)
+	public void writeNbt(CompoundTag tag)
 	{
-		super.writeSyncData(tag);
+		super.writeNbt(tag);
 
-		tag.put("fuel", this.item.serializeNBT());
 		tag.putInt("fuelLevel", this.fuelLevel);
 		tag.putInt("fuelTime", this.fuelTime);
+	}
+
+	@Override
+	public void readSyncData(FriendlyByteBuf buffer)
+	{
+		super.readSyncData(buffer);
+
+		this.fuelLevel = buffer.readInt();
+		this.fuelTime = buffer.readInt();
+	}
+
+	@Override
+	public void writeSyncData(FriendlyByteBuf buffer)
+	{
+		super.writeSyncData(buffer);
+
+		buffer.writeInt(this.fuelLevel);
+		buffer.writeInt(this.fuelTime);
 	}
 
 	@Override

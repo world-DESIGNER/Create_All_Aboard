@@ -7,7 +7,6 @@ import com.simibubi.create.content.fluids.tank.FluidTankBlockEntity;
 import com.simibubi.create.content.trains.entity.CarriageContraption;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -68,17 +67,6 @@ public class CarriageContraptionHelper
 		if (part.isRecipeFound())
 		{
 			list.add(part);
-		}
-
-	}
-
-	public static void copyData(List<? extends TrainPart<?>> to, List<CompoundTag> from)
-	{
-		int size = Math.min(to.size(), from.size());
-
-		for (int i = 0; i < size; i++)
-		{
-			to.get(i).readSyncData(from.get(i));
 		}
 
 	}

@@ -4,6 +4,7 @@ import com.simibubi.create.content.trains.entity.Train;
 import com.simibubi.create.foundation.utility.AnimationTickHolder;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
@@ -18,6 +19,7 @@ public class Engine extends TrainPart<TrainEngineTypeRecipe>
 	private double heat;
 	private double speed;
 	private boolean overheated;
+	private boolean reverse;
 
 	private float prevAngle;
 	private float angle;
@@ -30,6 +32,49 @@ public class Engine extends TrainPart<TrainEngineTypeRecipe>
 	public Engine(CompoundTag tag)
 	{
 		super(tag);
+
+		this.heat = tag.getDouble("heat");
+		this.speed = tag.getDouble("speed");
+		this.overheated = tag.getBoolean("overheated");
+		this.reverse = tag.getBoolean("reverse");
+	}
+
+	@Override
+	public void writeNbt(CompoundTag tag)
+	{
+		super.writeNbt(tag);
+
+		tag.putDouble("heat", this.heat);
+		tag.putDouble("speed", this.speed);
+		tag.putBoolean("overheated", this.overheated);
+		tag.putBoolean("reverse", this.reverse);
+	}
+
+	@Override
+	public void readSyncData(FriendlyByteBuf buffer)
+	{
+		super.readSyncData(buffer);
+
+		this.heat = buffer.readDouble();
+		this.speed = buffer.readDouble();
+
+		byte flags = buffer.readByte();
+		this.overheated = (flags & 0x01) != 0;
+		this.reverse = (flags & 0x02) != 0;
+	}
+
+	@Override
+	public void writeSyncData(FriendlyByteBuf buffer)
+	{
+		super.writeSyncData(buffer);
+
+		buffer.writeDouble(this.heat);
+		buffer.writeDouble(this.speed);
+
+		int flags = 0;
+		flags |= this.overheated ? 0x01 : 0x00;
+		flags |= this.reverse ? 0x02 : 0x00;
+		buffer.writeByte((byte) flags);
 	}
 
 	@Override
@@ -50,11 +95,12 @@ public class Engine extends TrainPart<TrainEngineTypeRecipe>
 		return ItemTagEntry.TYPE.testIngredient(recipe.getBlocks(), this.item);
 	}
 
-	public void onFuelBurned(FuelBurning fuel, double allocatedSpeed, int heatLevel)
+	public void onFuelBurned(FuelBurning fuel, double allocatedSpeed, boolean reverse, int heatLevel)
 	{
 		TrainEngineTypeRecipe recipe = this.getRecipe();
 		double speed = recipe.getPredictSpeed(fuel.toBurn(), fuel.burned(), allocatedSpeed, heatLevel);
 		this.setSpeed(speed);
+		this.setReverse(reverse);
 
 		double heat = this.getHeat();
 		this.setHeat(heat + (fuel.burned() * recipe.getHeatPerFuel()));
@@ -65,11 +111,13 @@ public class Engine extends TrainPart<TrainEngineTypeRecipe>
 	{
 		super.tickClient(train, level);
 
-		this.prevAngle = this.angle;
+		float angle = this.getTargetAngle();
+		this.prevAngle = angle;
 
 		if (train.graph != null)
 		{
-			this.angle += this.getSpeed() / 20.0D;
+			float delta = (float) this.getSpeed() / 20.0F;
+			this.setTargetAngle(angle + (this.isReverse() ? -delta : delta));
 		}
 
 	}
@@ -125,26 +173,6 @@ public class Engine extends TrainPart<TrainEngineTypeRecipe>
 			this.setOverheat(false);
 		}
 
-	}
-
-	@Override
-	public void readSyncData(CompoundTag tag)
-	{
-		super.readSyncData(tag);
-
-		this.heat = tag.getDouble("heat");
-		this.speed = tag.getDouble("speed");
-		this.overheated = tag.getBoolean("overheated");
-	}
-
-	@Override
-	public void writeSyncData(CompoundTag tag)
-	{
-		super.writeSyncData(tag);
-
-		tag.putDouble("heat", this.heat);
-		tag.putDouble("speed", this.speed);
-		tag.putBoolean("overheated", this.overheated);
 	}
 
 	public void setSpeed(double speed)
@@ -213,9 +241,24 @@ public class Engine extends TrainPart<TrainEngineTypeRecipe>
 		return this.overheated;
 	}
 
+	public boolean isReverse()
+	{
+		return this.reverse;
+	}
+
+	public void setReverse(boolean reverse)
+	{
+		this.reverse = reverse;
+	}
+
 	public float getTargetAngle()
 	{
 		return this.angle;
+	}
+
+	public void setTargetAngle(float angle)
+	{
+		this.angle = angle;
 	}
 
 	public float getAnimatingAngle()

@@ -763,6 +763,7 @@ public class TrainHelper
 			Map<TrainEngineTypeRecipe, EngineSpeedPlan> plan = makeEngineSpeedPlan(train, speed * 20.0D, heatState);
 			double reductionRatio = getCarriagesSpeedReductionRatio(train);
 			double targetSpeed = 0.0D;
+			boolean reverse = speed < 0;
 
 			for (Entry<TrainEngineTypeRecipe, EngineSpeedPlan> pair : plan.entrySet())
 			{
@@ -774,13 +775,13 @@ public class TrainHelper
 
 				for (Engine engine : engines)
 				{
-					engine.onFuelBurned(fuel, eachSpeed, heatState.level());
+					engine.onFuelBurned(fuel, eachSpeed, reverse, heatState.level());
 					targetSpeed += engine.getSpeed() * reductionRatio;
 				}
 
 			}
 
-			if (speed < 0)
+			if (reverse)
 			{
 				targetSpeed = -targetSpeed;
 			}
@@ -1164,12 +1165,12 @@ public class TrainHelper
 
 	}
 
-	public static <PART extends TrainPart<?>> List<PART> readTrainParts(FriendlyByteBuf buffer, Function<CompoundTag, PART> factory)
+	public static <PART extends TrainPart<?>> List<PART> readParts(FriendlyByteBuf buffer, Function<CompoundTag, PART> factory)
 	{
 		return buffer.readList(b -> factory.apply(b.readNbt()));
 	}
 
-	public static <PART extends TrainPart<?>> void writeTrainParts(FriendlyByteBuf buffer, Collection<PART> parts)
+	public static <PART extends TrainPart<?>> void writeParts(FriendlyByteBuf buffer, Collection<PART> parts)
 	{
 		buffer.writeCollection(parts, (b, p) -> b.writeNbt(p.toNbt()));
 	}

@@ -10,6 +10,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
@@ -44,8 +45,6 @@ public abstract class TrainPart<RECIPE extends Recipe<Container>>
 		this.localPos = NbtUtils.readBlockPos(tag.getCompound("localPos"));
 		this.blockState = NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), tag.getCompound("blockState"));
 		this.item = ItemStack.of(tag.getCompound("item"));
-
-		this.readSyncData(tag);
 	}
 
 	public void tickClient(Train train, Level level)
@@ -105,15 +104,14 @@ public abstract class TrainPart<RECIPE extends Recipe<Container>>
 		tag.put("localPos", NbtUtils.writeBlockPos(this.localPos));
 		tag.put("blockState", NbtUtils.writeBlockState(this.blockState));
 		tag.put("item", this.item.serializeNBT());
-		this.writeSyncData(tag);
 	}
 
-	public void readSyncData(CompoundTag tag)
+	public void readSyncData(FriendlyByteBuf buffer)
 	{
 
 	}
 
-	public void writeSyncData(CompoundTag tag)
+	public void writeSyncData(FriendlyByteBuf buffer)
 	{
 
 	}

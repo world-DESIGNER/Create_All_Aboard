@@ -29,8 +29,8 @@ public abstract class TrainPacketMixin extends SimplePacketBase
 		for (Carriage carriage : this.train.carriages)
 		{
 			CarriageExtension carriageExtension = (CarriageExtension) carriage;
-			carriageExtension.getEngines().addAll(TrainHelper.readTrainParts(buffer, Engine::new));
-			carriageExtension.getHeatSources().addAll(TrainHelper.readTrainParts(buffer, HeatSource::new));
+			carriageExtension.getEngines().addAll(TrainHelper.readParts(buffer, Engine::new));
+			carriageExtension.getHeatSources().addAll(TrainHelper.readParts(buffer, HeatSource::new));
 		}
 
 	}
@@ -41,8 +41,8 @@ public abstract class TrainPacketMixin extends SimplePacketBase
 		for (Carriage carriage : this.train.carriages)
 		{
 			CarriageExtension carriageExtension = (CarriageExtension) carriage;
-			TrainHelper.writeTrainParts(buffer, carriageExtension.getEngines());
-			TrainHelper.writeTrainParts(buffer, carriageExtension.getHeatSources());
+			TrainHelper.writeParts(buffer, carriageExtension.getEngines());
+			TrainHelper.writeParts(buffer, carriageExtension.getHeatSources());
 		}
 
 	}

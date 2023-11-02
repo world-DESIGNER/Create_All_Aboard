@@ -19,7 +19,7 @@ public abstract class SimpleRecipeBuilder<BUILDER extends SimpleRecipeBuilder<? 
 
 	public abstract RECIPE build(ResourceLocation id);
 
-	protected SimpleFinishedRecipe finish(RECIPE recipe)
+	protected FinishedRecipe finish(RECIPE recipe)
 	{
 		return new SimpleFinishedRecipe(recipe);
 	}

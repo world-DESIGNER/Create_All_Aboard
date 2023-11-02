@@ -64,6 +64,8 @@ public class TrainEngineTypeCategory extends ModJEIRecipeCategory<TrainEngineTyp
 	@Override
 	public void draw(TrainEngineTypeRecipe recipe, IRecipeSlotsView slotsView, PoseStack stack, double mouseX, double mouseY)
 	{
+		super.draw(recipe, slotsView, stack, mouseX, mouseY);
+
 		Minecraft minecraft = Minecraft.getInstance();
 		Font font = minecraft.font;
 		float maxSpeed = recipe.getMaxSpeed();

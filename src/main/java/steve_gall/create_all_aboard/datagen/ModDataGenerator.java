@@ -21,9 +21,9 @@ public class ModDataGenerator
 		generator.addProvider(event.includeClient(), new ModItemModelProvider(generator, existingFileHelper));
 
 		generator.addProvider(event.includeServer(), new ModLootTableProvider(generator));
-		ModBlockTagProvider blocktagProvider = new ModBlockTagProvider(generator, existingFileHelper);
-		generator.addProvider(event.includeServer(), blocktagProvider);
-		generator.addProvider(event.includeServer(), new ModItemTagProvider(generator, blocktagProvider, existingFileHelper));
+		ModBlockTagProvider blockTagProvider = new ModBlockTagProvider(generator, existingFileHelper);
+		generator.addProvider(event.includeServer(), blockTagProvider);
+		generator.addProvider(event.includeServer(), new ModItemTagProvider(generator, blockTagProvider, existingFileHelper));
 		generator.addProvider(event.includeServer(), new ModFluidTagProvider(generator, existingFileHelper));
 		ModRecipeProvider recipeProvider = new ModRecipeProvider(generator);
 		generator.addProvider(event.includeServer(), recipeProvider);

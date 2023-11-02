@@ -54,6 +54,8 @@ public class TrainEngineCoolantCategory extends ModJEIRecipeCategory<TrainEngine
 	@Override
 	public void draw(TrainEngineCoolantRecipe recipe, IRecipeSlotsView slotsView, PoseStack stack, double mouseX, double mouseY)
 	{
+		super.draw(recipe, slotsView, stack, mouseX, mouseY);
+
 		Minecraft minecraft = Minecraft.getInstance();
 		Font font = minecraft.font;
 

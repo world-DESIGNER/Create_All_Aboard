@@ -56,6 +56,8 @@ public class TrainHeatSourceCategory extends ModJEIRecipeCategory<TrainHeatSourc
 	@Override
 	public void draw(TrainHeatSourceRecipe recipe, IRecipeSlotsView slotsView, PoseStack stack, double mouseX, double mouseY)
 	{
+		super.draw(recipe, slotsView, stack, mouseX, mouseY);
+
 		Minecraft minecraft = Minecraft.getInstance();
 		Font font = minecraft.font;
 

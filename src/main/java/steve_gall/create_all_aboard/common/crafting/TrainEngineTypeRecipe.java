@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 import com.simibubi.create.foundation.fluid.FluidIngredient;
 
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.Container;
@@ -37,6 +38,8 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 	private final double overheatedResettingTemp;
 	private final CrashBehavior crashBehavior;
 
+	private final String translationKey;
+	private Component displayName;
 	private final List<Ingredient> blocks;
 	private final List<FluidIngredient> fuels;
 
@@ -57,8 +60,29 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 		this.overheatedResettingTemp = builder.overheatedResettingTemp();
 		this.crashBehavior = builder.crashBehavior();
 
+		this.translationKey = "engine_type." + id.getNamespace() + "." + id.getPath().replace('/', '.');
 		this.blocks = this.blockTypes.stream().map(ItemTagEntry::toIngredient).toList();
 		this.fuels = this.fuelTypes.stream().map(FluidTagEntry::toIngredient).toList();
+	}
+
+	public String getTranslationKey()
+	{
+		return this.translationKey;
+	}
+
+	public Component getDisplayName()
+	{
+		if (this.displayName == null)
+		{
+			this.displayName = this.createDisplayName();
+		}
+
+		return this.displayName;
+	}
+
+	protected Component createDisplayName()
+	{
+		return Component.translatable(this.getTranslationKey());
 	}
 
 	public double getPredictSpeed(double toBurn, double burned, double allocatedSpeed, int heatLevel)

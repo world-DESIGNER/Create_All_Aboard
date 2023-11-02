@@ -33,6 +33,7 @@ import steve_gall.create_all_aboard.common.crafting.HeatStage;
 import steve_gall.create_all_aboard.common.crafting.TrainEngineCoolantRecipe;
 import steve_gall.create_all_aboard.common.crafting.TrainEngineTypeRecipe;
 import steve_gall.create_all_aboard.common.crafting.TrainHeatSourceRecipe;
+import steve_gall.create_all_aboard.common.crafting.WrappedFinishedRecipe;
 import steve_gall.create_all_aboard.common.init.ModItems;
 import steve_gall.create_all_aboard.common.init.ModTags;
 import steve_gall.create_all_aboard.common.util.FluidTagEntry;
@@ -41,6 +42,8 @@ import steve_gall.create_all_aboard.common.util.ItemTagEntry;
 public class ModRecipeProvider extends RecipeProvider
 {
 	private final String modId;
+	public TrainEngineTypeRecipe steam;
+	public TrainEngineTypeRecipe diesel;
 
 	public ModRecipeProvider(DataGenerator pGenerator)
 	{
@@ -90,7 +93,7 @@ public class ModRecipeProvider extends RecipeProvider
 		steam.overheatedResettingTemp(0.0D);
 		steam.heatCapacity(0);
 		steam.crashBehavior(new CrashBehavior.Builder().explosionRadius(5.0F).causesFire(true).explosionMode(BlockInteraction.NONE).build());
-		this.save(pFinishedRecipeConsumer, steam, "steam");
+		this.steam = this.save(pFinishedRecipeConsumer, steam, "steam");
 
 		TrainEngineTypeRecipe.Builder<?> diesel = new TrainEngineTypeRecipe.Builder<>();
 		diesel.blockType(ItemTagEntry.TYPE.of(ModTags.Items.ENGINES_DIESEL));
@@ -101,7 +104,7 @@ public class ModRecipeProvider extends RecipeProvider
 		diesel.heatPerFuel(27.0D);
 		diesel.overheatedResettingTemp(0.1D);
 		this.solveHeatVariables(diesel, 10 * 60, 5 * 60);
-		this.save(pFinishedRecipeConsumer, diesel, "diesel");
+		this.diesel = this.save(pFinishedRecipeConsumer, diesel, "diesel");
 	}
 
 	public void solveHeatVariables(TrainEngineTypeRecipe.Builder<?> engineType, double airCoolingDurationToZero, double heatDurability)
@@ -112,14 +115,15 @@ public class ModRecipeProvider extends RecipeProvider
 		engineType.heatCapacity((int) (heatDurability * (fuelUsage - engineType.airCoolingRate())));
 	}
 
-	public void save(Consumer<FinishedRecipe> consumer, TrainEngineTypeRecipe.Builder<?> builder, String name)
+	public TrainEngineTypeRecipe save(Consumer<FinishedRecipe> consumer, TrainEngineTypeRecipe.Builder<?> builder, String name)
 	{
-		FinishedRecipe finish = builder.finish(new ResourceLocation(this.modId, "train/engines/" + name));
+		WrappedFinishedRecipe<TrainEngineTypeRecipe> finish = builder.finish(new ResourceLocation(this.modId, "train/engines/" + name));
 		List<ICondition> conditions = new ArrayList<>();
 		// no need, because safe if not item found
 		// this.addBlockExistConditions(builder.blockType(), conditions);
 
 		consumer.accept(new ConditionFinishedRecipe(finish, conditions));
+		return finish.getRecipe();
 	}
 
 	public void engineCoolants(Consumer<FinishedRecipe> pFinishedRecipeConsumer)

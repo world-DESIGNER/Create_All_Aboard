@@ -1008,7 +1008,7 @@ public class TrainHelper
 			{
 				TrainEngineTypeRecipe recipe = engine.getRecipe();
 				int heatCapacity = recipe.getHeatCapacity();
-				Lang.builder().add(engine.getItem().getHoverName().copy()).style(ChatFormatting.GRAY).forGoggles(tooltip, 1);
+				Lang.builder().add(recipe.getDisplayName().copy()).style(ChatFormatting.GRAY).forGoggles(tooltip, 1);
 
 				if (heatCapacity > 0)
 				{
@@ -1025,16 +1025,8 @@ public class TrainHelper
 			for (Entry<TrainEngineTypeRecipe, List<Engine>> entry : engines.stream().collect(Collectors.groupingBy(Engine::getRecipe)).entrySet())
 			{
 				TrainEngineTypeRecipe recipe = entry.getKey();
-				Component name = null;
-
-				for (Engine engine : entry.getValue())
-				{
-					name = engine.getItem().getHoverName();
-					break;
-				}
-
 				MutableComponent countComponent = Component.literal(NumberHelper.format(entry.getValue().size()));
-				Lang.builder().add(Component.translatable(TRAIN_GOGGLE_ENGINE_COUNT, name != null ? name.copy() : Component.empty(), countComponent)).style(ChatFormatting.GRAY).forGoggles(tooltip, 1);
+				Lang.builder().add(Component.translatable(TRAIN_GOGGLE_ENGINE_COUNT, recipe.getDisplayName().copy(), countComponent)).style(ChatFormatting.GRAY).forGoggles(tooltip, 1);
 
 				int heatCapacity = recipe.getHeatCapacity();
 

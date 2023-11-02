@@ -14,15 +14,19 @@ import steve_gall.create_all_aboard.client.jei.TrainEngineCoolantCategory;
 import steve_gall.create_all_aboard.client.jei.TrainEngineTypeCategory;
 import steve_gall.create_all_aboard.client.jei.TrainHeatSourceCategory;
 import steve_gall.create_all_aboard.common.CreateAllAboard;
+import steve_gall.create_all_aboard.common.content.train.Engine;
 import steve_gall.create_all_aboard.common.content.train.TrainHelper;
 import steve_gall.create_all_aboard.common.init.ModItems;
 import steve_gall.create_all_aboard.common.item.JerrycanItem;
 
 public class ModLanguageProvider extends LanguageProvider
 {
-	public ModLanguageProvider(DataGenerator gen)
+	private final ModRecipeProvider recipeProvider;
+
+	public ModLanguageProvider(DataGenerator gen, ModRecipeProvider recipeProvider)
 	{
 		super(gen, CreateAllAboard.MOD_ID, "en_us");
+		this.recipeProvider = recipeProvider;
 	}
 
 	@Override
@@ -50,11 +54,19 @@ public class ModLanguageProvider extends LanguageProvider
 
 		this.addJEI();
 
+		this.addTrainEngineType();
 		this.addTrainAssemble();
 		this.addTrainStation();
 		this.addTrainGoggle();
 
 		this.addPonder();
+	}
+
+	private void addTrainEngineType()
+	{
+		this.add(Engine.NOT_FOUND_RECIPE.getTranslationKey(), "Unknown Engine");
+		this.add(this.recipeProvider.steam.getTranslationKey(), "Steam Engine");
+		this.add(this.recipeProvider.diesel.getTranslationKey(), "Diesel Engine");
 	}
 
 	private void addTrainAssemble()

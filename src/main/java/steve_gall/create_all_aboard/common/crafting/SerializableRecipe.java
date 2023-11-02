@@ -11,10 +11,4 @@ public interface SerializableRecipe<CONTAINER extends Container> extends Recipe<
 	void toJson(JsonObject pJson);
 
 	void toNetwork(FriendlyByteBuf pBuffer);
-
-	public default SimpleFinishedRecipe finish()
-	{
-		return new SimpleFinishedRecipe(this);
-	}
-
 }

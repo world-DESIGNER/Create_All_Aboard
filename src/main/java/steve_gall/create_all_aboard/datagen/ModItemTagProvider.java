@@ -13,7 +13,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import steve_gall.create_all_aboard.common.CreateAllAboard;
-import steve_gall.create_all_aboard.common.init.ModItems;
+import steve_gall.create_all_aboard.common.init.ModBlocks;
 import steve_gall.create_all_aboard.common.init.ModTags;
 
 public class ModItemTagProvider extends ItemTagsProvider
@@ -32,7 +32,7 @@ public class ModItemTagProvider extends ItemTagsProvider
 
 		IntrinsicTagAppender<Item> engines_steam = this.tag(ModTags.Items.ENGINES_STEAM);
 		engines_steam.addOptional(AllBlocks.STEAM_ENGINE.getId());
-		engines_steam.addOptional(ModItems.TRAIN_STEAM_ENGINE.getId());
+		engines_steam.addOptional(ModBlocks.TRAIN_STEAM_ENGINE.getId());
 
 		IntrinsicTagAppender<Item> engines_diesel = this.tag(ModTags.Items.ENGINES_DIESEL);
 		engines_diesel.addOptional(new ResourceLocation("createindustry", "diesel_engine"));

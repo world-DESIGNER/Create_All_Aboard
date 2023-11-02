@@ -19,11 +19,16 @@ public abstract class SimpleRecipeBuilder<BUILDER extends SimpleRecipeBuilder<? 
 
 	public abstract RECIPE build(ResourceLocation id);
 
-	public FinishedRecipe finish(ResourceLocation id)
+	protected FinishedRecipe finish(RECIPE recipe)
+	{
+		return new SimpleFinishedRecipe(recipe);
+	}
+
+	public WrappedFinishedRecipe<RECIPE> finish(ResourceLocation id)
 	{
 		RECIPE recipe = this.build(id);
-		FinishedRecipe finish = recipe.finish();
-		return new ConditionFinishedRecipe(finish, this.conditions);
+		FinishedRecipe finish = this.finish(recipe);
+		return new WrappedFinishedRecipe<>(recipe, new ConditionFinishedRecipe(finish, this.conditions));
 	}
 
 	public BUILDER condition(ICondition condition)

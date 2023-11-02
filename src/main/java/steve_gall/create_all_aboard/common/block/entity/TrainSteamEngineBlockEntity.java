@@ -45,11 +45,7 @@ public class TrainSteamEngineBlockEntity extends SmartBlockEntity
 		super.tick();
 		PoweredShaftBlockEntity shaft = getShaft();
 
-		if (level.isClientSide())
-			return;
-		if (shaft == null)
-			return;
-		if (shaft.enginePos != null && !shaft.getBlockPos().subtract(worldPosition).equals(shaft.enginePos))
+		if (level.isClientSide() || (shaft == null) || (shaft.enginePos != null && !shaft.getBlockPos().subtract(worldPosition).equals(shaft.enginePos)))
 			return;
 		Direction facing = SteamEngineBlock.getFacing(getBlockState());
 		if (level.isLoaded(worldPosition.relative(facing.getOpposite())))

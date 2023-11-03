@@ -5,9 +5,9 @@
       "item": "create:steam_engine"
     },
     {
-      "amount": 1000,
       "fluid": "minecraft:water",
-      "nbt": {}
+      "nbt": {},
+      "amount": 1000
     }
   ],
   "results": [

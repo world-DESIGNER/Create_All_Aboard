@@ -1,6 +1,0 @@
-// 1.19.2	2023-10-30T23:21:38.6352368	Tags for minecraft:fluid
-0dcd342e5c4b71a7f7b082d3e21a916bd1934d28 data/create_all_aboard/tags/fluids/fuels.json
-3fb2a6ef034c6a696ace5b2f8053423111e2af6c data/create_all_aboard/tags/fluids/fuels/diesel.json
-cf3608bd187922aeb48c566c19e8482b0dca34c7 data/create_all_aboard/tags/fluids/fuels/steam.json
-35133e95f1c8fdd7a1c21afcc231fc0bffefb9a8 data/forge/tags/fluids/biodiesel.json
-35133e95f1c8fdd7a1c21afcc231fc0bffefb9a8 data/forge/tags/fluids/diesel.json

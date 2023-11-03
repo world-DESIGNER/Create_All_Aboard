@@ -1,4 +1,5 @@
 {
+  "replace": false,
   "values": [
     {
       "id": "createindustry:diesel_engine",

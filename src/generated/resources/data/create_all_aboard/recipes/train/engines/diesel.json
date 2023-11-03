@@ -1,15 +1,15 @@
 {
   "type": "create_all_aboard:train_engine_type",
-  "acceleration": 8.0,
-  "airCoolingRate": 20.0,
   "blockType": "#create_all_aboard:engines/diesel",
+  "maxSpeed": 40.0,
+  "acceleration": 8.0,
   "carriageStressMultiplier": 1.0,
+  "fuelType": "#create_all_aboard:fuels/diesel",
+  "limitableByHeat": false,
   "fuelPerDistance": 0.05555555555555556,
   "fuelPerHeatLevel": 0.0,
-  "fuelType": "#create_all_aboard:fuels/diesel",
   "heatCapacity": 12000,
   "heatPerFuel": 27.0,
-  "limitableByHeat": false,
-  "maxSpeed": 40.0,
+  "airCoolingRate": 20.0,
   "overheatedResettingTemp": 0.1
 }

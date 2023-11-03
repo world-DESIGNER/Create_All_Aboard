@@ -1,7 +1,7 @@
 {
   "type": "create_all_aboard:train_engine_coolant",
-  "cooling": 400,
   "item": {
     "item": "minecraft:ice"
-  }
+  },
+  "cooling": 400
 }

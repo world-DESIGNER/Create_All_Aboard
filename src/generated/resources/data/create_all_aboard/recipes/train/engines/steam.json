@@ -1,20 +1,20 @@
 {
   "type": "create_all_aboard:train_engine_type",
-  "acceleration": 0.8333333,
-  "airCoolingRate": 0.0,
   "blockType": "#create_all_aboard:engines/steam",
+  "maxSpeed": 50.0,
+  "acceleration": 0.8333333,
   "carriageStressMultiplier": 0.75,
-  "crashBehavior": {
-    "causesFire": true,
-    "explosionMode": "none",
-    "explosionRadius": 5.0
-  },
+  "fuelType": "#create_all_aboard:fuels/steam",
+  "limitableByHeat": true,
   "fuelPerDistance": 1.0,
   "fuelPerHeatLevel": 3.736920777279521,
-  "fuelType": "#create_all_aboard:fuels/steam",
   "heatCapacity": 0,
   "heatPerFuel": 0.0,
-  "limitableByHeat": true,
-  "maxSpeed": 50.0,
-  "overheatedResettingTemp": 0.0
+  "airCoolingRate": 0.0,
+  "overheatedResettingTemp": 0.0,
+  "crashBehavior": {
+    "explosionRadius": 5.0,
+    "causesFire": true,
+    "explosionMode": "none"
+  }
 }

@@ -7,7 +7,7 @@ import com.simibubi.create.AllTags.AllItemTags;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
-import net.minecraftforge.fluids.FluidType;
+import net.minecraftforge.fluids.FluidAttributes;
 
 public class CommonConfig
 {
@@ -39,8 +39,8 @@ public class CommonConfig
 		builder.pop();
 
 		builder.push("jerry_can");
-		this.jerryCanCapacity = builder.define("capacity", FluidType.BUCKET_VOLUME * 4);
-		this.jerryCanTransfer = builder.define("transfer", FluidType.BUCKET_VOLUME);
+		this.jerryCanCapacity = builder.define("capacity", FluidAttributes.BUCKET_VOLUME * 4);
+		this.jerryCanTransfer = builder.define("transfer", FluidAttributes.BUCKET_VOLUME);
 		builder.pop();
 
 		this.configSpec = builder.build();

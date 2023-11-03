@@ -7,8 +7,8 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
-import com.drmangotea.createindustry.content.Engines.diesel.DieselEngineBlockEntity;
-import com.drmangotea.createindustry.content.Engines.diesel.DieselEngineInstance;
+import com.drmangotea.createindustry.tile_entities.Engines.diesel.DieselEngineBlockEntity;
+import com.drmangotea.createindustry.tile_entities.Engines.diesel.DieselEngineInstance;
 import com.jozufozu.flywheel.api.MaterialManager;
 import com.jozufozu.flywheel.backend.instancing.blockentity.BlockEntityInstance;
 

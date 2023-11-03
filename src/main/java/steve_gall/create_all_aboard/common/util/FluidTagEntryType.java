@@ -4,7 +4,6 @@ import java.util.stream.Stream;
 
 import com.simibubi.create.foundation.fluid.FluidIngredient;
 
-import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
@@ -27,7 +26,7 @@ public class FluidTagEntryType implements RegistryTagEntryType<Fluid, FluidStack
 	}
 
 	@Override
-	public FluidTagEntry of(TagEntry tagEntry)
+	public FluidTagEntry of(WrappedTagEntry tagEntry)
 	{
 		return new FluidTagEntry(tagEntry);
 	}

@@ -2,13 +2,14 @@ package steve_gall.create_all_aboard.common.init;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import steve_gall.create_all_aboard.common.CreateAllAboard;
 
 public class ModCreativeModTabs
 {
-	private static final MutableComponent DISPLAY_NAME = Component.literal(CreateAllAboard.MODE_NAME);
+	private static final MutableComponent DISPLAY_NAME = new TextComponent(CreateAllAboard.MODE_NAME);
 
 	public static final String TAB_ID = CreateAllAboard.MOD_ID + "_tab";
 

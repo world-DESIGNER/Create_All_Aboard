@@ -9,6 +9,8 @@ import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.runtime.IIngredientManager;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeManager;
 
@@ -24,7 +26,7 @@ public abstract class ModJEICategory<RECIPE> implements IRecipeCategory<RECIPE>
 		this.plugin = plugin;
 		this.type = type;
 		this.background = background;
-		this.title = Component.translatable(titleKey);
+		this.title = new TranslatableComponent(titleKey);
 	}
 
 	public abstract List<RECIPE> getRecipes(RecipeManager recipeManager);
@@ -68,6 +70,18 @@ public abstract class ModJEICategory<RECIPE> implements IRecipeCategory<RECIPE>
 	public RecipeType<RECIPE> getRecipeType()
 	{
 		return this.type;
+	}
+
+	@Override
+	public ResourceLocation getUid()
+	{
+		return this.getRecipeType().getUid();
+	}
+
+	@Override
+	public Class<? extends RECIPE> getRecipeClass()
+	{
+		return this.getRecipeType().getRecipeClass();
 	}
 
 	@Override

@@ -49,6 +49,8 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -327,7 +329,7 @@ public class TrainHelper
 
 		if (assemblingEngines.size() == 0)
 		{
-			accessor.invokeException(new AssemblyException(Component.translatable(TRAIN_ASSEMBLEY_NO_ENGINES)), -1);
+			accessor.invokeException(new AssemblyException(new TranslatableComponent(TRAIN_ASSEMBLEY_NO_ENGINES)), -1);
 			return;
 		}
 
@@ -343,7 +345,7 @@ public class TrainHelper
 
 		if (!Double.isInfinite(totalEngineCarriageStressHeap) && maxCarriageCount < carriages.size())
 		{
-			accessor.invokeException(new AssemblyException(Component.translatable(TRAIN_ASSEMBLEY_TOO_MANY_CARRIAGES, maxCarriageCount, carriages.size())), -1);
+			accessor.invokeException(new AssemblyException(new TranslatableComponent(TRAIN_ASSEMBLEY_TOO_MANY_CARRIAGES, maxCarriageCount, carriages.size())), -1);
 			return;
 		}
 
@@ -351,7 +353,7 @@ public class TrainHelper
 
 		if (!Double.isInfinite(maxBlocksPerCarriage) && maxBlocks < totalBlocks)
 		{
-			accessor.invokeException(new AssemblyException(Component.translatable(TRAIN_ASSEMBLEY_TOO_MANY_BLOCKS, maxBlocks, totalBlocks)), -1);
+			accessor.invokeException(new AssemblyException(new TranslatableComponent(TRAIN_ASSEMBLEY_TOO_MANY_BLOCKS, maxBlocks, totalBlocks)), -1);
 			return;
 		}
 
@@ -359,14 +361,14 @@ public class TrainHelper
 		{
 			if (assemblingHeatSources.size() == 0)
 			{
-				accessor.invokeException(new AssemblyException(Component.translatable(TRAIN_ASSEMBLEY_NO_HEAT_SOURCES)), -1);
+				accessor.invokeException(new AssemblyException(new TranslatableComponent(TRAIN_ASSEMBLEY_NO_HEAT_SOURCES)), -1);
 				return;
 			}
 		}
 
 		if (carriagesHavingTanksInterfaces == 0)
 		{
-			accessor.invokeException(new AssemblyException(Component.translatable(TRAIN_ASSEMBLEY_NO_FLUID_INTERFACES, AllBlocks.FLUID_TANK.asStack().getHoverName(), AllBlocks.PORTABLE_FLUID_INTERFACE.asStack().getHoverName())), contraptions.size() + 1);
+			accessor.invokeException(new AssemblyException(new TranslatableComponent(TRAIN_ASSEMBLEY_NO_FLUID_INTERFACES, AllBlocks.FLUID_TANK.asStack().getHoverName(), AllBlocks.PORTABLE_FLUID_INTERFACE.asStack().getHoverName())), contraptions.size() + 1);
 			return;
 		}
 
@@ -972,9 +974,9 @@ public class TrainHelper
 				int heatCapacity = recipe.getHeatCapacity();
 				double temp = engine.getHeat() / heatCapacity;
 				double airCoolingDuration = ((temp - recipe.getOverheatedResettingTemp()) * heatCapacity) / recipe.getAirCoolingRate();
-				Lang.builder().add(Component.translatable(TRAIN_GOGGLE_OVERHEATED)).style(ChatFormatting.GOLD).style(ChatFormatting.BOLD).forGoggles(tooltip);
-				Lang.builder().add(Component.translatable(TRAIN_GOGGLE_OVERHEATED_1)).style(ChatFormatting.GRAY).forGoggles(tooltip);
-				Lang.builder().add(Component.translatable(TRAIN_GOGGLE_OVERHEATED_2, Component.literal(NumberHelper.format(airCoolingDuration, 1)).withStyle(ChatFormatting.WHITE))).style(ChatFormatting.GRAY).forGoggles(tooltip);
+				Lang.builder().add(new TranslatableComponent(TRAIN_GOGGLE_OVERHEATED)).style(ChatFormatting.GOLD).style(ChatFormatting.BOLD).forGoggles(tooltip);
+				Lang.builder().add(new TranslatableComponent(TRAIN_GOGGLE_OVERHEATED_1)).style(ChatFormatting.GRAY).forGoggles(tooltip);
+				Lang.builder().add(new TranslatableComponent(TRAIN_GOGGLE_OVERHEATED_2, new TextComponent(NumberHelper.format(airCoolingDuration, 1)).withStyle(ChatFormatting.WHITE))).style(ChatFormatting.GRAY).forGoggles(tooltip);
 				return;
 			}
 
@@ -984,24 +986,24 @@ public class TrainHelper
 		double speed = ((CarriageSyncDataExtension) carriageContraptionEntity.getCarriageData()).getTrainSpeed() * 20;
 		int carriagesTotalBlockCount = getCarriagesTotalBlockCount(train);
 		CarriageBlocksLimit carriagesTotalBlockLimit = getCarriagesTotalBlockLimit(train, Math.abs(speed) + acceleration(train), heatState);
-		MutableComponent speedComponent = Component.literal(NumberHelper.format(speed, 1) + "m/s").withStyle(ChatFormatting.GOLD);
-		MutableComponent maxSpeedComponent = Component.literal(NumberHelper.format(train.maxSpeed() * 20, 1) + "m/s").withStyle(ChatFormatting.DARK_GRAY);
-		MutableComponent blocksComponent = Component.literal(NumberHelper.format(carriagesTotalBlockCount)).withStyle(carriagesTotalBlockLimit.isOvered(carriagesTotalBlockCount) ? ChatFormatting.RED : ChatFormatting.GOLD);
-		MutableComponent blocksLimitComponent = Component.literal(carriagesTotalBlockLimit.hasLimit() ? NumberHelper.format(carriagesTotalBlockLimit.limitBlocks()) : "∞").withStyle(ChatFormatting.DARK_GRAY);
+		MutableComponent speedComponent = new TextComponent(NumberHelper.format(speed, 1) + "m/s").withStyle(ChatFormatting.GOLD);
+		MutableComponent maxSpeedComponent = new TextComponent(NumberHelper.format(train.maxSpeed() * 20, 1) + "m/s").withStyle(ChatFormatting.DARK_GRAY);
+		MutableComponent blocksComponent = new TextComponent(NumberHelper.format(carriagesTotalBlockCount)).withStyle(carriagesTotalBlockLimit.isOvered(carriagesTotalBlockCount) ? ChatFormatting.RED : ChatFormatting.GOLD);
+		MutableComponent blocksLimitComponent = new TextComponent(carriagesTotalBlockLimit.hasLimit() ? NumberHelper.format(carriagesTotalBlockLimit.limitBlocks()) : "∞").withStyle(ChatFormatting.DARK_GRAY);
 
-		Lang.builder().add(Component.translatable(TRAIN_GOGGLE_TRAIN_INFO)).forGoggles(tooltip);
-		Lang.builder().add(Component.translatable(TRAIN_GOGGLE_TRAIN_SPEED, speedComponent, maxSpeedComponent)).style(ChatFormatting.GRAY).forGoggles(tooltip, 1);
-		Lang.builder().add(Component.translatable(TRAIN_GOGGLE_TRAIN_BLOCKS, blocksComponent, blocksLimitComponent)).style(ChatFormatting.GRAY).forGoggles(tooltip, 1);
+		Lang.builder().add(new TranslatableComponent(TRAIN_GOGGLE_TRAIN_INFO)).forGoggles(tooltip);
+		Lang.builder().add(new TranslatableComponent(TRAIN_GOGGLE_TRAIN_SPEED, speedComponent, maxSpeedComponent)).style(ChatFormatting.GRAY).forGoggles(tooltip, 1);
+		Lang.builder().add(new TranslatableComponent(TRAIN_GOGGLE_TRAIN_BLOCKS, blocksComponent, blocksLimitComponent)).style(ChatFormatting.GRAY).forGoggles(tooltip, 1);
 
 		if (heatState.sources() > 0)
 		{
-			MutableComponent heatLevelComponent = Component.literal(NumberHelper.format(heatState.level())).withStyle(ChatFormatting.GOLD);
-			MutableComponent maxHeatLevelComponent = Component.literal(NumberHelper.format(heatState.maxLevel())).withStyle(ChatFormatting.DARK_GRAY);
-			Lang.builder().add(Component.translatable(TRAIN_GOGGLE_HEAT_SOURCE_INFO)).forGoggles(tooltip);
-			Lang.builder().add(Component.translatable(TRAIN_GOGGLE_HEAT_SOURCE_LEVEL, heatLevelComponent, maxHeatLevelComponent)).style(ChatFormatting.GRAY).forGoggles(tooltip, 1);
+			MutableComponent heatLevelComponent = new TextComponent(NumberHelper.format(heatState.level())).withStyle(ChatFormatting.GOLD);
+			MutableComponent maxHeatLevelComponent = new TextComponent(NumberHelper.format(heatState.maxLevel())).withStyle(ChatFormatting.DARK_GRAY);
+			Lang.builder().add(new TranslatableComponent(TRAIN_GOGGLE_HEAT_SOURCE_INFO)).forGoggles(tooltip);
+			Lang.builder().add(new TranslatableComponent(TRAIN_GOGGLE_HEAT_SOURCE_LEVEL, heatLevelComponent, maxHeatLevelComponent)).style(ChatFormatting.GRAY).forGoggles(tooltip, 1);
 		}
 
-		Lang.builder().add(Component.translatable(TRAIN_GOGGLE_ENGINE_INFO)).forGoggles(tooltip);
+		Lang.builder().add(new TranslatableComponent(TRAIN_GOGGLE_ENGINE_INFO)).forGoggles(tooltip);
 
 		if (engines.size() == 1)
 		{
@@ -1014,7 +1016,7 @@ public class TrainHelper
 				if (heatCapacity > 0)
 				{
 					double temp = engine.getHeat() / heatCapacity;
-					Lang.builder().add(Component.translatable(TRAIN_GOGGLE_ENGINE_TEMP, getHeatPercentComponent(temp))).style(ChatFormatting.GRAY).forGoggles(tooltip, 1);
+					Lang.builder().add(new TranslatableComponent(TRAIN_GOGGLE_ENGINE_TEMP, getHeatPercentComponent(temp))).style(ChatFormatting.GRAY).forGoggles(tooltip, 1);
 				}
 
 			}
@@ -1026,8 +1028,8 @@ public class TrainHelper
 			for (Entry<TrainEngineTypeRecipe, List<Engine>> entry : engines.stream().collect(Collectors.groupingBy(Engine::getRecipe)).entrySet())
 			{
 				TrainEngineTypeRecipe recipe = entry.getKey();
-				MutableComponent countComponent = Component.literal(NumberHelper.format(entry.getValue().size()));
-				Lang.builder().add(Component.translatable(TRAIN_GOGGLE_ENGINE_COUNT, recipe.getDisplayName().copy(), countComponent)).style(ChatFormatting.GRAY).forGoggles(tooltip, 1);
+				MutableComponent countComponent = new TextComponent(NumberHelper.format(entry.getValue().size()));
+				Lang.builder().add(new TranslatableComponent(TRAIN_GOGGLE_ENGINE_COUNT, recipe.getDisplayName().copy(), countComponent)).style(ChatFormatting.GRAY).forGoggles(tooltip, 1);
 
 				int heatCapacity = recipe.getHeatCapacity();
 
@@ -1048,9 +1050,9 @@ public class TrainHelper
 
 					double highestTemp = hostHeat / heatCapacity;
 					MutableComponent highestTempComponent = getHeatPercentComponent(highestTemp);
-					MutableComponent overheatedsComponent = Component.literal(NumberHelper.format(overheates)).withStyle(overheates > 0 ? ChatFormatting.RED : ChatFormatting.GRAY);
-					Lang.builder().add(Component.translatable(TRAIN_GOGGLE_ENGINE_HIGHEST_TEMP, highestTempComponent)).style(ChatFormatting.GRAY).forGoggles(tooltip, 2);
-					Lang.builder().add(Component.translatable(TRAIN_GOGGLE_ENGINE_OVERHEATEDS, overheatedsComponent)).style(ChatFormatting.GRAY).forGoggles(tooltip, 2);
+					MutableComponent overheatedsComponent = new TextComponent(NumberHelper.format(overheates)).withStyle(overheates > 0 ? ChatFormatting.RED : ChatFormatting.GRAY);
+					Lang.builder().add(new TranslatableComponent(TRAIN_GOGGLE_ENGINE_HIGHEST_TEMP, highestTempComponent)).style(ChatFormatting.GRAY).forGoggles(tooltip, 2);
+					Lang.builder().add(new TranslatableComponent(TRAIN_GOGGLE_ENGINE_OVERHEATEDS, overheatedsComponent)).style(ChatFormatting.GRAY).forGoggles(tooltip, 2);
 				}
 
 			}
@@ -1087,14 +1089,14 @@ public class TrainHelper
 		if (hasTank)
 		{
 			Lang.translate("gui.goggles.fluid_container").forGoggles(tooltip);
-			Lang.builder().add(Component.translatable(TRAIN_GOGGLE_FLUID_CAPACITY, Component.literal(NumberHelper.format(totalCapacity) + "mB"))).style(ChatFormatting.GRAY).forGoggles(tooltip, 1);
+			Lang.builder().add(new TranslatableComponent(TRAIN_GOGGLE_FLUID_CAPACITY, new TextComponent(NumberHelper.format(totalCapacity) + "mB"))).style(ChatFormatting.GRAY).forGoggles(tooltip, 1);
 
 			for (Entry<FluidStack, Long> entry : amountMap.entrySet())
 			{
 				Component displayName = entry.getKey().getDisplayName();
-				Component percentComponent = Component.literal(NumberHelper.format(entry.getValue() / (totalCapacity / 100.0D), 1) + "%").withStyle(ChatFormatting.GOLD);
-				Component amountComponent = Component.literal(NumberHelper.format(entry.getValue()) + "mB").withStyle(ChatFormatting.GOLD);
-				Lang.builder().add(Component.translatable(TRAIN_GOGGLE_FLUID_AMOUNT, displayName, percentComponent, amountComponent)).style(ChatFormatting.GRAY).forGoggles(tooltip, 1);
+				Component percentComponent = new TextComponent(NumberHelper.format(entry.getValue() / (totalCapacity / 100.0D), 1) + "%").withStyle(ChatFormatting.GOLD);
+				Component amountComponent = new TextComponent(NumberHelper.format(entry.getValue()) + "mB").withStyle(ChatFormatting.GOLD);
+				Lang.builder().add(new TranslatableComponent(TRAIN_GOGGLE_FLUID_AMOUNT, displayName, percentComponent, amountComponent)).style(ChatFormatting.GRAY).forGoggles(tooltip, 1);
 			}
 
 		}
@@ -1103,7 +1105,7 @@ public class TrainHelper
 
 	public static MutableComponent getHeatPercentComponent(double temp)
 	{
-		return Component.literal(NumberHelper.format(temp * 100.0D, 1) + "%").setStyle(Style.EMPTY.withColor(Mth.hsvToRgb((float) ((1.0D - temp) / 3.0F), (float) (temp), 1.0F)));
+		return new TextComponent(NumberHelper.format(temp * 100.0D, 1) + "%").setStyle(Style.EMPTY.withColor(Mth.hsvToRgb((float) ((1.0D - temp) / 3.0F), (float) (temp), 1.0F)));
 	}
 
 	public static void onCrash(Train train)

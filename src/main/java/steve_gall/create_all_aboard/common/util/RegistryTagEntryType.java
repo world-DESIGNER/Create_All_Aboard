@@ -11,17 +11,17 @@ import com.google.gson.JsonObject;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagKey;
 import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.IForgeRegistryEntry;
 
-public interface RegistryTagEntryType<VALUE, STACK, INGREDIENT, ENTRY extends RegistryTagEntry<VALUE, STACK, INGREDIENT>>
+public interface RegistryTagEntryType<VALUE extends IForgeRegistryEntry<VALUE>, STACK, INGREDIENT, ENTRY extends RegistryTagEntry<VALUE, STACK, INGREDIENT>>
 {
 	VALUE getEmptyValue();
 
 	INGREDIENT getEmptyIngredient();
 
-	ENTRY of(TagEntry tagEntry);
+	ENTRY of(WrappedTagEntry tagEntry);
 
 	IForgeRegistry<VALUE> getRegistry();
 
@@ -40,12 +40,12 @@ public interface RegistryTagEntryType<VALUE, STACK, INGREDIENT, ENTRY extends Re
 
 	public default ENTRY fromJson(JsonElement json)
 	{
-		return this.of(TagEntryHelper.fromJson(json));
+		return this.of(WrappedTagEntry.fromJson(json));
 	}
 
 	public default JsonElement toJson(ENTRY entry)
 	{
-		return TagEntryHelper.toJson(entry.getTagEntry());
+		return entry.getTagEntry().toJson();
 	}
 
 	public default ENTRY getAsTagEntry(JsonObject json, String memberName)
@@ -55,22 +55,22 @@ public interface RegistryTagEntryType<VALUE, STACK, INGREDIENT, ENTRY extends Re
 
 	public default ENTRY fromNetwork(FriendlyByteBuf buffer)
 	{
-		return this.of(TagEntryHelper.fromNetwork(buffer));
+		return this.of(WrappedTagEntry.fromNetwork(buffer));
 	}
 
 	public default void toNetwork(FriendlyByteBuf buffer, ENTRY entry)
 	{
-		TagEntryHelper.toNetwork(buffer, entry.getTagEntry());
+		entry.getTagEntry().toNetwork(buffer);
 	}
 
 	public default ENTRY fromNbt(Tag tag)
 	{
-		return this.of(TagEntryHelper.fromNbt(tag));
+		return this.of(WrappedTagEntry.fromNbt(tag));
 	}
 
 	public default Tag toNbt(ENTRY entry)
 	{
-		return TagEntryHelper.toNbt(entry.getTagEntry());
+		return entry.getTagEntry().toNbt();
 	}
 
 	public default ENTRY of(VALUE value)
@@ -81,7 +81,7 @@ public interface RegistryTagEntryType<VALUE, STACK, INGREDIENT, ENTRY extends Re
 	public default ENTRY of(VALUE value, boolean isRequired)
 	{
 		ResourceLocation id = this.getRegistry().getKey(value);
-		return this.of(isRequired ? TagEntry.element(id) : TagEntry.optionalElement(id));
+		return this.of(new WrappedTagEntry(id, false, isRequired));
 	}
 
 	public default ENTRY of(TagKey<VALUE> tagKey)
@@ -91,8 +91,7 @@ public interface RegistryTagEntryType<VALUE, STACK, INGREDIENT, ENTRY extends Re
 
 	public default ENTRY of(TagKey<VALUE> tagKey, boolean isRequired)
 	{
-		ResourceLocation location = tagKey.location();
-		return this.of(isRequired ? TagEntry.tag(location) : TagEntry.optionalTag(location));
+		return this.of(new WrappedTagEntry(tagKey.location(), true, isRequired));
 	}
 
 	public default Stream<STACK> getIngredientMatchingStacks(Collection<INGREDIENT> collection)

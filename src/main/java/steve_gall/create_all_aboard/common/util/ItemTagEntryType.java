@@ -3,7 +3,6 @@ package steve_gall.create_all_aboard.common.util;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
-import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -33,7 +32,7 @@ public class ItemTagEntryType implements RegistryTagEntryType<Item, ItemStack, I
 	}
 
 	@Override
-	public ItemTagEntry of(TagEntry tagEntry)
+	public ItemTagEntry of(WrappedTagEntry tagEntry)
 	{
 		return new ItemTagEntry(tagEntry);
 	}

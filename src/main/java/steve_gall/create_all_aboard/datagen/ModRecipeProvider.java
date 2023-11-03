@@ -16,7 +16,6 @@ import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.TagEntry;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -25,7 +24,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.common.crafting.conditions.ItemExistsCondition;
-import net.minecraftforge.fluids.FluidType;
+import net.minecraftforge.fluids.FluidAttributes;
 import steve_gall.create_all_aboard.common.CreateAllAboard;
 import steve_gall.create_all_aboard.common.crafting.ConditionFinishedRecipe;
 import steve_gall.create_all_aboard.common.crafting.CrashBehavior;
@@ -38,6 +37,7 @@ import steve_gall.create_all_aboard.common.init.ModItems;
 import steve_gall.create_all_aboard.common.init.ModTags;
 import steve_gall.create_all_aboard.common.util.FluidTagEntry;
 import steve_gall.create_all_aboard.common.util.ItemTagEntry;
+import steve_gall.create_all_aboard.common.util.WrappedTagEntry;
 
 public class ModRecipeProvider extends RecipeProvider
 {
@@ -89,7 +89,7 @@ public class ModRecipeProvider extends RecipeProvider
 		steam.fuelType(FluidTagEntry.TYPE.of(ModTags.Fluids.FUELS_STEAM));
 		steam.limitableByHeat(true);
 		steam.fuelPerDistance(1.0D);
-		steam.fuelPerHeatLevel(FluidType.BUCKET_VOLUME / 267.6D);
+		steam.fuelPerHeatLevel(FluidAttributes.BUCKET_VOLUME / 267.6D);
 		steam.overheatedResettingTemp(0.0D);
 		steam.heatCapacity(0);
 		steam.crashBehavior(new CrashBehavior.Builder().explosionRadius(5.0F).causesFire(true).explosionMode(BlockInteraction.NONE).build());
@@ -215,12 +215,12 @@ public class ModRecipeProvider extends RecipeProvider
 
 	private void addBlockExistConditions(List<ICondition> conditions, ItemTagEntry blockType)
 	{
-		TagEntry tagEntry = blockType.getTagEntry();
+		WrappedTagEntry tagEntry = blockType.getTagEntry();
 		List<String> builtinNamespaces = Arrays.asList(ResourceLocation.DEFAULT_NAMESPACE, Create.ID, CreateAllAboard.MOD_ID);
 
-		if (!tagEntry.isTag() && !builtinNamespaces.contains(tagEntry.getId().getNamespace()))
+		if (!tagEntry.isTag() && !builtinNamespaces.contains(tagEntry.id().getNamespace()))
 		{
-			conditions.add(new ItemExistsCondition(tagEntry.getId()));
+			conditions.add(new ItemExistsCondition(tagEntry.id()));
 		}
 
 	}

@@ -12,8 +12,8 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
-import net.minecraftforge.event.TickEvent.LevelTickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
+import net.minecraftforge.event.TickEvent.WorldTickEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -91,11 +91,11 @@ public class CreateTrainwreckedClient
 
 	}
 
-	public static void clientLevelTick(LevelTickEvent e)
+	public static void clientLevelTick(WorldTickEvent e)
 	{
 		if (e.phase == Phase.START && e.side == LogicalSide.CLIENT)
 		{
-			Level level = e.level;
+			Level level = e.world;
 
 			for (Train train : CreateClient.RAILWAYS.trains.values())
 			{

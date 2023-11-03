@@ -6,7 +6,7 @@ import static steve_gall.create_all_aboard.client.init.ModPonders.TEXT_IDLE_TIME
 import static steve_gall.create_all_aboard.client.init.ModPonders.TEXT_SHOW_TIME;
 import static steve_gall.create_all_aboard.client.init.ModPonders.createAssemblingTrainStory;
 
-import com.drmangotea.createindustry.registry.CIBlocks;
+import com.drmangotea.createindustry.blocks.CIBlocks;
 import com.simibubi.create.foundation.ponder.PonderPalette;
 import com.simibubi.create.foundation.ponder.PonderStoryBoardEntry;
 import com.simibubi.create.foundation.ponder.PonderWorld;

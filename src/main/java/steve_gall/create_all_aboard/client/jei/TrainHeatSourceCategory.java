@@ -16,7 +16,7 @@ import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import steve_gall.create_all_aboard.common.content.train.HeatSource;
@@ -98,14 +98,14 @@ public class TrainHeatSourceCategory extends ModJEIRecipeCategory<TrainHeatSourc
 	{
 		HeatStage.IngredientType ingredientType = stage.getIngredientType();
 
-		font.draw(stack, Component.translatable(ingredientType == HeatStage.IngredientType.PASSIVE ? "Passive" : "On item burned"), textX + 18, textY, textColor);
+		font.draw(stack, new TranslatableComponent(ingredientType == HeatStage.IngredientType.PASSIVE ? "Passive" : "On item burned"), textX + 18, textY, textColor);
 		textY += font.lineHeight;
-		font.draw(stack, Component.translatable("Heat Level: " + stage.getLevel()), textX + 18, textY, textColor);
+		font.draw(stack, new TranslatableComponent("Heat Level: " + stage.getLevel()), textX + 18, textY, textColor);
 		textY += font.lineHeight;
 
 		if (stage.getLevel() > 0)
 		{
-			font.draw(stack, Component.translatable("Speed Limit: %s m/s", NumberHelper.format(stage.getSpeedLimit(), 2)), textX + 18, textY, textColor);
+			font.draw(stack, new TranslatableComponent("Speed Limit: %s m/s", NumberHelper.format(stage.getSpeedLimit(), 2)), textX + 18, textY, textColor);
 		}
 
 		textY += font.lineHeight;

@@ -13,6 +13,8 @@ import com.simibubi.create.content.trains.entity.CarriageContraptionEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -25,10 +27,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
@@ -59,25 +60,25 @@ public class JerrycanItem extends Item
 	{
 		super.appendHoverText(pStack, pLevel, pTooltip, pIsAdvanced);
 
-		IFluidHandlerItem jerrycan = pStack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).orElseGet(null);
+		IFluidHandlerItem jerrycan = pStack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).orElseGet(null);
 
 		if (jerrycan != null)
 		{
-			pTooltip.add(Component.empty());
+			pTooltip.add(TextComponent.EMPTY);
 
 			for (int i = 0; i < jerrycan.getTanks(); i++)
 			{
-				pTooltip.add(Component.translatable(this.getDescriptionId() + ".tooltip.capacity", NumberHelper.format(jerrycan.getTankCapacity(i)) + " mB"));
+				pTooltip.add(new TranslatableComponent(this.getDescriptionId() + ".tooltip.capacity", NumberHelper.format(jerrycan.getTankCapacity(i)) + " mB"));
 
 				FluidStack fluid = jerrycan.getFluidInTank(i);
 
 				if (fluid.isEmpty())
 				{
-					pTooltip.add(Component.translatable(this.getDescriptionId() + ".tooltip.empty"));
+					pTooltip.add(new TranslatableComponent(this.getDescriptionId() + ".tooltip.empty"));
 				}
 				else
 				{
-					pTooltip.add(Component.translatable(this.getDescriptionId() + ".tooltip.amount", fluid.getDisplayName(), NumberHelper.format(fluid.getAmount()) + " mB"));
+					pTooltip.add(new TranslatableComponent(this.getDescriptionId() + ".tooltip.amount", fluid.getDisplayName(), NumberHelper.format(fluid.getAmount()) + " mB"));
 				}
 
 			}
@@ -95,7 +96,7 @@ public class JerrycanItem extends Item
 	@Override
 	public int getBarColor(ItemStack pStack)
 	{
-		IFluidHandlerItem jerrycan = pStack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).orElseGet(null);
+		IFluidHandlerItem jerrycan = pStack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).orElseGet(null);
 
 		if (jerrycan != null)
 		{
@@ -111,7 +112,7 @@ public class JerrycanItem extends Item
 					}
 					else if (FMLEnvironment.dist == Dist.CLIENT)
 					{
-						return IClientFluidTypeExtensions.of(fluid.getFluid()).getTintColor(fluid);
+						return fluid.getFluid().getAttributes().getColor(fluid);
 					}
 
 				}
@@ -127,7 +128,7 @@ public class JerrycanItem extends Item
 	public int getBarWidth(ItemStack pStack)
 	{
 		double ratio = 0.0D;
-		IFluidHandlerItem jerrycan = pStack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).orElseGet(null);
+		IFluidHandlerItem jerrycan = pStack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).orElseGet(null);
 
 		if (jerrycan != null)
 		{
@@ -162,8 +163,8 @@ public class JerrycanItem extends Item
 		{
 			if (((PortableStorageInterfaceBlockEntityAccessor) pfi).getConnectedEntity() instanceof CarriageContraptionEntity)
 			{
-				IFluidHandlerItem jerrycan = pContext.getItemInHand().getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).orElse(null);
-				IFluidHandler to = pfi.getCapability(ForgeCapabilities.FLUID_HANDLER).orElse(null);
+				IFluidHandlerItem jerrycan = pContext.getItemInHand().getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).orElse(null);
+				IFluidHandler to = pfi.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY).orElse(null);
 
 				if (to instanceof CreativeSmartFluidTank inventory)
 				{
@@ -191,7 +192,7 @@ public class JerrycanItem extends Item
 			if (!pPlayer.getLevel().isClientSide())
 			{
 				ItemStack item = pPlayer.getItemInHand(pHand);
-				IFluidHandlerItem jerrycan = item.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).orElseGet(null);
+				IFluidHandlerItem jerrycan = item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).orElseGet(null);
 				this.move(pPlayer, jerrycan, cce.getCarriage().storage.getFluids());
 				return true;
 			}
@@ -214,7 +215,7 @@ public class JerrycanItem extends Item
 
 		if (draining.isEmpty())
 		{
-			pPlayer.displayClientMessage(Component.translatable(shiftKeyDown ? TOOLTIP_ITEM_EMPTY : TOOLTIP_STORAGE_EMPTY), true);
+			pPlayer.displayClientMessage(new TranslatableComponent(shiftKeyDown ? TOOLTIP_ITEM_EMPTY : TOOLTIP_STORAGE_EMPTY), true);
 			return FluidStack.EMPTY;
 		}
 
@@ -222,7 +223,7 @@ public class JerrycanItem extends Item
 
 		if (filling <= 0)
 		{
-			pPlayer.displayClientMessage(Component.translatable(shiftKeyDown ? TOOLTIP_STORAGE_FULL : TOOLTIP_ITEM_FULL), true);
+			pPlayer.displayClientMessage(new TranslatableComponent(shiftKeyDown ? TOOLTIP_STORAGE_FULL : TOOLTIP_ITEM_FULL), true);
 			return FluidStack.EMPTY;
 		}
 
@@ -230,7 +231,7 @@ public class JerrycanItem extends Item
 		int filled = to.fill(drained, FluidAction.EXECUTE);
 		FluidStack moved = FluidHelper.deriveAmount(draining, filled);
 
-		pPlayer.displayClientMessage(Component.translatable(shiftKeyDown ? TOOLTIP_FILLED : TOOLTIP_DRAINED, moved.getDisplayName(), NumberHelper.format(moved.getAmount()) + " mB"), true);
+		pPlayer.displayClientMessage(new TranslatableComponent(shiftKeyDown ? TOOLTIP_FILLED : TOOLTIP_DRAINED, moved.getDisplayName(), NumberHelper.format(moved.getAmount()) + " mB"), true);
 		return moved;
 	}
 

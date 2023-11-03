@@ -6,15 +6,15 @@ import com.google.gson.JsonElement;
 
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagKey;
 import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.IForgeRegistryEntry;
 
-public abstract class RegistryTagEntry<VALUE, STACK, INGREDIENT>
+public abstract class RegistryTagEntry<VALUE extends IForgeRegistryEntry<VALUE>, STACK, INGREDIENT>
 {
-	private final TagEntry tagEntry;
+	private final WrappedTagEntry tagEntry;
 
-	public RegistryTagEntry(TagEntry tagEntry)
+	public RegistryTagEntry(WrappedTagEntry tagEntry)
 	{
 		this.tagEntry = tagEntry;
 	}
@@ -23,16 +23,16 @@ public abstract class RegistryTagEntry<VALUE, STACK, INGREDIENT>
 	{
 		RegistryTagEntryType<VALUE, STACK, INGREDIENT, ?> type = this.getType();
 		IForgeRegistry<VALUE> registry = type.getRegistry();
-		TagEntry tagEntry = this.getTagEntry();
+		WrappedTagEntry tagEntry = this.getTagEntry();
 
 		if (tagEntry.isTag())
 		{
-			TagKey<VALUE> tagKey = registry.tags().createTagKey(tagEntry.getId());
+			TagKey<VALUE> tagKey = registry.tags().createTagKey(tagEntry.id());
 			return type.toIngredient(tagKey);
 		}
 		else
 		{
-			VALUE value = registry.getValue(tagEntry.getId());
+			VALUE value = registry.getValue(tagEntry.id());
 
 			if (value != null)
 			{
@@ -59,7 +59,7 @@ public abstract class RegistryTagEntry<VALUE, STACK, INGREDIENT>
 		return this.getType().testIngredient(this.toIngredient(), stack);
 	}
 
-	public TagEntry getTagEntry()
+	public WrappedTagEntry getTagEntry()
 	{
 		return this.tagEntry;
 	}

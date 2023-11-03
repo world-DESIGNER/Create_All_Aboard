@@ -14,7 +14,7 @@ import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -60,7 +60,7 @@ public class TrainEngineCoolantCategory extends ModJEIRecipeCategory<TrainEngine
 		Font font = minecraft.font;
 
 		int textColor = 0x404040;
-		font.draw(stack, Component.translatable(TEXT_COOLING, NumberHelper.format(recipe.getCooling()) + " J"), 22, 6, textColor);
+		font.draw(stack, new TranslatableComponent(TEXT_COOLING, NumberHelper.format(recipe.getCooling()) + " J"), 22, 6, textColor);
 	}
 
 	@Override

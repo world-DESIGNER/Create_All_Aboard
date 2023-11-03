@@ -9,9 +9,9 @@ import com.simibubi.create.AllRecipeTypes;
 import com.simibubi.create.foundation.data.recipe.ProcessingRecipeGen;
 import com.simibubi.create.foundation.recipe.IRecipeTypeInfo;
 
-import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
+import net.minecraft.data.HashCache;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.material.Fluids;
@@ -25,7 +25,7 @@ public class ModProcessingRecipeProvider
 		List<ProcessingRecipeGen> providiers = new ArrayList<>();
 		providiers.add(new FillingRecipeGen(gen));
 
-		gen.addProvider(true, new DataProvider()
+		gen.addProvider(new DataProvider()
 		{
 			@Override
 			public String getName()
@@ -34,13 +34,13 @@ public class ModProcessingRecipeProvider
 			}
 
 			@Override
-			public void run(CachedOutput dc) throws IOException
+			public void run(HashCache pCache) throws IOException
 			{
 				providiers.forEach(g ->
 				{
 					try
 					{
-						g.run(dc);
+						g.run(pCache);
 					}
 					catch (Exception e)
 					{

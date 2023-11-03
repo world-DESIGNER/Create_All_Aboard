@@ -13,11 +13,11 @@ import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.fluids.FluidAttributes;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidType;
 import steve_gall.create_all_aboard.common.config.CreateTrainwreckedConfig;
 import steve_gall.create_all_aboard.common.crafting.TrainEngineTypeRecipe;
 import steve_gall.create_all_aboard.common.fluid.FluidHelper;
@@ -91,41 +91,41 @@ public class TrainEngineTypeCategory extends ModJEIRecipeCategory<TrainEngineTyp
 		int textX = 2;
 		int textY = 22;
 		int textColor = 0x404040;
-		font.draw(stack, Component.translatable(TEXT_MAX_CARRIAGES, NumberHelper.format(recipe.getMaxCarriageCount(), 2)), textX, textY, textColor);
+		font.draw(stack, new TranslatableComponent(TEXT_MAX_CARRIAGES, NumberHelper.format(recipe.getMaxCarriageCount(), 2)), textX, textY, textColor);
 		textY += font.lineHeight;
 
-		font.draw(stack, Component.translatable(TEXT_MAX_BLOCKS_PER_CARRIAGE, NumberHelper.format(recipe.getMaxBlockCountPerCarriage(), 2)), textX, textY, textColor);
+		font.draw(stack, new TranslatableComponent(TEXT_MAX_BLOCKS_PER_CARRIAGE, NumberHelper.format(recipe.getMaxBlockCountPerCarriage(), 2)), textX, textY, textColor);
 		textY += font.lineHeight;
 
-		font.draw(stack, Component.translatable(TEXT_MAX_SPEED, NumberHelper.format(recipe.getMaxSpeed(), 2) + " m/s"), textX, textY, textColor);
+		font.draw(stack, new TranslatableComponent(TEXT_MAX_SPEED, NumberHelper.format(recipe.getMaxSpeed(), 2) + " m/s"), textX, textY, textColor);
 		textY += font.lineHeight;
 
-		font.draw(stack, Component.translatable(TEXT_ACCELERATION, NumberHelper.format(recipe.getAcceleration(), 2) + " m/s²"), textX, textY, textColor);
+		font.draw(stack, new TranslatableComponent(TEXT_ACCELERATION, NumberHelper.format(recipe.getAcceleration(), 2) + " m/s²"), textX, textY, textColor);
 		textY += font.lineHeight;
 
-		font.draw(stack, Component.translatable(TEXT_MAX_FUEL_USAGE, NumberHelper.format(maxFuelUsage, 2) + " mB/s"), textX, textY, textColor);
+		font.draw(stack, new TranslatableComponent(TEXT_MAX_FUEL_USAGE, NumberHelper.format(maxFuelUsage, 2) + " mB/s"), textX, textY, textColor);
 		textY += font.lineHeight;
 
 		if (recipe.isLimitableByHeat())
 		{
-			font.draw(stack, Component.translatable(TEXT_HEAT_LEVEL_FOR_MAX_SPEED, NumberHelper.format(heatLevel)), textX, textY, textColor);
+			font.draw(stack, new TranslatableComponent(TEXT_HEAT_LEVEL_FOR_MAX_SPEED, NumberHelper.format(heatLevel)), textX, textY, textColor);
 			textY += font.lineHeight;
 		}
 
 		if (recipe.getHeatPerFuel() > 0 && recipe.hasHeatCapacity())
 		{
 			textY += font.lineHeight;
-			font.draw(stack, Component.translatable(TEXT_HEAT_CAPACITY, NumberHelper.format(recipe.getHeatCapacity()) + " J"), textX, textY, textColor);
+			font.draw(stack, new TranslatableComponent(TEXT_HEAT_CAPACITY, NumberHelper.format(recipe.getHeatCapacity()) + " J"), textX, textY, textColor);
 			textY += font.lineHeight;
 
-			font.draw(stack, Component.translatable(TEXT_HEAT_PER_FUEL, NumberHelper.format(recipe.getHeatPerFuel(), 2) + " J/mB"), textX, textY, textColor);
+			font.draw(stack, new TranslatableComponent(TEXT_HEAT_PER_FUEL, NumberHelper.format(recipe.getHeatPerFuel(), 2) + " J/mB"), textX, textY, textColor);
 			textY += font.lineHeight;
 
-			font.draw(stack, Component.translatable(TEXT_AIR_COOLING_RATE, NumberHelper.format(recipe.getAirCoolingRate(), 2) + " J/s"), textX, textY, textColor);
+			font.draw(stack, new TranslatableComponent(TEXT_AIR_COOLING_RATE, NumberHelper.format(recipe.getAirCoolingRate(), 2) + " J/s"), textX, textY, textColor);
 			textY += font.lineHeight;
 
 			double heatDuration = recipe.getHeatDuration(maxFuelUsage);
-			font.draw(stack, Component.translatable(TEXT_HEAT_DURABILITY, NumberHelper.format(heatDuration, 2) + " s"), textX, textY, textColor);
+			font.draw(stack, new TranslatableComponent(TEXT_HEAT_DURABILITY, NumberHelper.format(heatDuration, 2) + " s"), textX, textY, textColor);
 			textY += font.lineHeight;
 		}
 
@@ -136,7 +136,7 @@ public class TrainEngineTypeCategory extends ModJEIRecipeCategory<TrainEngineTyp
 	{
 		layout.addSlot(RecipeIngredientRole.INPUT, 2, 2).addItemStacks(ItemTagEntry.TYPE.getIngredientMatchingStacks(recipe.getBlocks()).toList());
 
-		List<FluidStack> fluids = FluidHelper.deriveAmount(FluidTagEntry.TYPE.getIngredientMatchingStacks(recipe.getFuels()).toList(), FluidType.BUCKET_VOLUME).toList();
+		List<FluidStack> fluids = FluidHelper.deriveAmount(FluidTagEntry.TYPE.getIngredientMatchingStacks(recipe.getFuels()).toList(), FluidAttributes.BUCKET_VOLUME).toList();
 		layout.addSlot(RecipeIngredientRole.INPUT, 26, 2).addIngredients(ForgeTypes.FLUID_STACK, fluids);
 	}
 

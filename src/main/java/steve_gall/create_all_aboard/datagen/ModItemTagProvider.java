@@ -1,6 +1,6 @@
 package steve_gall.create_all_aboard.datagen;
 
-import com.drmangotea.createindustry.registry.CIBlocks;
+import com.drmangotea.createindustry.blocks.CIBlocks;
 import com.jesz.createdieselgenerators.blocks.BlockRegistry;
 import com.simibubi.create.AllBlocks;
 

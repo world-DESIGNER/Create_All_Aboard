@@ -9,6 +9,7 @@ import com.simibubi.create.foundation.fluid.FluidIngredient;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.Container;
@@ -82,7 +83,7 @@ public class TrainEngineTypeRecipe implements SerializableRecipe<Container>, Non
 
 	protected Component createDisplayName()
 	{
-		return Component.translatable(this.getTranslationKey());
+		return new TranslatableComponent(this.getTranslationKey());
 	}
 
 	public double getPredictSpeed(double toBurn, double burned, double allocatedSpeed, int heatLevel)

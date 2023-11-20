@@ -35,7 +35,7 @@ public class CommonConfig
 
 		builder.push("carriage");
 		this.carriageSpeedStress = builder.define("speed_stress", 4.0F);
-		this.carriageBlocksLimit = builder.define("blocks_limit", 50);
+		this.carriageBlocksLimit = builder.define("blocks_limit", 160);
 		builder.pop();
 
 		builder.push("jerry_can");

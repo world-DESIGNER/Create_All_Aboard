@@ -12,15 +12,15 @@ import com.simibubi.create.content.trains.station.StationBlockEntity;
 @Mixin(value = AbstractStationScreen.class)
 public interface AbstractStationScreenAcessor
 {
-	@Accessor
+	@Accessor(remap = false)
 	StationBlockEntity getBlockEntity();
 
-	@Accessor
+	@Accessor(remap = false)
 	GlobalStation getStation();
 
-	@Invoker
+	@Invoker(remap = false)
 	Train invokeGetImminent();
 
-	@Invoker
+	@Invoker(remap = false)
 	boolean invokeTrainPresent();
 }

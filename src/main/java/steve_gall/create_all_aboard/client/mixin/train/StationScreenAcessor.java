@@ -8,6 +8,6 @@ import com.simibubi.create.content.trains.station.StationScreen;
 @Mixin(value = StationScreen.class)
 public interface StationScreenAcessor extends AbstractStationScreenAcessor
 {
-	@Invoker
+	@Invoker(remap = false)
 	void invokeUpdateAssemblyTooltip(String key);
 }
